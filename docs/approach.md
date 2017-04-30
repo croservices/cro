@@ -13,7 +13,7 @@ Messages are represented by `Crow::Message`. Concrete implementations include:
 * Crow::HTTP::Response
 
 A `Crow::Source` is a source of either messages or connections. For example,
-`Crow::TCP::Listener` produces `Crow::TCP::Connection` objects.
+`Crow::TCP::Listener` produces `Crow::TCP::ServerConnection` objects.
 
 A `Crow::Transform` transforms one connection or message into another. For
 example, `Crow::HTTP::RequestParser` will transform `Crow::TCP::Message`s into
@@ -30,7 +30,7 @@ Some messages or connections can be replied to with one or more messages. These
 do the `Crow::Replyable` role. Anything that produces a replyable is also
 responsible for providing something that can send response messages. This
 "something" may either be a transform or a sink. Examples of replyables include
-both `Crow::HTTP::Request` and `Crow::TCP::Connection`.
+both `Crow::HTTP::Request` and `Crow::TCP::ServerConnection`.
 
 ## Composition
 
