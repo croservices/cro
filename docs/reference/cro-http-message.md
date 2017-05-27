@@ -9,7 +9,7 @@ intermediaries.
 
 ## Headers
 
-### Retrieving Headers
+### Retrieving headers
 
 The `headers` method gets a `List` of `Cro::HTTP::Header` objects. This gets
 the headers in the order they were originally received. If multiple headers
@@ -38,7 +38,7 @@ request without caring about its value; again, matching is case-insensitive.
         cache($resp);
     }
 
-### Setting Headers
+### Setting headers
 
 Headers can be added to the response object using the `append-header` method.
 This can take either a `Cro::HTTP::Header` object:
@@ -78,9 +78,16 @@ header.
     my $header = $resp.headers.pick; # Pick a random header to remove
     $resp.remove-header($header);    # And remove it
 
+## Content type
+
+The `content-type` method obtains the `Content-type` header, if any, and
+parses it into a `Cro::MediaType` instance. If there is no `Content-type`
+header, then `Nil` is returned. If for some reason the header value is not a
+valid media type then an exception will be thrown.
+
 ## Body
 
-### Retrieving the Body
+### Retrieving the body
 
 Cro provides access to the message body at a range of abstraction levels,
 from low-level ("give me bytes as they arrived") to high level ("automatically
@@ -88,11 +95,11 @@ parse application/json and give me an object"). Note that each of these will
 "sink" the body bytes, meaning that **only one of them may be used** on a
 given HTTP message.
 
-#### As a stream
+#### As a byte stream
 
-The `body-stream` method returns a `Supply` containing the bytes making up the
-message, as they are received over the network. Transfer encoding (such as
-"chunked") will already have been applied, as will handling of known length
+The `body-byte-stream` method returns a `Supply` containing the bytes making
+up the message, as they are received over the network. Transfer encoding (such
+as "chunked") will already have been applied, as will handling of known length
 content (marked by the presence of the `Content-length` header). When the body
 has been full received, then a `done` will be emitted on the `Supply`.
 
@@ -105,14 +112,14 @@ has been full received, then a `done` will be emitted on the `Supply`.
 #### As a binary Blob
 
 The `body-blob` method returns a `Promise` that is kept with all of the data
-emitted on `body-stream` joined into a single `Blob`.
+emitted on `body-byte-stream` joined into a single `Blob`.
 
     my Blob $bytes = await $resp.body-blob();
 
 #### As a text Str
 
-The `body-text` method returns a `Promise` that is kept with all of the data
-emitted on the `body-stream` has been received and then decoded to a `Str`.
+The `body-text` method returns a `Promise` that is kept when all of the data
+emitted on the `body-body-stream` has been received and then decoded to a `Str`.
 
     my Str $text = await $resp.body-text();
 
@@ -126,7 +133,8 @@ be used, if passed:
 
 If it is not passed, the a heuristic will be used: if the body can be decoded
 as `utf-8` then it will be deemed to be `utf-8`, and failing that it will be
-decoded as `latin-1` (which can never fail as all bytes are valid).
+decoded as `latin-1` (which can never fail as all bytes are valid, although
+the result may not be meaningful).
 
 #### As an object
 
@@ -142,12 +150,8 @@ do include:
 * Parsing an `application/json` into an appropriate object using `JSON::Class`
 * Parsing `text/html` using the Gumbo library to get a DOM
 
-Body parsers can be categorized in three ways:
-
-* Those that are provided by Cro and that are enabled by default
-* Those that are provided by Cro, but need to be explicity enabled
-* Those that are implemented outside of Cro, either in an ecosystem module or
-  in an application
+Cro provides a number of body parsers, which it enables by default. They can
+also be provided externally.
 
 A `Cro::HTTP::Message` has a `Cro::HTTP::BodyParserSelector`, which picks
 the appropriate `Cro::HTTP::BodyParser` implementation to use. This may be
@@ -161,3 +165,74 @@ from a range of places:
 * The `Cro::HTTP::Router` can add body parsers within a certain group of
   routes.
 * A `Cro::HTTP::Client` can be constructed with extra body parsers to use.
+
+The following body parsers are provided by default for requests:
+
+* `Cro::HTTP::BodyParser::WWWFormUrlEncoded` - used whenever the content-type
+  is `application/x-www-form-urlencoded`; parses the form data and provides it
+  as an instance of `Cro::HTTP::Body::WWWFormUrlEncoded`
+* `Cro::HTTP::BodyParser::MultiPartFormData` - used whenever the content-type
+  is `multipart/form-data`; parses the multipart document and provides it as
+  an instance of `Cro::HTTP::Body::MultiPartFormData`
+* `Cro::HTTP::BodyParser::JSON` - used whenever the content-type is either
+  `application-json` or anything with a `+json` suffix; parses the data using
+  the `JSON::Fast` module, which returns a `Hash` or `Array`
+* `Cro::HTTP::BodyParser::TextFallback` - used whenever the content-type has a
+  type `text` (for example, `text/plain`, `text/html`); uses `body-text`
+* `Cro::HTTP::BodyParser::BlobFallback` - used as a last resort and will match
+  any message; uses `body-blob`
+
+The final 3 body parsers are in the default set for parsing responses:
+
+* `Cro::HTTP::BodyParser::JSON`
+* `Cro::HTTP::BodyParser::TextFallback`
+* `Cro::HTTP::BodyParser::BlobFallback`
+
+### Setting the Body
+
+The `set-body` method can be used to set the body. The `Cro::HTTP::Message`
+will typically then reach either a `Cro::HTTP::ResponseSerializer` (servers)
+or `Cro::HTTP::RequestSerializer` (clients), which call `body-byte-stream`. At
+this point, an instance of `Cro::HTTP::BodySerializerSelector` will be used to
+pick a `Cro::HTTP::BodySerializer` to use. Applications can change the selector
+in order to add extra body serializers at any point before the message is
+serialized to be sent over the network.
+
+The following body serializers are in the default set for serializing requests:
+
+* `Cro::HTTP::BodySeiralizer::WWWFormUrlEncoded` - used when the `content-type`
+  header has been set to `application/x-www-form-urlencoded` and the body was
+  set to a `List` or a `Hash`, *or* when the body is an instance of
+  `Cro::HTTP::Body::WWWFormUrlEncoded`. If a `List` is provided then all of
+  the list elements must be pairs. If there is no `content-type` header, it
+  will be added.
+* `Cro::HTTP::BodySeiralizer::MultiPartFormData` - used when the `content-type`
+  header has been set to `application/x-www-form-urlencoded` and the body was
+  set to a `List`, *or* when the body is an instance of
+  `Cro::HTTP::Body::MultiPartFormData`. If a `List` is provided then all of
+  the list elements must be either `Cro::HTTP::Body::MultiPartFormData::Part`
+  instances or pairs (a mix of the two is allowed). Any `content-type` header
+  will be removed and replaced with one containing the boundary parameter.
+* `Cro::HTTP::BodySerializer::JSON` - used when the `content-type` header has
+  been set to `application/json` or any media type with the `+json` suffix.
+  The body will be passed to `JSON::Fast` to serialize.
+* `Cro::HTTP::BodySerializer::StrFallback` - used whenever the body has been
+  set to `Str`. If the `content-type` contains a `charset` parameter, it will
+  be used to decide on the encoding of the string; the default will be UTF-8.
+  If there is no `content-type` header then a `text/plain` one will be added.
+* `Cro::HTTP::BodySerializer::BlobFallback` - used whenever the body has been
+  set to a `Blob`. If there is no `content-type` header than an
+  `application/octet-stream` one will be added.
+
+All of these will set a `Content-length` header.
+
+The default set of serializers for a response are:
+
+* `Cro::HTTP::BodySerializer::JSON` (described above)
+* `Cro::HTTP::BodySerializer::StrFallback` (described above)
+* `Cro::HTTP::BodySerializer::BlobFallback` (described above)
+* `Cro::HTTP::BodySerializer::SupplyFalback` - used when the body has been set
+  to a `Supply`. This `Supply` must emit `Blob`s; anything else will result in
+  an error. This is the only built-in body serializer that does not add a
+  `content-length` header (meaning that the response serializer will use the
+  chunked encoding).
