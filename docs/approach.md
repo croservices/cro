@@ -12,6 +12,12 @@ Messages are represented by `Cro::Message`. Concrete implementations include:
 * Cro::HTTP::Request
 * Cro::HTTP::Response
 
+Incoming connections are represented by `Cro::Connection`; implementations
+include:
+
+* Cro::TCP::ServerConnection
+* Cro::SSL::ServerConnection
+
 A `Cro::Source` is a source of either messages or connections. For example,
 `Cro::TCP::Listener` produces `Cro::TCP::ServerConnection` objects.
 
@@ -28,9 +34,10 @@ the end of a message processing pipeline. A sink in a TCP server would consume
 
 Some messages or connections can be replied to with one or more messages. These
 do the `Cro::Replyable` role. Anything that produces a replyable is also
-responsible for providing something that can send response messages. This
+responsible for providing something that can process the reply messages. This
 "something" may either be a transform or a sink. Examples of replyables include
-`Cro::TCP::ServerConnection` and `Cro::SSL::ServerConnection`.
+`Cro::TCP::ServerConnection` and `Cro::SSL::ServerConnection`, which give a
+`Cro::Sink` replier that sends `Cro::TCP::Message` objects back to the client.
 
 ## Composition
 
@@ -44,7 +51,8 @@ possible example is setting up an echo server:
         
         method reply(Supply $source) {
             # We could actually just `return $source` here, but the identity
-            # supply is written out here for good measure.
+            # supply is written out here to illustrate what a transform will
+            # often look like.
             supply {
                 whenever $source -> $message {
                     emit $message;
@@ -96,7 +104,7 @@ that turns a request into a response:
                 whenever $request-stream -> $request {
                     given Cro::HTTP::Response.new(:200status) {
                         .append-header('Content-type', 'text/html');
-                        .set-body("<strong>Hello from Cro!</strong>".encode('ascii'));
+                        .set-body("<strong>Hello from Cro!</strong>");
                         .emit;
                     }
                 }
