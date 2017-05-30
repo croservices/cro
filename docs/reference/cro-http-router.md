@@ -148,49 +148,30 @@ Not Found response. If a route matches on segments, but not on the HTTP method
 (for example, a `PUT` was performed but the only routes matching are for `GET`
 and `POST`), then it will instead produce a HTTP 405 Method Not Allowed.
 
-## Query string, headers, cookies, and body
+## Query string, headers, and cookies
 
 Named parameters in a route signature can be used to unpack and constrain the
-route match on additional aspects of the request.
-
-By default, a named parameter obtains its value according to the following
-rules:
-
-* If there is a request body, and the request's `Content-type` header is set to
-  either `application/x-www-form-urlencoded` or `multipart/form-data`, then the
-  parameters will be sourced from request body
-* If there is no such request body, then they will be sourced from the query
-  string
-
-In the presence of a request body, the query string will never be considered.
-The `is query` and `is form-data` traits can be used in order to be explicit
-about where the data should come from. Also note that named parameters in Perl
-6 are optional by default; if the query string or form parameter is required,
-then it should be marked as such.
+route match on additional aspects of the request. By default, values are taken
+from the query string, however traits can be applied to have them use data
+from other sources. Note that named parameters in Perl 6 are optional by default;
+if the query string parameter is required, then it should be marked as such.
 
 ```
 my $app = route {
-    # Must have a search term; sourced from request body if there is one or
-    # the query string otherwise.
+    # Must have a search term in the query string.
     get -> 'search', :$term! {
         ...
     }
 
-    # Mininum and maximum price filters are optional; sourced from the request
-    # body if there is one, or the query string otherwise.
+    # Mininum and maximum price filters are optional; sourced from the query
+    # string.
     get -> 'category', $category-name, :$min-price, :$max-price {
         ...
     }
 
-    # Must have a term in the query string
+    # Must have a term in the query string (the `is query` trait here is purely
+    # for documentation purposes).
     get -> 'search', :$term! is query {
-        ...
-    }
-
-    # May optionally have min-price and max-price, sourced only from the
-    # request body
-    get -> 'category', $category-name, :$min-price is form-body,
-                                       :$max-price is form-body {
         ...
     }
 }
@@ -201,16 +182,16 @@ As with URL segments, the `Int`, `UInt`, `int64`, `uint64`, `int32`, `uint32`,
 an integer and range-check them. Further, `subset` types based on `Int`, `UInt`,
 and `Str` are also allowed.
 
-Sometimes, multiple values may be provided for a given key, either in the query
-string or in the request body. In these cases, if there is no type constraint,
-then an object of type `Cro::HTTP::MultiValue` will be passed. This object
-inherits from `List`, and so can be iterated to get the values. It also does
-the `Stringy` role, and stringifies to the various values joined by a comma.
-To rule this out, a `Str` constraint may be applied, which will refuse to
-accept the request if there are multiple values. To explicitly allow multiple
-values, use the `@` sigil (note that this may not be used in conjunction with
-any other type constraint). This will also happily accept zero or one values,
-giving an empty and 1-element list respectively.
+Sometimes, multiple values may be provided for a given name in the query
+string. In these cases, if there is no type constraint, then an object of type
+`Cro::HTTP::MultiValue` will be passed. This object inherits from `List`, and
+so can be iterated to get the values. It also does the `Stringy` role, and
+stringifies to the various values joined by a comma. To rule this out, a `Str`
+constraint may be applied, which will refuse to accept the request if there
+are multiple values. To explicitly allow multiple values, use the `@` sigil
+(note that this may not be used in conjunction with other type constraints).
+This will also happily accept zero or one values, giving an empty and
+1-element list respectively. Use a `where` clause to further constrain this.
 
 ```
 my $app = route {
@@ -222,13 +203,13 @@ my $app = route {
 }
 ```
 
-To get all form data or query data, a hash named parameter may be used with the
-`is query` or `is form-data` traits:
+To get all query string data, a hash named parameter may be used (optionally
+with the `is query` trait):
 
 ```
 my $app = route {
-    # Get a hash of all form parameters
-    get -> 'search', 'advanced', :%params is form-data {
+    # Get a hash of all query string parameters
+    get -> 'search', 'advanced', :%params {
         ...
     }
 }
@@ -414,6 +395,121 @@ a HTTP 500 Internal Server Error response, however other middleware may be
 inserted to change what happens (for example, serving custom error pages).
 
 All other response codes are produced by explicitly setting `response.status`.
+
+## Request bodies
+
+Requests will be dispatched by `Cro::HTTP::Router` as soon as the headers are
+available; the request body, if any, will become available once it has arrived
+over the network. The `request` term provides the `Cro::HTTP::Request` object,
+which has various methods for accessing the request body (`body`, `body-text`,
+and `body-blob`), all returning a `Promise`. As a concenience, the router also
+provides subroutines of the same name, which take a block. These routines will
+`await` the result, and then invoke the block with it. For example:
+
+```
+put -> 'product', $id, 'description' {
+    # Get the body as text (assumes the client set the body to some text; note
+    # this is not something a web browser form would do).
+    body-text -> $description {
+        # Save it; produce no content response
+    }
+}
+
+put -> 'product', $id, 'image', $filename {
+    # Get the body as a binary blob.
+    body-blob -> $image {
+        # Save it; produce no content
+    }
+}
+
+post -> 'product' {
+    # Get the body produced by the body parser.
+    body -> %json-object {
+        # Save it, and then...
+        created, 'application/json', %json-object;
+    }
+}
+```
+
+The block signature may use Perl 6 signatures in order to unpack the data that
+was submitted. This is useful to, for example, unpack a JSON object:
+
+```
+post -> 'product' {
+    body -> (:$name!, :$description!, :$price!) {
+        # Do stuff here...
+    }
+}
+```
+
+In the event that the signature cannot be bound, an exception will be thrown
+that results in a `400 Bad Request` response. This means that signatures may
+be used to do basic validation of the request body also.
+
+In the event that `body`, `body-text`, or `body-blob` are passed a Pair, the
+key will be taken as a media type, to be matched against the `Content-type`
+header of the request. Any parameters on the media type will be ignored (for
+example, if the `Content-type` header is `text/plain; charset=UTF-8` then
+only the `text/plain` will be considered). If the request does not match the
+`Content-type`, then an exception will be thrown that results in a `404 Bad
+Request` response.
+
+```
+post -> 'product' {
+    body 'application/json' => -> (:$name!, :$description!, :$price!) {
+        # Do stuff here...
+    }
+}
+```
+
+If multiple arguments are given to `body`, `body-blob`, or `body-text`, then
+they will be tried in order until one matches, with an exception thrown that
+results in a `400 Bad Request` response if none match. The arguments may be
+`Block`s, `Pair`s, or a mixture. This allows switching on `Content-type` of
+the request body:
+
+```
+put -> 'product', $id, 'image {
+    body-blob
+        'image/gif' => -> $gif {
+            ...
+        },
+        'image/jpeg' => -> $jpeg {
+            ...
+        };
+}
+```
+
+Or switching on `Content-type`, but providing a block at the end as a fallback:
+
+```
+put -> 'product', $id, 'image {
+    body-blob
+        'image/gif' => -> $gif {
+            ...
+        },
+        'image/jpeg' => -> $jpeg {
+            ...
+        },
+        {
+            bad-request 'text/plain', 'Only gif or jpeg allowed';
+        }
+}
+```
+
+Or pattern-matching on the structure and content of some incoming data:
+
+```
+post -> 'log' {
+    body
+        -> (:$level where 'error', :$message!) {
+            # Process errors specially
+        },
+        -> (:$level!, :$message!) {
+            # Process other levels
+        };
+}
+```
 
 ## Composing routers
 
