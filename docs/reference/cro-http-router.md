@@ -259,14 +259,14 @@ If there is at least one route handler that matches on the URL segments, but
 all of the candidates fail to match on conditions expressed using named
 parameters, then the router will produce a HTTP 400 Bad Request response.
 
-## Producing responses
+## Accessing the Cro::HTTP::Request instance
 
 Inside of a request handler, the `request` term may be used to obtain the
 `Cro::HTTP::Request` object that corresponds to the current request. In many
 request handlers, this will not be required, since signatures allow for
 unpacking the most common forms of request information. If the full set of
 request headers were needed in their original order, however, they could be
-accessed through `request`.
+accessed using `request`.
 
 ```
 my $app = route {
@@ -278,6 +278,165 @@ my $app = route {
     }
 }
 ```
+
+## Request bodies
+
+Requests will be dispatched by `Cro::HTTP::Router` as soon as the headers are
+available; the request body, if any, will become available once it has arrived
+over the network. The `request` term provides the `Cro::HTTP::Request` object,
+which has various methods for accessing the request body (`body`, `body-text`,
+and `body-blob`), all returning a `Promise`. As a concenience, the router also
+exports the subs `request-body`, `request-body-text`, and `request-body-blob`,
+which take a block. These routines will call the appropriate method on the
+request object, `await` it, and then invoke the block with it. For example:
+
+```
+put -> 'product', $id, 'description' {
+    # Get the body as text (assumes the client set the body to some text; note
+    # this is not something a web browser form would do).
+    request-body-text -> $description {
+        # Save it; produce no content response
+    }
+}
+
+put -> 'product', $id, 'image', $filename {
+    # Get the body as a binary blob.
+    request-body-blob -> $image {
+        # Save it; produce no content
+    }
+}
+
+post -> 'product' {
+    # Get the body produced by the body parser.
+    request-body -> %json-object {
+        # Save it, and then...
+        created, 'application/json', %json-object;
+    }
+}
+```
+
+The block signature may use Perl 6 signatures in order to unpack the data that
+was submitted. This is useful to, for example, unpack a JSON object:
+
+```
+post -> 'product' {
+    request-body -> (:$name!, :$description!, :$price!) {
+        # Do stuff here...
+    }
+}
+```
+
+In the event that the signature cannot be bound, an exception will be thrown
+that results in a `400 Bad Request` response. This means that signatures may
+be used to do basic validation of the request body also.
+
+In the event that `request-body`, `request-body-text`, or `request-body-blob`
+are passed a Pair, the key will be taken as a media type to be matched against
+the `Content-type` header of the request. Any parameters on the media type will
+be ignored (for example, a `Content-type` header of `text/plain; charset=UTF-8`
+will only have the `text/plain` part considered). If the request does not match
+the `Content-type`, then an exception will be thrown that results in a `404 Bad
+Request` response.
+
+```
+post -> 'product' {
+    request-body 'application/json' => -> (:$name!, :$description!, :$price!) {
+        # Do stuff here...
+    }
+}
+```
+
+If multiple arguments are given, then they will be tried in order until one
+matches, with an exception thrown that results in a `400 Bad Request` response
+if none match. The arguments may be `Block`s, `Pair`s, or a mixture. This
+allows switching on `Content-type` of the request body:
+
+```
+put -> 'product', $id, 'image {
+    request-body-blob
+        'image/gif' => -> $gif {
+            ...
+        },
+        'image/jpeg' => -> $jpeg {
+            ...
+        };
+}
+```
+
+Or switching on `Content-type`, but providing a block at the end as a fallback:
+
+```
+put -> 'product', $id, 'image {
+    request-body-blob
+        'image/gif' => -> $gif {
+            ...
+        },
+        'image/jpeg' => -> $jpeg {
+            ...
+        },
+        {
+            bad-request 'text/plain', 'Only gif or jpeg allowed';
+        }
+}
+```
+
+If the parameter of the body block has either a type constraint, a `where`
+constraint, or a sub-signature, then this will be tested to see if it matches
+the body object. If it does not, then the next alternative will be tried. This
+allows for pattern-matching on the structure and content of some incoming data:
+
+```
+post -> 'log' {
+    request-body
+        -> (:$level where 'error', :$message!) {
+            # Process errors specially
+        },
+        -> (:$level!, :$message!) {
+            # Process other levels
+        };
+}
+```
+
+## Adding custom request body parsers
+
+By default, five body parsers are provided for requests:
+
+* `Cro::HTTP::BodyParser::WWWFormUrlEncoded` - used whenever the content-type
+  is `application/x-www-form-urlencoded`; parses the form data and provides it
+  as an instance of `Cro::HTTP::Body::WWWFormUrlEncoded`
+* `Cro::HTTP::BodyParser::MultiPartFormData` - used whenever the content-type
+  is `multipart/form-data`; parses the multipart document and provides it as
+  an instance of `Cro::HTTP::Body::MultiPartFormData`
+* `Cro::HTTP::BodyParser::JSON` - used whenever the content-type is either
+  `application-json` or anything with a `+json` suffix; parses the data using
+  the `JSON::Fast` module, which returns a `Hash` or `Array`
+* `Cro::HTTP::BodyParser::TextFallback` - used whenever the content-type has a
+  type `text` (for example, `text/plain`, `text/html`); uses `body-text`
+* `Cro::HTTP::BodyParser::BlobFallback` - used as a last resort and will match
+  any message; uses `body-blob`
+
+Cro can be extended with further body parsers, which whould implement the
+`Cro::HTTP::BodyParser` role. These can be added globally by passing them when
+setting up `Cro::HTTP::Server`. They can also be applied within the scope of a
+`route` block:
+
+```
+my $app = route {
+    body-parser My::Custom::BodyParser;
+
+    post -> 'product' {
+        request-body -> My::Type $body {
+        }
+    }
+}
+```
+
+Here, a body parser `My::Custom::BodyParser` has been used, which presumably
+produces objects of type `My::Type`. This might be used from anything, from
+using a YAML or XML parser up to parsing requests into application-specific
+domain objects.
+
+## Producing responses
 
 Before calling the request handler, the router creates a `Cro::HTTP::Response`
 object. The default response is 204 No Content, or 200 OK if a body is set.
@@ -308,27 +467,18 @@ The `header` routine calls `response.append-header`. It can accept two strings
 (name and value), a single string of the form `Name: value`, or an instance of
 `Cro::HTTP::Header`.
 
-The `content` routine takes a content type and the data that should make up the
-body of the response. The data may be provided as:
+The `content` routine takes a content type and the data that should make up
+the body of the response. The data will be processed by a body serializer. The
+default set of body serializers in effect allow for:
 
-* A `Str`. If there is an `Accept-Charset` request header, then the encodings
-  will be tried in order of quality preference. In the absence of such a
-  header, the 'utf-8' encoding shall be used. The optional `enc` named
-  parameter may be passed in order to force a particular encoding. The chosen
-  encoding will be included in the response header.
-* A `Blob`. No encoding will be set in the response unless the `enc` named
-  parameter is passed (and if it is, no validation will be done to ensure the
-  `Blob` actually contains that encoding).
-* A `Supply`, which should emit `Str` or `Blob`. In this case, the response
-  will be sent as the `Supply` emits data, using the chunked transfer encoding.
-  If `Str` will be emitted, it is **mandatory** to pass the `enc` named
-  parameter to indicate the way the response text should be encoded. This is
-  because the headers are sent prior to the body becoming available, and so no
-  automatic inferences can be made. Worse, a document without an encoding will,
-  per the HTTP specification, be considered ISO-8859-1 - which is liable to
-  cause problems later. Failing to specify an `enc` parameter and then giving
-  a `Supply` that emits `Str` values will trigger an exception, terminating
-  the response and closing the connection.
+* Setting the content-type to `application/json` or any media type with the
+  `+json` suffix, and provided a body that can be handled by `JSON::Fast`
+* Providing a `Str` body, which will be encoded according to any `charset`
+  parameter in the `content-type`
+* Providing a `Blob`, which will be used as the body
+* Providing a `Supply`, which will be taken to mean the body will produced
+  over time; unless a `content-length` header has been sit explicitly, then
+  the response will be sent with the chunked transfer coding
 
 Therefore, a simple HTML response can be written as:
 
@@ -396,118 +546,23 @@ inserted to change what happens (for example, serving custom error pages).
 
 All other response codes are produced by explicitly setting `response.status`.
 
-## Request bodies
+## Adding custom response body serializers
 
-Requests will be dispatched by `Cro::HTTP::Router` as soon as the headers are
-available; the request body, if any, will become available once it has arrived
-over the network. The `request` term provides the `Cro::HTTP::Request` object,
-which has various methods for accessing the request body (`body`, `body-text`,
-and `body-blob`), all returning a `Promise`. As a concenience, the router also
-provides subroutines of the same name, which take a block. These routines will
-`await` the result, and then invoke the block with it. For example:
+Custom body serializers implement the `Cro::HTTP::BodySerializer` role. They
+can decide when they are applicable by considering the type of the body and/or
+the response headers (most typically the `content-type` header).
+
+Body serializers can be applied when configuring `Cro:HTTP::Server`, in which
+case they will be applicable to all requests. They may also be applied within
+a given `route` block:
 
 ```
-put -> 'product', $id, 'description' {
-    # Get the body as text (assumes the client set the body to some text; note
-    # this is not something a web browser form would do).
-    body-text -> $description {
-        # Save it; produce no content response
+my $app = route {
+    body-serializer Custom::Serializer::YAML;
+
+    get -> 'userlevels' {
+        content 'application/yaml', <reader moderator producer admin>;
     }
-}
-
-put -> 'product', $id, 'image', $filename {
-    # Get the body as a binary blob.
-    body-blob -> $image {
-        # Save it; produce no content
-    }
-}
-
-post -> 'product' {
-    # Get the body produced by the body parser.
-    body -> %json-object {
-        # Save it, and then...
-        created, 'application/json', %json-object;
-    }
-}
-```
-
-The block signature may use Perl 6 signatures in order to unpack the data that
-was submitted. This is useful to, for example, unpack a JSON object:
-
-```
-post -> 'product' {
-    body -> (:$name!, :$description!, :$price!) {
-        # Do stuff here...
-    }
-}
-```
-
-In the event that the signature cannot be bound, an exception will be thrown
-that results in a `400 Bad Request` response. This means that signatures may
-be used to do basic validation of the request body also.
-
-In the event that `body`, `body-text`, or `body-blob` are passed a Pair, the
-key will be taken as a media type, to be matched against the `Content-type`
-header of the request. Any parameters on the media type will be ignored (for
-example, if the `Content-type` header is `text/plain; charset=UTF-8` then
-only the `text/plain` will be considered). If the request does not match the
-`Content-type`, then an exception will be thrown that results in a `404 Bad
-Request` response.
-
-```
-post -> 'product' {
-    body 'application/json' => -> (:$name!, :$description!, :$price!) {
-        # Do stuff here...
-    }
-}
-```
-
-If multiple arguments are given to `body`, `body-blob`, or `body-text`, then
-they will be tried in order until one matches, with an exception thrown that
-results in a `400 Bad Request` response if none match. The arguments may be
-`Block`s, `Pair`s, or a mixture. This allows switching on `Content-type` of
-the request body:
-
-```
-put -> 'product', $id, 'image {
-    body-blob
-        'image/gif' => -> $gif {
-            ...
-        },
-        'image/jpeg' => -> $jpeg {
-            ...
-        };
-}
-```
-
-Or switching on `Content-type`, but providing a block at the end as a fallback:
-
-```
-put -> 'product', $id, 'image {
-    body-blob
-        'image/gif' => -> $gif {
-            ...
-        },
-        'image/jpeg' => -> $jpeg {
-            ...
-        },
-        {
-            bad-request 'text/plain', 'Only gif or jpeg allowed';
-        }
-}
-```
-
-Or pattern-matching on the structure and content of some incoming data:
-
-```
-post -> 'log' {
-    body
-        -> (:$level where 'error', :$message!) {
-            # Process errors specially
-        },
-        -> (:$level!, :$message!) {
-            # Process other levels
-        };
 }
 ```
 
