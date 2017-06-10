@@ -105,6 +105,63 @@ Or replace the set of body serializers entirely by passing `body-serializers`:
 If both `add-body-serializers` and `body-serializers` are passed, they both
 will be used, with those in `add-body-serializers` taking precedence.
 
+## Middleware
+
+HTTP middleware is implemented as a `Cro::Transform`. There are four places
+that HTTP middleware can be inserted. There are, in order of processing:
+
+* **before-parse** - operates on the raw bytes coming over the network prior
+  to the `Cro::HTTP::RequestParser` seeing them. The transform should consume
+  a `Cro::TCP::Message` and produce a `Cro::TCP::Message`. It is relatively
+  unusual to need to insert middleware at this stage, though it could be
+  useful for getting rate limiting in early before the effort to even parse
+  a request has been expended, for example.
+* **before** - operates on requests after they have been parsed, but before
+  they reach the application. Consumes a `Cro::HTTP::Request` and produces a
+  `Cro::HTTP::Request`.  This is a common place to put middleware that does
+  athentication, authorization, session handling, CSRF protection, and so
+  forth.
+* **after** - operates on responses produced by the application. Consumes a
+  `Cro::HTTP::Response` and produces a `Cro::HTTP::Response`. This is a common
+  place to put middleware that does things like logging and inserting headers
+  to increase security (like `X-Frame-Options`, `Strict-Transport-Security`,
+  `Content-Security-Policy`, and so forth).
+* **after-serialize** - operates on the bytes sent back over the network in
+  response to a request. Consumes a `Cro::TCP::Message` and produces a
+  `Cro::TCP::Message`. It is unusual to need to insert middleware at this
+  stage.
+
+The names of these places are named parameters that can be passed to the
+`Cro::HTTP::Server` constructor. Either a single `Cro::Transform` or an
+`Iterable` (for example, `List`) of `Cro::Transform`s may be passed.
+
+For example, the following piece of middleware:
+
+    class StrictTransportSecurity does Cro::Transform {
+        has Duration:D $.max-age is required;
+
+        method consumes() { Cro::HTTP::Response }
+        method produces() { Cro::HTTP::Response }
+
+        method transformer(Supply $pipeline --> Supply) {
+            supply {
+                whenever $pipeline -> $response {
+                    $response.append-header:
+                        'Strict-Transport-Security',
+                        "max-age=$!max-age";
+                    emit $response;
+                }
+            }
+        }
+    }
+
+Could be applied as follows:
+
+    my Cro::Service $hello-service = Cro::HTTP::Server.new(
+        :host('localhost'), :port(8888), :$application,
+        after => ScriptTransportSecurity.new(Duration.new(30 * 24 * 60 * 60))
+    );
+
 ## HTTP versions
 
 The `:http` option can be passed to control which versions of HTTP should be
