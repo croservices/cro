@@ -47,6 +47,64 @@ and private key respectively, should be passed.
         :host('localhost'), :port(8888), :%ssl, :$application
     );
 
+## Request body parsers and response body serializers
+
+Additional request body parsers (implementations of `Cro::HTTP::BodyParser`)
+and response body serializers (impelemntations of `Cro::HTTP::BodySerializer`)
+can be added at the server level. Alternatively, the set of default set of
+body parsers and serializers can be replaced entirely.
+
+To add extra body parsers to the set of defaults, pass a list of them to
+`add-body-parsers`.
+
+    my Cro::Service $hello-service = Cro::HTTP::Server.new(
+        :host('localhost'), :port(8888), :$application,
+        add-body-parsers => [
+            YAMLBodyParser,
+            XMLBodyParser
+        ]
+    );
+
+These will take precedence over (that is, tested for applicability ahead of)
+the default set of body parsers. To replace those entirely, pass a list of the
+body parsers to use as the `body-parsers` named parameter:
+
+    my Cro::Service $hello-service = Cro::HTTP::Server.new(
+        :host('localhost'), :port(8888), :$application,
+        body-parsers => [
+            # Don't parse any kind of body except a JSON one; anything else
+            # will throw an exception when `.body` is called.
+            Cro::HTTP::BodyParser::JSON
+        ]
+    );
+
+If both `body-parsers` and `add-body-parsers` is used, then both will be used,
+with those in `add-body-parsers` again having higher precedence.
+
+A similar scheme applies for body serializers. Use `add-body-serializers` to
+add extra ones to the defaults:
+
+    my Cro::Service $hello-service = Cro::HTTP::Server.new(
+        :host('localhost'), :port(8888), :$application,
+        add-body-serializers => [
+            YAMLBodySerializer,
+            XMLBodySerializer
+        ]
+    );
+
+Or replace the set of body serializers entirely by passing `body-serializers`:
+
+    my Cro::Service $hello-service = Cro::HTTP::Server.new(
+        :host('localhost'), :port(8888), :$application,
+        body-serializers => [
+            # The body can only ever be something that can be JSON serialized.
+            Cro::HTTP::BodySerializer::JSON
+        ]
+    );
+
+If both `add-body-serializers` and `body-serializers` are passed, they both
+will be used, with those in `add-body-serializers` taking precedence.
+
 ## HTTP versions
 
 The `:http` option can be passed to control which versions of HTTP should be
