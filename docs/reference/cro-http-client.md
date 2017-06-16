@@ -74,3 +74,40 @@ It is also possible to get the body as it arrives, using the `body-stream`
 method. This returns a `Supply` that emits a `Blob` whenever data arrives (if
 the chunked transfer coding is used, then this will already have been handled
 before the body is delivered).
+
+## Making Complex Requests
+
+All baskc requests can be extended by passing of special parameters to
+retreiving methods in different ways.
+
+One or more headers can be set for a request by passing an array, that
+may contain instances of `Cro::HTTP::Header` or simple Pairs(in form `header
+=> value`). Array may contain both `Cro::HTTP::Header` instances and
+Pairs simultaneously.
+
+    my $resp = await Cro::HTTP::Client.get('example.com',
+                                           headers => {
+                                             header =>  header-value,
+                                             Cro::HTTP::Header.new(
+                                                 name => 'header', value => 'value'
+                                             ),
+                                             ... });
+
+Along with that, Content-Type header can be passed directly:
+
+    my $resp = await Cro::HTTP::Client.get('example.com',
+                                           content-type => 'text/plain');
+
+For each request type it is possible to set request's body either
+by passing its value or encoded byte-stream:
+
+    my $resp = await Cro::HTTP::Client.get('example.com',
+                                           body => 'Example');
+
+or
+
+    my $resp = await Cro::HTTP::Client.get('example.com',
+                                           body-byte-stream => $encoded-blob);
+
+Arguments `body` and `body-byte-stream` cannot be set simultaneously
+and `X::Cro::HTTP::Client::BodyAlreadySet` exception will be thrown in this case.
