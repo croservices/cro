@@ -26,6 +26,42 @@ range of methods for accessing it. These read-only methods include:
   separated)
 * `query-value($key)` - looks up a value in the `query-hash`
 
+## Cookies
+
+Cookies in a request are placed in a single `Cookie` header. This is somewhat
+inconvenient to work with, and so `Cro::HTTP::Request` provides higher level
+methods for working with cookies also.
+
+### Accessing cookies
+
+The `has-cookie($name)` method checks if there is a cookie with the specified
+name. The name is matched case-sensitively. If there is a cookie with this
+name, `True` is returned; otherwise, `False` is returned.
+
+The `cookie-value($name)` method retrieves the value of the cookie with
+specified name, matched case-sensitively. If there is no cookie with this
+name, `Nil` is returned.
+
+The `cookie-hash` method returns a `Hash` mapping cookie names to cookie
+values. Note that mutation of the returned hash has no affect upon the
+`Cro::HTTP::Request` object.
+
+### Manipulating cookies
+
+The `add-cookie` method has two multi candidates:
+
+* `set-cookie(Cro::HTTP::Cookie)` - adds or updates any existing `Cookie`
+  header line to include the cookie name and value specified in the
+  `Cro::HTTP::Cookie` instance. If there is already a cookie with that
+  name in the `Cookie` header value, it will be replaced with the new value.
+* `add-cookie`(Str $name, Str() $value)` - creates a `Cro::HTTP::Cookie`
+  instance from specified name and value (to ensure they do not contain any
+  disallowed characters), and delegate to the first `add-cookie` candidate
+
+The `remove-cookie($name)` method removes the cookie with the specified name
+from the `Cookie` header, provided such a cookie exists. It returns `True` if
+a cookie was actually removed, and `False` otherwise.
+
 ## Stringification
 
 Calling the `Str` method on a `Cro::HTTP::Request` will serialize the requeset
