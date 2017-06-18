@@ -217,8 +217,9 @@ my $app = route {
 
 Both cookies and headers may also be unpacked into named parameters, using the
 `is cookie` and `is header` traits. The same rules about multiple values are
-taken into account. The `is header` trait is the only one that functions in a
-case-insensitive manner, since request headers are defined as case-insensitive.
+taken into account for headers (cookies may not have duplicate values for per
+name). The `is header` trait is the only one that functions in a case-insensitive
+manner, since request headers are defined as case-insensitive.
 
 ```
 my $app = route {
@@ -227,8 +228,14 @@ my $app = route {
         ...
     }
 
-    # Gets the super-sneaky-tracking-id cookie, if there is one.
-    get -> 'viral', $meme, :$super-sneaky-tracking-id is cookie {
+    # Gets the super-sneaky-tracking-id cookie; does not match if there
+    # is no such cookie (since it's marked required).
+    get -> 'viral', $meme, :$super-sneaky-tracking-id! is cookie {
+        ...
+    }
+
+    # Gets all the cookies and all the headers in hashes.
+    get -> 'dump', :%cookies is cookie, :%headers is header {
         ...
     }
 }
