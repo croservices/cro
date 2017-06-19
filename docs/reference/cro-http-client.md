@@ -86,12 +86,12 @@ may contain instances of `Cro::HTTP::Header` or simple Pairs(in form `header
 Pairs simultaneously.
 
     my $resp = await Cro::HTTP::Client.get('example.com',
-                                           headers => {
+                                           headers => [
                                              header =>  header-value,
                                              Cro::HTTP::Header.new(
                                                  name => 'header', value => 'value'
                                              ),
-                                             ... });
+                                             ... ]);
 
 Along with that, Content-Type header can be passed directly:
 
@@ -99,15 +99,17 @@ Along with that, Content-Type header can be passed directly:
                                            content-type => 'text/plain');
 
 For each request type it is possible to set request's body either
-by passing its value or encoded byte-stream:
+by passing its value or a supply that emits blobs:
 
+    my %object = :truth, :!lie; # Hash with the body
     my $resp = await Cro::HTTP::Client.get('example.com',
-                                           body => 'Example');
+                                           content-type => 'application/json',
+                                           body => %body); # Will be packed and sent as json
 
 or
 
     my $resp = await Cro::HTTP::Client.get('example.com',
-                                           body-byte-stream => $encoded-blob);
+                                           body-byte-stream => $supply);
 
 Arguments `body` and `body-byte-stream` cannot be set simultaneously
 and `X::Cro::HTTP::Client::BodyAlreadySet` exception will be thrown in this case.
