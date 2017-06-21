@@ -13,7 +13,7 @@ consumed in two ways:
   insert into the request/response processing pipeline. An instance of
   `Cro::HTTP::Client` may be used concurrently.
 
-## Making Basic Requests
+## Making basic requests
 
 The `get`, `post`, `put`, `delete`, and `head` methods may be called on either
 the type object or an instance of `Cro::HTTP::Client`. They will all return a
@@ -45,11 +45,146 @@ The actual exception type will be either `X::Cro::HTTP::Error::Client` for
 when setting up retries that should distinguish server errors from client
 errors).
 
-### Getting the Response Body
+## Adding extra request headers
+
+One or more headers can be set for a request by passing an array to the
+`headers` named argument. It may contain either `Pair` objects, instances
+of `Cro::HTTP::Header`, or a mix of the two.
+
+    my $resp = await Cro::HTTP::Client.get: 'example.com',
+        headers => [
+            referer => 'http://anotherexample.com',
+            Cro::HTTP::Header.new(
+                name => 'User-agent',
+                value => 'Cro'
+            )
+        ];
+
+## Setting the request body
+
+To give the request a body, pass the `body` named argument. The `content-type`
+named argument should typically be passed too, to indicate the type of the
+body. For example, a request with a JSON body can be sent as:
+
+    my %panda = name => 'Bao Bao', eats => 'bamboo';
+    my $resp = await Cro::HTTP::Client.post: 'we.love.pand.as/pandas',
+        content-type => 'application/json',
+        body => %panda;
+
+If writing a client for a JSON API, it may become tedious to set the content
+type on every request. In this case, it can be set when constructing an
+instance of the client, and used by default (note that it will only be used
+if a body is set):
+
+    # Configure with JSON content type.
+    my $client = Cro::HTTP::Client.new: content-type => 'application/json';
+
+    # And later get it added by default.
+    my %panda = name => 'Bao Bao', eats => 'bamboo';
+    my $resp = await $client.post: 'we.love.pand.as/pandas', body => %panda;
+
+The `Cro::HTTP::Client` class uses a `Cro::HTTP::BodySerializer` in order to
+serialize request bodies for sending. Besides JSON, there are body parsers
+encoding and sending a `Str`:
+
+    my $resp = await Cro::HTTP::Client.post: 'we.love.pand.as/facts',
+        content-type => 'text/plain; charset=UTF-8',
+        body => "99% of a Panda's diet consists of bamboo";
+
+A `Blob`:
+
+    my $resp = await Cro::HTTP::Client.put: 'we.love.pand.as/images/baobao.jpg',
+        content-type => 'image/jpeg',
+        body => slurp('baobao.jpg', :bin);
+
+Form data formatted according to 'application/x-www-form-urlencoded` (this is
+the default in a web browser):
+
+    my $resp = await Cro::HTTP::Client.post: 'we.love.pand.as/pandas',
+        content-type => 'application/x-www-form-urlencoded',
+        # Can use a Hash; an Array of Pair allows multiple values per name
+        body => [
+            name => 'Bao Bao',
+            eats => 'bamboo'
+        ];
+
+Or form data formatted according to `multipart/form-data` (this is used in web
+browsers for forms that contain file uploads):
+
+    my $resp = await Cro::HTTP::Client.post: 'we.love.pand.as/pandas',
+        content-type => 'multipart/form-data',
+        body => [
+            # Simple pairs for simple form values
+            name => 'Bao Bao',
+            eats => 'bamboo',
+            # For file uploads, make a part object
+            Cro::HTTP::Body::MultiPartFormData::Part.new(
+                headers => [Cro::HTTP::Header.name(
+                    name => 'Content-type',
+                    value => 'image/jpeg'
+                )],
+                name => 'photo',
+                filename => 'baobao.jpg',
+                body-body => slurp('baobao.jpg', :bin)
+            )
+        ];
+
+To replace the set of body serializers that a client will use, pass an array
+of them when constructing an instance of `Cro::HTTP::Client` using the
+`body-serializers` named argument:
+
+    my $client = Cro::HTTP::Client.new:
+        body-serializers => [
+            Cro::HTTP::BodySerializer::JSON,
+            My::BodySerializer::XML
+        ];
+
+To instead retain the existing set of body serializers and add some new ones
+(which will have higher precedence), use `add-body-serializers`:
+
+    my $client = Cro::HTTP::Client.new:
+        add-body-serializers => [ My::BodySerializer::XML ];
+
+It is also possible to have the body come from a stream of bytes by passing a
+`Supply` to `body-byte-stream`.
+
+    my $resp = await Cro::HTTP::Client.post: 'example.com/incoming',
+        content-type => 'application/octet-stream',
+        body-byte-stream => $supply;
+
+The `body` and `body-byte-stream` arguments cannot be used together; trying to
+do so will result in a `X::Cro::HTTP::Client::BodyAlreadySet` exception.
+
+## Getting the response body
 
 The response body is always provided asynchronously, either by a `Promise` (if
 requesting the enitre body) or a `Supply` (when the body is to be delivered as
 it arrives).
+
+The `body` method returns a `Promise` that will be kept when the body has
+been received and parsed. There default set of body parsers are:
+
+* JSON, which will be used when the `Content-type` header is either
+  `application/json` or uses the `+json` suffix. `JSON::Fast` will be used to
+  perform the parsing.
+* String fallback, which is used when the `Content-type` type is `text`. A
+  `Str` will be returned.
+* Blob fallback, which is used in all other cases and returns a `Blob` with
+  the body.
+
+A `Cro::HTTP::Client` can be configured either with a replacement set of body
+parsers by passing the `body-parsers` argument:
+
+    my $client = Cro::HTTP::Client.new:
+        body-parsers => [
+            Cro::HTTP::BodyParser::JSON,
+            My::BodyParser::XML
+        ];
+
+Or to add extra body parsers atop of the default set use `add-body-parsers`:
+
+    my $client = Cro::HTTP::Client.new:
+        add-body-parsers => [ My::BodyParser::XML ];
 
 To get the entire response body as a `Blob`, use the `body-blob` method:
 
@@ -62,54 +197,6 @@ To get the entire response body as a `Str`, use the `body-text` method:
 This method will look at the `Content-type` header to see if a `charset` is
 specified, and decode the body using that. Otherwise, it will see if the body
 starts with a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark) and rely on
-that. Failing that, the `default-enc` named parameter will be used, if passed:
-
-    my Str $body = await $resp.body-text(:default-enc<latin-1>);
-
-If it is not passed, the a heuristic will be used: if the body can be decoded
-as `utf-8` then it will be deemed to be `utf-8`, and failing that it will be
-decoded as `latin-1` (which can never fail as all bytes are valid).
-
-It is also possible to get the body as it arrives, using the `body-stream`
-method. This returns a `Supply` that emits a `Blob` whenever data arrives (if
-the chunked transfer coding is used, then this will already have been handled
-before the body is delivered).
-
-## Making Complex Requests
-
-All baskc requests can be extended by passing of special parameters to
-retreiving methods in different ways.
-
-One or more headers can be set for a request by passing an array, that
-may contain instances of `Cro::HTTP::Header` or simple Pairs(in form `header
-=> value`). Array may contain both `Cro::HTTP::Header` instances and
-Pairs simultaneously.
-
-    my $resp = await Cro::HTTP::Client.get('example.com',
-                                           headers => [
-                                             header =>  header-value,
-                                             Cro::HTTP::Header.new(
-                                                 name => 'header', value => 'value'
-                                             ),
-                                             ... ]);
-
-Along with that, Content-Type header can be passed directly:
-
-    my $resp = await Cro::HTTP::Client.get('example.com',
-                                           content-type => 'text/plain');
-
-For each request type it is possible to set request's body either
-by passing its value or a supply that emits blobs:
-
-    my %object = :truth, :!lie; # Hash with the body
-    my $resp = await Cro::HTTP::Client.get('example.com',
-                                           content-type => 'application/json',
-                                           body => %body); # Will be packed and sent as json
-
-or
-
-    my $resp = await Cro::HTTP::Client.get('example.com',
-                                           body-byte-stream => $supply);
-
-Arguments `body` and `body-byte-stream` cannot be set simultaneously
-and `X::Cro::HTTP::Client::BodyAlreadySet` exception will be thrown in this case.
+that. If it is not passed, the a heuristic will be used: if the body can be
+decoded as `utf-8` then it will be deemed to be `utf-8`, and failing that it
+will be decoded as `latin-1` (which can never fail as all bytes are valid).
