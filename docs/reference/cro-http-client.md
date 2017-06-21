@@ -200,3 +200,41 @@ starts with a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark) and rely on
 that. If it is not passed, the a heuristic will be used: if the body can be
 decoded as `utf-8` then it will be deemed to be `utf-8`, and failing that it
 will be decoded as `latin-1` (which can never fail as all bytes are valid).
+
+## Cookies
+
+By default, cookies in the response are ignored. However, constructing a
+`Cro::HTTP::Client` with the `:cookie-jar` option (that is, passing `True`)
+will create an instance of `Cro::HTTP::Client::CookieJar`. This will be used
+to store all cookies set in responses. Relevant cookies will automatically be
+included in follow-up requests.
+
+    my $client = Cro::HTTP::Client.new(:cookie-jar);
+
+Cookie relevance is determiend by considering host, path, and the `Secure`
+extension. Cookies that have passed their expiration date for maximum age will
+automatically be removed from the cookie jar.
+
+It is also possible to pass in an instance of `Cro::HTTP::Client::CookieJar`,
+which makes it possible to share one cookie jar amongst several instances of
+the client (or to pass in a subclass that adds extra features).
+
+    my $jar = Cro::HTTP::Client::CookieJar.new;
+    my $client = Cro::HTTP::Client.new(cookie-jar => $jar);
+    my $json-client = Cro::HTTP::Client.new:
+        cookie-jar => $jar,
+        content-type => 'application/json';
+
+To include a particular set of cookies with a request, pass them in a hash
+using the `cookies` named argument when making a reuqest:
+
+    my $resp = await $client.get: 'http://somesite.com/',
+        cookies => {
+            session => $fake-session-id
+        };
+
+Cookies passed in this way will *override* any cookies from a cookie jar.
+
+To get the cookies set by a response, use the `cookies` method on the
+`Cro::HTTP::Response` object, which returns a `List` of `Cro::HTTP::Cookie`
+objects.
