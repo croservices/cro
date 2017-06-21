@@ -60,6 +60,14 @@ of `Cro::HTTP::Header`, or a mix of the two.
             )
         ];
 
+If the headers should be added to all requests, they can be set by default at
+construction time:
+
+    my $client = Cro::HTTP::Client.new:
+        headers => [
+            User-agent => 'Cro'
+        ];
+
 ## Setting the request body
 
 To give the request a body, pass the `body` named argument. The `content-type`
