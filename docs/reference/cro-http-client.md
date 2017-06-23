@@ -127,7 +127,7 @@ browsers for forms that contain file uploads):
             eats => 'bamboo',
             # For file uploads, make a part object
             Cro::HTTP::Body::MultiPartFormData::Part.new(
-                headers => [Cro::HTTP::Header.name(
+                headers => [Cro::HTTP::Header.new(
                     name => 'Content-type',
                     value => 'image/jpeg'
                 )],
