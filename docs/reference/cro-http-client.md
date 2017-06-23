@@ -133,7 +133,7 @@ browsers for forms that contain file uploads):
                 )],
                 name => 'photo',
                 filename => 'baobao.jpg',
-                body-body => slurp('baobao.jpg', :bin)
+                body-blob => slurp('baobao.jpg', :bin)
             )
         ];
 
