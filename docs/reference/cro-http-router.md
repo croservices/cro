@@ -553,6 +553,47 @@ inserted to change what happens (for example, serving custom error pages).
 
 All other response codes are produced by explicitly setting `response.status`.
 
+## Serving static content
+
+The `static` routine is used to easily serve static content. It sets the
+content of the request body to the content of the file being served, and the
+content type according to the extension of the file.
+
+In its simplest form, `static` simply serves an individual file:
+
+    get -> {
+        static 'www/index.html';
+    }
+
+In its multi-argument form, it treats the first argument as a base directory,
+and then slurps the remaining arguments and treats them as path segments to
+append to the base directory. This is useful for serving content from a base
+directory:
+
+    get -> 'css', *@path {
+        static 'css', @path;
+    }
+
+This form will never serve content outside of the base directory; a path that
+tries to do `../` tricks shall not be able to escape.
+
+For either of these forms, if no file is found then a HTTP 404 response will
+be served. If the path resolves to anything that is not a normal file (such as
+a directory) or a file that cannot be read, then a HTTP 403 response will be
+served instead.
+
+The default set of file extension to MIME type mappings are derived from the
+list provided with the Apache web server. If no mapping is found, the content
+type will be set to `application/octet-stream`. To provide extras or to
+override the default, pass a hash of mappins to the `mime-types` named
+argument.
+
+    get -> 'downloads', *@path {
+        static 'files', @path, mime-types => {
+            'foo' => 'application/x-foo'
+        }
+    }
+
 ## Adding custom response body serializers
 
 Custom body serializers implement the `Cro::HTTP::BodySerializer` role. They
