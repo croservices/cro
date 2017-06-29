@@ -268,3 +268,35 @@ The 301, 307 and 308 redirects are treated identically at this time; no
 caching of permanent redirects takes place. They retain the original request
 method. 302 and 303 instead cause a `GET` request to be issued, regardless of
 the original request method.
+
+## Authentication
+
+Both basic authentication and bearer authentication are supported directly by
+`Cro::HTTP::Client`. These can be configured when instantiating the client, or
+per request (which will override that configured on the instance).
+
+For basic authentication, pass the `auth` option with a hash containing a
+username and a password.
+
+    auth => {
+        username => $user,
+        password => $password
+    }
+
+For bearer authentication, pass the `auth` option with a hash containing a
+bearer:
+
+    auth => { bearer => $jwt }
+
+Failing to pass precisely either `username` and `password` *or* `bearer` will
+result in an `X::Cro::Client::InvalidAuth` exception.
+
+In both cases, the authentication information will be sent immediately with
+the request. In order to only have it sent if the server responds to the
+initial request with a 401 response, set the `if-asked` option to `True`.
+
+    auth => {
+        username => $user,
+        password => $password,
+        if-asked => True
+    }
