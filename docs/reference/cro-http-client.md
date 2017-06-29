@@ -246,3 +246,25 @@ Cookies passed in this way will *override* any cookies from a cookie jar.
 To get the cookies set by a response, use the `cookies` method on the
 `Cro::HTTP::Response` object, which returns a `List` of `Cro::HTTP::Cookie`
 objects.
+
+## Following redirects
+
+By default, `Cro::HTTP::Client` will follow HTTP redirect responses, with a
+limit of 5 redirects being enforced in order to avoid circular redirects. If
+there are more than 5 redirections, `X::Cro::HTTP::Client::TooManyRedirects'
+will be thrown.
+
+This behavior can be configured when constructing a new `Cro::HTTP::Client` or
+on a per-request basis, with the per-request setting overriding the behavior
+configured at construction time. In either case, it is done using the `follow`
+named argument.
+
+    :follow         # follow redirects (up to 5 times per request)
+    :!follow        # never follow redirects
+    :follow(2)      # follow redirects (up to 2 times per request)
+    :follow(10)     # follow redirects (up to 10 times per request)
+
+The 301, 307 and 308 redirects are treated identically at this time; no
+caching of permanent redirects takes place. They retain the original request
+method. 302 and 303 instead cause a `GET` request to be issued, regardless of
+the original request method.
