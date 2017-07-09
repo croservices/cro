@@ -614,6 +614,54 @@ my $app = route {
 }
 ```
 
+## Setting response cachability
+
+The `cache-control` sub provides a convenient way to set the `Cache-control`
+header in the HTTP response, which controls whether, and for how long, the
+response may be cached. If there already is a cache control header, it will be
+removed and a new one added as specified.
+
+The `cache-control` sub may be passed the following named parameters:
+
+* `:public` - may be stored by any cache
+* `:private` - may only be stored by a single-user cache (for example, in the
+  browser)
+* `:no-cache` - cache entry may never be used without checking if it's still
+  valid
+* `:no-store` - response may never even be stored in a cache
+* `:max-age(600)` - how old the content can become before the cache should
+  evict it
+* `:s-maxage(600)` - as for `maxage` but applies only to shared caches
+* `:must-revalidate` - the response may not be used after the `max-age` has
+  passed
+* `:proxy-revalidate` - same as `must-revalidate` but for shared proxies
+* `:no-transform` - the response must not be transformed (e.g. recompressing
+  images)
+
+It will emit a single `Cache-control` header with the options comma-separated.
+
+A typical usage to cache image assets for up to 10 minutes in any cache would
+be:
+
+    cache-control :public, :max-age(600);
+
+This could be used with static file serving:
+
+    get -> 'css', *@path {
+        cache-control :public, :maxage(300);
+        static 'css', @path;
+    }
+
+To state a response should never be stored in a cache, it is in theory enough
+to state:
+
+    cache-control :no-store;
+
+However, given differring interpretations by different user ages, it is wise
+to instead use:
+
+    cache-control :no-store, :no-cache;
+
 ## Composing routers
 
 For any non-trivial service, defining all of the routes and their handlers in a
