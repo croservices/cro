@@ -657,7 +657,7 @@ to state:
 
     cache-control :no-store;
 
-However, given differring interpretations by different user ages, it is wise
+However, given differring interpretations by different user-agents, it is wise
 to instead use:
 
     cache-control :no-store, :no-cache;
