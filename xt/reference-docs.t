@@ -17,11 +17,7 @@ my @code = files($*CWD.IO.child('lib'), '.pm6');
 my $docs = set files($*CWD.IO.child('docs/reference'), 'md');
 
 for @code -> $fn {
-    if $docs{$fn.Str.lc.subst('.pm6', '.md').subst('/', '-', :g)} {
-        pass "$fn - is documented";
-    } else {
-        flunk "$fn - to be documented";
-    }
+    ok $docs{$fn.Str.lc.subst('.pm6', '.md').subst('/', '-', :g)}, "$fn is documented";
 }
 
 done-testing;
