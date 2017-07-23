@@ -17,6 +17,7 @@ as well as covering some more advanced topics.
 * [The Cro Approach](approach)
 * [Module Structure](module-structure)
 * [The cro Development Tool](cro-tool)
+* [The .cro.yml File](cro-yml)
 
 ## Reference
 
