@@ -102,10 +102,14 @@ unimportant, so these are equivalent:
 ## Serving Static Content
 
 Sometimes it is useful to set up a HTTP server to serve some static content.
-Serve the current directory with:
+Serve the current directory on port 8080 of localhost with:
 
-    cro serve
+    cro serve 8080
 
 Or specify a directory to serve:
 
-    cro serve static_content/
+    cro serve 8080 static_content/
+
+A hostname to bind to may be provided before the port also:
+
+    cro serve 192.168.0.1:8080 static_content/
