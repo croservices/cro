@@ -6,6 +6,20 @@ using `cro web`). It is entirely possible to use Cro without these tools. They
 aim to provide some reasonable defaults, but may not be suitable for every
 project.
 
+## Running the Cro Web Interface
+
+The Cro web interface can be started using:
+
+    cro web
+
+To change the port that it runs on from the default, use:
+
+    cro web 8000
+
+To have it bind to a host other than `localhost`, use:
+
+    cro web 192.168.0.1:8080
+
 ## Stubbing Services
 
 A new service can be stubbed using the `cro stub` command. The general usage

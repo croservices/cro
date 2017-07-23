@@ -1,8 +1,11 @@
-
 proto MAIN(|) is export {*}
 
-multi MAIN('web') {
-    !!! "web"
+multi MAIN('web', Str $host-port = '10203') {
+    use Cro::Tools::Web;
+    my ($host, $port) = parse-host-port($host-port);
+    my $service = web $host, $port;
+    say "Cro web interface running at http://$host:$port/";
+    stop-on-sigint($service);
 }
 
 multi MAIN('stub', Str $service-type, Str $name, Str $path, *@option) {
@@ -22,6 +25,19 @@ multi MAIN('trace', *@service-name-or-filter) {
 }
 
 multi MAIN('serve', Str $host-port, Str $directory = '.') {
+    my ($host, $port) = parse-host-port($host-port);
+    if $directory.IO.d {
+        use Cro::Tools::Serve;
+        my $service = serve $host, $port, $directory;
+        say "Serving '$directory' at http://$host:$port/";
+        stop-on-sigint($service);
+    }
+    else {
+        conk "The serve command requires a directory, but '$directory' isn't one.";
+    }
+}
+
+sub parse-host-port($host-port) {
     my ($host, $port);
     given $host-port {
         when /^(\d+)$/ {
@@ -39,29 +55,24 @@ multi MAIN('serve', Str $host-port, Str $directory = '.') {
     unless 1 <= $port <= 0xFFFF {
         conk "Port number $port is out of range.";
     }
+    return $host, $port;
+}
 
-    if $directory.IO.d {
-        use Cro::Tools::Serve;
-        my $service = serve $host, $port, $directory;
-        say "Serving '$directory' at http://$host:$port/";
-        react {
-            my $sigints = 0;
-            whenever signal(SIGINT) {
-                if $sigints++ {
+sub stop-on-sigint($service) {
+    react {
+        my $sigints = 0;
+        whenever signal(SIGINT) {
+            if $sigints++ {
+                done;
+            }
+            else
+            {
+                say "Shutting down server cleanly (Ctrl+C again to force exit).";
+                whenever start $service.stop {
                     done;
-                }
-                else
-                {
-                    say "Shutting down server cleanly (Ctrl+C again to force exit).";
-                    whenever start $service.stop {
-                        done;
-                    }
                 }
             }
         }
-    }
-    else {
-        conk "The serve command requires a directory, but '$directory' isn't one.";
     }
 }
 
