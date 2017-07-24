@@ -38,3 +38,41 @@ For example:
     id: flashcard-backend
     name: Flashcards Backend
     entrypoint: service.p6
+
+## Endpoints
+
+An endpoint is something exposed by a service for services or applications to
+connect to. Most often, it's a network port. The stub services produced by Cro
+do not hard-code a port number, but instead take it from an environment
+variable.
+
+Endpoints are specified as a list under the `endpoints` key. For example, a
+service that accepts both HTTP and HTTPS would look as follows:
+
+    endpoints:
+        - id: http
+          name: HTTP (Insecure)
+          protocol: http
+          env: FLASHCARD_BACKEND_HTTP
+        - id: https
+          name: HTTP (Secure)
+          protocol: https
+          env: FLASHCARD_BACKEND_HTTPS
+
+The `id` is used to identify the endpoint in commands and when referencing it
+from other services. The `name` is for display in the user interface; it is
+optional and will default to the `id`. The `protocol` describes the protocol
+that the endpoint speaks; this is used when stubbing code to call the service
+from another service. Protocols include:
+
+* `https` - HTTP/1.1 and/or HTTP/2.0 secure (negotiated using ALPN)
+* `http` - HTTP/1.1 insecure
+* `http2` - HTTP/2.0 insecure (starts HTTP/2 by prior knowledge)
+* `wss` - web socket secure
+* `ws` - insecure
+* `zeromq/rep` - ZeroMQ `REP` (generated client would be a `REQ`)
+* `zeromq/pub` - ZeroMQ `PUB` (generated client would be a `SUB`)
+
+It is allowed to write multiple protocols with a comma. This is mostly useful
+when an endpoint handles both HTTP and web sockets (securely as `https,wss` or
+insecurely as `http,ws`).
