@@ -53,11 +53,13 @@ service that accepts both HTTP and HTTPS would look as follows:
         - id: http
           name: HTTP (Insecure)
           protocol: http
-          env: FLASHCARD_BACKEND_HTTP
+          host-env: FLASHCARD_BACKEND_HTTP_HOST
+          port-env: FLASHCARD_BACKEND_HTTP_PORT
         - id: https
           name: HTTP (Secure)
           protocol: https
-          env: FLASHCARD_BACKEND_HTTPS
+          host-env: FLASHCARD_BACKEND_HTTPS_HOST
+          port-env: FLASHCARD_BACKEND_HTTPS_PORT
 
 The `id` is used to identify the endpoint in commands and when referencing it
 from other services. The `name` is for display in the user interface; it is
@@ -76,3 +78,47 @@ from another service. Protocols include:
 It is allowed to write multiple protocols with a comma. This is mostly useful
 when an endpoint handles both HTTP and web sockets (securely as `https,wss` or
 insecurely as `http,ws`).
+
+The `host-env` and `port-env` fields name environment variables that will be
+populated with the host and port that the endpoint should be hosted on.
+
+## Links
+
+The `links` section describes which other Cro services this one references. It
+is used for `cro run` and `cro trace` (or running/tracing the services in the
+web interface) to inject environment variables indicating the host and port of
+the other endpoints. The environment variables can then instead be supplied by
+configuration management, Kubernetes, and so forth when deploying the service.
+
+A `links` section might look like:
+
+    links:
+      - service: flashcard-backend
+        endpoint: https
+        host-env: FLASHCARD_BACKEND_HTTPS_HOST
+        port-env: FLASHCARD_BACKEND_HTTPS_PORT
+      - service: users
+        endpoint: https
+        host-env: USERS_HTTPS_HOST
+        port-env: USERS_HTTPS_PORT
+
+Where `service` is the ID of the service (defined by `id` in its `.cro.yml`),
+`endpoint` is the ID of the endpoint (from the target service's `.cro.yml`'s
+`endpoints` section), and `env` is the environment variable specifying the
+host and port in the form `host:port`
+
+## Environment
+
+Services will usually need other resources, such as database connections,
+addresses of non-Cro services, and (development fake) security credentials. It
+may be convenient to inject these using the environment. The `env` section
+provides a way to set environment variables that will be passed to the
+service. This is a handy way to store development configuration and cut down
+a little of the setup work needed when other developers want to get the
+services running.
+
+    env:
+      - name: FLASH_DATABASE
+        value: test-database.internal:6555
+      - name: JWT_SECRET
+        value: my-dev-not-so-secret
