@@ -172,8 +172,10 @@ supported. It can be passed a single item or list. Valid options are `1.1`
     :http<2>        # HTTP/2 only
     :http<1.1 2>    # HTTP/1.1 and HTTP/2 (SSL only; selected by ALPN)
 
-The default is `:http<1.1>` for a HTTP server, and `:http<1.1 2>` for a HTTPS
-server. The only supported mechanism for selecting between HTTP/1.1 and HTTP/2
-is Application Level Protocol Negotiation, which is part of SSL. Therefore, it
-is not possible to have a HTTP server that can accept both HTTP/1.1 and HTTP/2
-connections in Cro.
+The default is `:http<1.1>` for a HTTP server. For a HTTPS server, if the SSL
+library (`IO::Socket::Async::SSL`) detects that ALPN support is available then
+it will default to `:http<1.1 2>`; otherwise it will default to `:http<1.1>`.
+If `:http<1.1 2>` is specified and ALPN support is not available, then an
+exception will be thrown. ALPN is the only supported mechanism for selecting
+between HTTP/1.1 and HTTP/2, thus the requirement on it for this configuration
+(and why there is no option for both versions with HTTP).
