@@ -313,4 +313,65 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     X::Cro::Tools::CroFile::Unexpected, field => 'wat', in => 'env',
    'Unexpected env field is an error';
 
+{
+    my $try-serialize = Cro::Tools::CroFile.new(
+        id => 'flashcard-backend',
+        name => 'Flashcards Backend',
+        entrypoint => 'service.p6',
+        endpoints => [
+            Cro::Tools::CroFile::Endpoint.new(
+                id => 'http',
+                name => 'HTTP (Insecure)',
+                protocol => 'http',
+                host-env => 'FLASHCARD_BACKEND_HTTP_HOST',
+                port-env => 'FLASHCARD_BACKEND_HTTP_PORT'
+            )
+        ],
+        links => [
+            Cro::Tools::CroFile::Link.new(
+                service => 'flashcard-backend',
+                endpoint => 'https',
+                host-env => 'FLASHCARD_BACKEND_HTTPS_HOST',
+                port-env => 'FLASHCARD_BACKEND_HTTPS_PORT'
+            )
+        ],
+        env => [
+            Cro::Tools::CroFile::Environment.new(
+                name => 'FLASH_DATABASE',
+                value => 'test-database.internal:6555'
+            )
+        ]
+    );
+
+    my $yaml;
+    lives-ok { $yaml = $try-serialize.to-yaml() }, 'Serializing to YAML lives';
+    like $yaml, /'cro' \s* ':' \s* 1/, 'Has cro version identifier';
+
+    my $parsed;
+    lives-ok { $parsed = Cro::Tools::CroFile.parse($yaml) }, 'Could parse output';
+    is $parsed.id, 'flashcard-backend', 'Correct id (roundtrip)';
+    is $parsed.name, 'Flashcards Backend', 'Correct name (roundtrip)';
+    is $parsed.entrypoint, 'service.p6', 'Correct entrypoint (roundtrip)';
+    is $parsed.endpoints.elems, 1, 'Roundtripped 1 endpoint';
+    given $parsed.endpoints[0] {
+        is .id, 'http', 'Correct endpoint id (roundtrip)';
+        is .name, 'HTTP (Insecure)', 'Correct endpoint name (roundtrip)';
+        is .protocol, 'http', 'Correct endpoint protocol (roundtrip)';
+        is .host-env, 'FLASHCARD_BACKEND_HTTP_HOST', 'Correct endpoint host-env (roundtrip)';
+        is .port-env, 'FLASHCARD_BACKEND_HTTP_PORT', 'Correct endpoint port-env (roundtrip)';
+    }
+    is $parsed.links.elems, 1, 'Roundtripped 1 link';
+    given $parsed.links[0] {
+        is .service, 'flashcard-backend', 'Correct link service (roundtrip)';
+        is .endpoint, 'https', 'Correct link endpoint (roundtrip)';
+        is .host-env, 'FLASHCARD_BACKEND_HTTPS_HOST', 'Correct link host-env (roundtrip)';
+        is .port-env, 'FLASHCARD_BACKEND_HTTPS_PORT', 'Correct link port-env (roundtrip)';
+    }
+    is $parsed.env.elems, 1, 'Roundtripped 1 environment variables';
+    given $parsed.env[0] {
+        is .name, 'FLASH_DATABASE', 'Correct environment name (roundtrip)';
+        is .value, 'test-database.internal:6555', 'Correct environment name (roundtrip)';
+    }
+}
+
 done-testing;

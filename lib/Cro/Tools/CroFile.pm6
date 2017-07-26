@@ -89,4 +89,27 @@ class Cro::Tools::CroFile {
             die X::Cro::Tools::CroFile::Unexpected.new(field => $unexpected.keys.head, :$in);
         }
     }
+
+    method to-yaml() {
+        save-yaml {
+            :cro(1), :$!id, :$!name, :$!entrypoint,
+            :endpoints(@!endpoints.map({%(
+                id => .id,
+                name => .name,
+                protocol => .protocol,
+                host-env => .host-env,
+                port-env => .port-env
+            )})),
+            :links(@!links.map({%(
+                service => .service,
+                endpoint => .endpoint,
+                host-env => .host-env,
+                port-env => .port-env
+            )})),
+            :env(@!env.map({%(
+                name => .name,
+                value => .value
+            )}))
+        }
+    }
 }
