@@ -56,3 +56,11 @@ The full details, organized by module.
 * [Cro::WebSocket::MessageSerializer](cro-websocket-messageserializer.md)
 
 ### Cro::ZeroMQ
+
+### Cro::Tools
+
+The development tools are mostly without API docs, as they are mostly not
+expected to be extended from the outside at this point. However, the following
+parts have stable APIs for the sake of extending the tools.
+
+* [Cro::Tools::Template](cro-tools-template)
