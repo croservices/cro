@@ -53,8 +53,8 @@ with-test-dir -> $dir {
         my $s1-meta-change = $first-found.metadata-changed.Channel;
         my $s1-change = $first-found.source-changed.Channel;
 
-        my $s2-meta-change = $third-found.metadata-changed.Channel;
-        my $s2-change = $third-found.source-changed.Channel;
+        my $s2-meta-change = $second-found.metadata-changed.Channel;
+        my $s2-change = $second-found.source-changed.Channel;
 
         nok $s1-meta-change.poll, 'No initial metadata change reported';
         spurt "$dir/nested/service2/.cro.yml",
