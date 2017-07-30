@@ -73,6 +73,13 @@ with-test-dir -> $dir {
             'Metadata changes not mis-delivered to second service';
         nok $s2-change.poll,
             'Source changes not mis-delivered to second service';
+
+        nok $second-found.cro-file-error.defined, 'No exception is set when no error';
+        spurt "$dir/service1/.cro.yml", ": invalid stuff!";
+        ok $s2-meta-change.receive,
+            'Got notification of change to second service .cro.yml';
+        nok $second-found.cro-file.defined, 'Parse error gives undefined .cro-file';
+        ok $second-found.cro-file-error.defined, 'Exception is set on error';
     }
 
     {

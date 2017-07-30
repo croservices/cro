@@ -4,6 +4,7 @@ class Cro::Tools::Services {
     class Service {
         has IO::Path $.path;
         has Cro::Tools::CroFile $.cro-file;
+        has Exception $.cro-file-error;
         has Supply $!file-changed;
         has Promise $!deleted .= new;
         has $!deleted-vow = $!deleted.vow;
@@ -49,6 +50,12 @@ class Cro::Tools::Services {
 
         method !load-cro-file() {
             $!cro-file = Cro::Tools::CroFile.parse($!path.add('.cro.yml').slurp);
+            CATCH {
+                default {
+                    $!cro-file = Nil;
+                    $!cro-file-error = $_;
+                }
+            }
         }
     }
 
