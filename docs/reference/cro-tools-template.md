@@ -85,7 +85,7 @@ well, or a `List` of `Str` errors to indicate issues. It is passed a hash of
 the entered options. Here is the HTTP service template's implementation, as
 an example (it destructures the options hash for conveneince):
 
-    method get-option-errors((:$http1, :$http2, :$secure) --> List) { () }
+    method get-option-errors((:$http1, :$http2, :$secure, *%) --> List) { () }
         my @errors;
         unless $http1 || $http2 {
             push @errors, 'Must select at least one of HTTP/1.1 or HTTP/2.0';
