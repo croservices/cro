@@ -143,7 +143,7 @@ Typically used together with `Cro::ZeroMQ::XSub`.
 
 This is a `Cro::Source` backed by a ZeroMQ XSUB socket. It produces
 `Cro::ZeroMQ::Message` objects, which represent messages received from
-subscriptions. It is a `Cro::Replyable`, the replier being a `Cro::Sink`
+publishers. It is a `Cro::Replyable`, the replier being a `Cro::Sink`
 that consumes `Cro::ZeroMQ::Message` objects (which represent subscription
 requests to pass on to the publisher). Typically used together with
 `Cro::ZeroMQ::XPub`.
