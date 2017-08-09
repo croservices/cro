@@ -25,14 +25,16 @@ To have it bind to a host other than `localhost`, use:
 A new service can be stubbed using the `cro stub` command. The general usage
 is:
 
-    cro stub <service-type> <id> <path> [options...]
+    cro stub <service-type> <id> <path> ['options']
 
 Where `service-type` is the type of service to create, `id` is the ID of the
 service (to be used with other `cro` coammands), `path` is the location to
 create the service, and `options` are a set of options specific to the service
 type. The options are written in a simplified version of Perl 6 colonpair
 syntax, where `:foo` enables an option, `:!foo` disables an option, and
-`:foo<bar>` is the option `foo` with the value `bar`.
+`:foo<bar>` is the option `foo` with the value `bar`. For example:
+
+    cro stub http foo services/foo ':!secure :websocket :link<bar>'
 
 The stubbed services take port and certificate configuration from environment
 variables, and when there are relations between services their addresses are
