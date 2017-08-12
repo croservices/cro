@@ -11,23 +11,62 @@ class Cro::Tools::Runner {
         has %.endpoint-ports;
     }
 
+    class Restarted does Message {
+        has $.cro-file;
+    }
+
     has Cro::Tools::Services $.services is required;
     has $.service-id-filter = *;
 
     method run(--> Supply) {
         supply {
-            my $next-try-port = 20000;
+            my class RunningService {
+                has $.path;
+                has %.endpoint-ports;
+                has $.proc is rw;
+                has $.proc-exit is rw;
+                has $.cro-file is rw;
+            }
+            my %running-services;
 
-            whenever $!services.services {
-                my $path = .path;
-                my $cro-file = .cro-file;
+            whenever $!services.services -> $service {
+                my $path = $service.path;
+                my $cro-file = $service.cro-file;
                 my $service-id = $cro-file.id;
                 if $service-id ~~ $!service-id-filter {
                     my %endpoint-ports = assign-ports($cro-file.endpoints);
                     my ($proc, $proc-exit) = service-proc($path, $cro-file, %endpoint-ports);
                     whenever $proc.ready {
+                        add-service $service, RunningService.new:
+                            :$path, :%endpoint-ports, :$proc, :$proc-exit, :$cro-file;
                         emit Started.new(:$service-id, :$cro-file, :%endpoint-ports);
                     }
+                }
+            }
+
+            sub add-service($service, $running-service) {
+                %running-services{$service.cro-file.id} = $running-service;
+                whenever $service.metadata-changed.merge($service.source-changed).stable(1) {
+                    $running-service.cro-file = $service.cro-file;
+                    restart-service($running-service);
+                }
+            }
+
+            sub restart-service($running-service) {
+                try $running-service.proc.kill(SIGINT);
+                whenever $running-service.proc-exit {
+                    given $running-service {
+                        (.proc, .proc-exit) = service-proc(.path, .cro-file, .endpoint-ports);
+                    }
+                    emit Restarted.new:
+                        service-id => $running-service.cro-file.id,
+                        cro-file => $running-service.cro-file;
+                }
+            }
+
+            CLOSE {
+                for %running-services.values {
+                    .proc.kill(SIGINT);
                 }
             }
 
@@ -35,6 +74,7 @@ class Cro::Tools::Runner {
                 hash @endpoints.map({ .id => free-port() })
             }
 
+            my $next-try-port = 20000;
             sub free-port() {
                 loop {
                     my $try-conn = IO::Socket::Async.connect('localhost', $next-try-port);
