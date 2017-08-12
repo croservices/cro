@@ -146,7 +146,9 @@ class Cro::Tools::Services {
                     emit $_;
                     my $path-io = .path.IO;
                     when $path-io.d {
-                        add-dir($path-io) unless %watched-dirs{$path-io};
+                        unless $path-io.basename.starts-with('.') {
+                            add-dir($path-io) unless %watched-dirs{$path-io};
+                        }
                     }
                 }
 
@@ -158,7 +160,9 @@ class Cro::Tools::Services {
                         );
                     }
                     when .d {
-                        add-dir($_, :$initial);
+                        unless .basename.starts-with('.') {
+                            add-dir($_, :$initial);
+                        }
                     }
                 }
             }
