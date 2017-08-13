@@ -20,10 +20,8 @@ my Cro::Service $http = Cro::HTTP::Server.new(
     ]
 );
 $http.start;
-say "Listening at http://%*ENV<SERVICE1_HTTP_HOST>:%*ENV<SERVICE1_HTTP_PORT>";
 react {
     whenever signal(SIGINT) {
-        say "Shutting down...";
         $http.stop;
         done;
     }

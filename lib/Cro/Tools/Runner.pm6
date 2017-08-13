@@ -15,6 +15,11 @@ class Cro::Tools::Runner {
         has $.cro-file;
     }
 
+    class Output does Message {
+        has Bool $.on-stderr;
+        has Str $.line;
+    }
+
     has Cro::Tools::Services $.services is required;
     has $.service-id-filter = *;
 
@@ -93,6 +98,7 @@ class Cro::Tools::Runner {
             }
 
             sub service-proc($path, $cro-file, %endpoint-ports) {
+                my $service-id = $cro-file.id;
                 my %env = %*ENV;
                 for $cro-file.endpoints -> $endpoint {
                     with $endpoint.host-env {
@@ -103,6 +109,12 @@ class Cro::Tools::Runner {
                     }
                 }
                 my $proc = Proc::Async.new('perl6', '-Ilib', $cro-file.entrypoint);
+                whenever $proc.stdout.lines -> $line {
+                    emit Output.new(:$service-id, :!stderr, :$line);
+                }
+                whenever $proc.stderr.lines -> $line {
+                    emit Output.new(:$service-id, :stderr, :$line);
+                }
                 return $proc, $proc.start(:ENV(%env), :cwd($path));
             }
         }

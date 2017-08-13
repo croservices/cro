@@ -34,13 +34,18 @@ with-test-dir -> $test-dir {
         services => Cro::Tools::Services.new(base-path => $test-dir.IO),
         service-id-filter => 'service1'
     );
-    my $messages = Channel.new;
+    my $start-restart-messages = Channel.new;
+    my $other-messages = Channel.new;
     my $run-tap = $r.run.tap:
-        { $messages.send($_) },
-        done => { $messages.close() },
-        quit => { $messages.fail($_) };
+        {
+            .isa(Cro::Tools::Runner::Started) || .isa(Cro::Tools::Runner::Restarted)
+                ?? $start-restart-messages.send($_)
+                !! $other-messages.send($_)
+        },
+        done => { $start-restart-messages.close() },
+        quit => { $start-restart-messages.fail($_) };
 
-    my $started = $messages.receive;
+    my $started = $start-restart-messages.receive;
     isa-ok $started, Cro::Tools::Runner::Started,
         'Got started event';
     is $started.service-id, 'service1', 'Correct service ID was started';
@@ -54,9 +59,14 @@ with-test-dir -> $test-dir {
     ok $got-body.defined, 'Could call the started service';
     is $got-body, 'Service 1 OK', 'Got expected resposne from service';
 
+    my $log = $other-messages.receive;
+    isa-ok $log, Cro::Tools::Runner::Output, 'Got an output message after request';
+    nok $log.on-stderr, 'Was not on STDERR';
+    ok $log.line ~~ /200/, 'Got log line mentioning status code';
+
     my $service-file = "$test-dir/service1/service.p6";
     spurt $service-file, slurp($service-file).subst("OK", "UPDATED");
-    my $restarted = $messages.receive;
+    my $restarted = $start-restart-messages.receive;
     isa-ok $restarted, Cro::Tools::Runner::Restarted,
         'Got restarted message';
     is $started.service-id, 'service1', 'Correct service ID was restarted';
@@ -65,6 +75,11 @@ with-test-dir -> $test-dir {
     $got-body = test-request("http://localhost:$port/");
     ok $got-body.defined, 'Could call the restarted service';
     is $got-body, 'Service 1 UPDATED', 'Got response indicating new service running';
+
+    $log = $other-messages.receive;
+    isa-ok $log, Cro::Tools::Runner::Output, 'Got an output message from restarted service';
+    nok $log.on-stderr, 'Was not on STDERR';
+    ok $log.line ~~ /200/, 'Got log line mentioning status code';
 
     $run-tap.close;
     dies-ok { await Cro::HTTP::Client.get("http://localhost:$port/") },
