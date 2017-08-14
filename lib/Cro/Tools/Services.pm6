@@ -14,8 +14,14 @@ class Cro::Tools::Services {
             start react {
                 whenever $!file-changed {
                     unless $!path.add('.cro.yml').e {
-                        $!deleted-vow.keep(True);
-                        done;
+                        # Some tools rename the file and then save the new one
+                        # in its place, so check again later.
+                        whenever Promise.in(1) {
+                            unless $!path.add('.cro.yml').e {
+                                $!deleted-vow.keep(True);
+                                done;
+                            }
+                        }
                     }
                 }
             }
