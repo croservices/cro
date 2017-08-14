@@ -78,24 +78,24 @@ All of the ZeroMQ pipeline components do the `Cro::ZeroMQ::Component` role,
 which factors out these commonalities. There will be little reason for typical
 Cro applications to care about this, however.
 
-### Cro::ZeroMQ::Push
+### Cro::ZeroMQ::Socket::Push
 
 This class is a `Cro::Sink` backed by a ZeroMQ PUSH socket. It is to be placed
 at the end of a pipeline, consuming `Cro::ZeroMQ::Message` objects and sending
 them.
 
-### Cro::ZeroMQ::Pull
+### Cro::ZeroMQ::Socket::Pull
 
 This class is a `Cro::Source` backed by a ZeroMQ PULL socket. It is to be
 placed at the start of a pipeline, and produces `Cro::ZeroMQ::Message`
 objects.
 
-### Cro::ZeroMQ::Pub
+### Cro::ZeroMQ::Socket::Pub
 
 This class is a `Cro::Sink` backed by a ZeroMQ PUB socket. It consumes
 `Cro::ZeroMQ::Message` objects and publishes them.
 
-### Cro::ZeroMQ::Sub
+### Cro::ZeroMQ::Socket::Sub
 
 This class is a `Cro::Source` backed by a ZeroMQ SUB socket. It produces
 `Cro::ZeroMQ::Message` objects for each message received. Subscriptions are
@@ -131,7 +131,7 @@ that is still active to be meaningful; it is not, therefore, possible to
 subscribe to everything and then exclude things. (At the end of the day, these
 are all just convenient ways to have `zmq_setsockopt` called.)
 
-### Cro::ZeroMQ::XPub
+### Cro::ZeroMQ::Socket::XPub
 
 This is a `Cro::Source` backed by a ZeroMQ XPUB socket. It produces
 `Cro::ZeroMQ::Message` objects, which represent subscription requests. It is
@@ -139,7 +139,7 @@ This is a `Cro::Source` backed by a ZeroMQ XPUB socket. It produces
 `Cro::ZeroMQ::Message` objects (which correspond to messages to publish).
 Typically used together with `Cro::ZeroMQ::XSub`.
 
-### Cro::ZeroMQ::XSub
+### Cro::ZeroMQ::Socket::XSub
 
 This is a `Cro::Source` backed by a ZeroMQ XSUB socket. It produces
 `Cro::ZeroMQ::Message` objects, which represent messages received from
@@ -148,7 +148,7 @@ that consumes `Cro::ZeroMQ::Message` objects (which represent subscription
 requests to pass on to the publisher). Typically used together with
 `Cro::ZeroMQ::XPub`.
 
-### Cro::ZeroMQ::Rep
+### Cro::ZeroMQ::Socket::Rep
 
 This class is a `Cro::Source` backed by a ZeroMQ REP socket, which produces
 `Cro::ZeroMQ::Message`. It is also a `Cro::Replyable`, and the replier is a
@@ -165,7 +165,7 @@ message at a time, so another message will not be emitted until the reply
 has been sent by the replier. To build services that can work on multiple
 messages asynchronously, `Cro::ZeroMQ::Router` is a better bet.
 
-### Cro::ZeroMQ::Req
+### Cro::ZeroMQ::Socket::Req
 
 This class is a `Cro::Connector` backed by a ZeroMQ REQ socket. It consumes
 `Cro::ZeroMQ::Message` and produces `Cro::ZeroMQ::Message`. It must never have
@@ -173,17 +173,170 @@ a message emitted to it while it is still waiting for the response from an
 earlier message, to follow the ZeroMQ REQ constraints. To build clients that
 can have multiple outstanding requests, `Cro::ZeroMQ::Dealer` is a better bet.
 
-### Cro::ZeroMQ::Router
+### Cro::ZeroMQ::Socket::Router
 
 This class is a `Cro::Source` backed by a ZeroMQ ROUTER socket. It produces
 `Cro::ZeroMQ::Message` objects. It is also a `Cro::Replyable`, the replier
 being a sink that sends on the ROUTER socket.
 
-### Cro::ZeroMQ::Dealer
+### Cro::ZeroMQ::Socket::Dealer
 
 This class is a `Cro::Connector` backed by a ZeroMQ DEALER socket. It consumes
 and produces `Cro::ZeroMQ::Message` objects.
 
 ## Higher Level APIs
 
-TODO
+### Cro::ZeroMQ::Service
+
+This is a `Cro::Service` containing a pipeline for processing ZeroMQ messages.
+Many services will have a single `Cro::Service` instance that they start up,
+but there's no reason a service can't have many. A `Cro::Service` makes most
+sense for pipelines that feel "server"-like, or that are the "main loop" of
+the service.
+
+There are various methods for constructing the most common kinds of pipeline.
+It is allowable (though not always sensible) to bind or connect endpoints.
+
+#### Replier (REP)
+
+A service that receives and replies to messages. The echo service would just
+be:
+
+    my Cro::Service $rep = Cro::ZeroMQ::Service.rep(
+        bind => 'tcp://*:5555'
+    );
+
+A more realistic example would include a transform implementing the service.
+
+    class MyReplier is Cro::Transform {
+        method consumes() { Cro::ZeroMQ::Message }
+        method produces() { Cro::ZeroMQ::Message }
+        method transformer(Supply $messages --> Supply) {
+            supply {
+                whenever $messages {
+                    my $response = ...;
+                    emit $response;
+                }
+            }
+        }
+    }
+    my Cro::Service $rep = Cro::ZeroMQ::Service.rep(
+        bind => 'tcp://*:5555',
+        MyReplier
+    );
+
+#### Pull (PULL)
+
+Used for a service that will pull messages and process them. Since it doesn't
+send anything, then the service is a sink.
+
+    class MyAggregator is Cro::Sink {
+        method consumes() { Cro::ZeroMQ::Message }
+        method sinker(Supply $messages --> Supply) {
+            supply {
+                whenever $messages {
+                    # Do something with the message.
+                }
+            }
+        }
+    }
+    my Cro::Service $rep = Cro::ZeroMQ::Service.pull(
+        connect => 'tcp://some-publisher:5555',
+        MyAggregator
+    );
+
+#### Pull/Push (PULL, PUSH)
+
+This is typically used as a parallel worker. Unlike other service types, it
+expects:
+
+* Either `pull-bind` or `pull-connect` (typically `connect`, as the source of
+  work is a static point in the service topology)
+* Either `push-bind` or `push-connect` (typically also `connect`, as the sink
+  for work is a static point in the service topology too)
+
+    class MyWorker is Cro::Transform {
+        method consumes() { Cro::ZeroMQ::Message }
+        method produces() { Cro::ZeroMQ::Message }
+        method transformer(Supply $messages --> Supply) {
+            supply {
+                whenever $messages {
+                    my $outcome = ...;
+                    emit $outcome;
+                }
+            }
+        }
+    }
+    my Cro::Service $rep = Cro::ZeroMQ::Service.pull-push(
+        pull-connect => 'tcp://source:5555',
+        push-connect => 'tcp://sink:5555',
+        MyWorker
+    );
+
+#### Subscriber (SUB)
+
+A service that reacts to received messages. Since it doesn't send anything,
+then the service is a sink.
+
+    class MyHandler is Cro::Sink {
+        method consumes() { Cro::ZeroMQ::Message }
+        method sinker(Supply $messages --> Supply) {
+            supply {
+                whenever $messages {
+                    # Do something with the message.
+                }
+            }
+        }
+    }
+    my Cro::Service $rep = Cro::ZeroMQ::Service.sub(
+        connect => 'tcp://some-publisher:5555',
+        MyHandler
+    );
+
+### Cro::ZeroMQ::Client for request/response (REQ, DEALER)
+
+This provides a simple interface for sending messages using a `REQ` or a
+`DEALER` socket and receiving a single response to that message. A `req`
+client will send a message, and will not be able to send another until a
+response has been received. Trying to do so will result in an exception.
+
+    my $client = Cro::ZeroMQ::Client.req(
+        connect => 'tcp://some-replier:5555'
+    );
+    my $reply = await $client.send($message);
+
+By contrast, a `dealer` is an asynchronous client. It will synthesize an ID
+for each request and insert it, followed by an empty frame, before sending the
+requst. Responses will cause the correct `Promise`s returned by `send` to be
+kept.
+
+    my $client = Cro::ZeroMQ::Client.dealer(
+        connect => 'tcp://some-replier:5555'
+    );
+    my $reply = await $client.send($message);
+
+In most cases, `dealer` will be preferable.
+
+### Cro::ZeroMQ::Sender for send-only (PUSH, PUB)
+
+These socket types have a `send` method that sends the message asynchronously
+and return immediately.
+
+    my $client = Cro::ZeroMQ::Sender.push(
+        bind => 'tcp://work-source:5555'
+    );
+    $client.send($message);
+
+### Cro::ZeroMQ::Socket
+
+This provides an API that looks largely like a Perl 6 asynchronous socket, for
+situations where there's no simpler API that fits.
+
+TODO: Describe these
+
+### Cro::ZeroMQ::Proxy
+
+This combines a `Cro::ZeroMQ::Service` with a `Cro::ZeroMQ::Socket` in order
+to get proxying behavior.
+
+TODO: Describe these
