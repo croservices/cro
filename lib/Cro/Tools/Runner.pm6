@@ -110,10 +110,10 @@ class Cro::Tools::Runner {
                 }
                 my $proc = Proc::Async.new('perl6', '-Ilib', $cro-file.entrypoint);
                 whenever $proc.stdout.lines -> $line {
-                    emit Output.new(:$service-id, :!stderr, :$line);
+                    emit Output.new(:$service-id, :!on-stderr, :$line);
                 }
                 whenever $proc.stderr.lines -> $line {
-                    emit Output.new(:$service-id, :stderr, :$line);
+                    emit Output.new(:$service-id, :on-stderr, :$line);
                 }
                 return $proc, $proc.start(:ENV(%env), :cwd($path));
             }
