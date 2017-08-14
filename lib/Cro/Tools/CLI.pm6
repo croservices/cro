@@ -1,5 +1,7 @@
+use Cro::Tools::Runner;
 use Cro::Tools::Template;
 use Cro::Tools::TemplateLocator;
+use Terminal::ANSIColor;
 
 proto MAIN(|) is export {*}
 
@@ -150,15 +152,76 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
 }
 
 multi MAIN('run') {
-    !!! 'run'
+    run-services();
 }
 
 multi MAIN('run', *@service-name) {
-    !!! 'run services'
+    run-services(filter => any(@service-name));
 }
 
 multi MAIN('trace', *@service-name-or-filter) {
     !!! 'trace'
+}
+
+sub run-services(:$filter = *) {
+    my $runner = Cro::Tools::Runner.new(
+        services => Cro::Tools::Services.new(base-path => $*CWD),
+        :$filter
+    );
+    react {
+        my %service-id-colors;
+
+        whenever $runner.run() {
+            when Cro::Tools::Runner::Started {
+                my $color = %service-id-colors{.service-id} = next-color();
+                say colored
+                    "\c[BLACK RIGHT-POINTING TRIANGLE] Starting {.cro-file.name} ({.service-id})",
+                    "bold $color";
+                my %endpoint-ports = .endpoint-ports;
+                for .cro-file.endpoints -> $endpoint {
+                    my $port = %endpoint-ports{$endpoint.id};
+                    print color($color) ~ "\c[ELECTRIC PLUG] Endpoint $endpoint.name() will be ";
+                    given $endpoint.protocol {
+                        when 'http' {
+                            say "at http://localhost:$port/" ~ RESET();
+                        }
+                        when 'https' {
+                            say "at https://localhost:$port/" ~ RESET();
+                        }
+                        default {
+                            say "on port $port" ~ RESET();
+                        }
+                    }
+                }
+            }
+            when Cro::Tools::Runner::Restarted {
+                my $color = %service-id-colors{.service-id};
+                say colored
+                    "\c[BLACK UNIVERSAL RECYCLING SYMBOL] Restarting {.cro-file.name} ({.service-id})",
+                    "bold $color";
+            }
+            when Cro::Tools::Runner::Output {
+                my $color = %service-id-colors{.service-id};
+                if .on-stderr {
+                    note color($color), "\c[WARNING SIGN] {.service-id} ", RESET(),
+                        .line;
+                }
+                else {
+                    note color($color), "\c[NOTEBOOK] {.service-id} ", RESET(),
+                        .line;
+                }
+            }
+        }
+
+        whenever signal(SIGINT) {
+            say "Shutting down...";
+            done;
+        }
+
+        sub next-color() {
+            shift state @colors ||= <green yellow blue red cyan magenta>;
+        }
+    }
 }
 
 multi MAIN('serve', Str $host-port, Str $directory = '.') {
