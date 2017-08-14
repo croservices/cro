@@ -41,7 +41,7 @@ class Cro::Tools::Services {
 
         method source-changed(--> Supply) {
             supply {
-                whenever $!file-changed.grep(!*.path.basename.starts-with('.')) {
+                whenever $!file-changed.grep(!*.path.IO.basename.starts-with('.')) {
                     emit .path;
                 }
                 whenever $!deleted {
