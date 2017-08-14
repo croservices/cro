@@ -41,7 +41,7 @@ class Cro::Tools::Services {
 
         method source-changed(--> Supply) {
             supply {
-                whenever $!file-changed.grep(*.path ne "$!path/.cro.yml") {
+                whenever $!file-changed.grep(!*.path.basename.starts-with('.')) {
                     emit .path;
                 }
                 whenever $!deleted {
