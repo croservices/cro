@@ -226,7 +226,14 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
             when Cro::Tools::Runner::Trace {
                 my $color = %service-id-colors{.service-id};
                 my $prefix = "\c[EYEGLASSES] {.service-id} ";
-                note colored($prefix, $color) ~ "{.event.uc} [{.id}] {.component}";
+                my $event = do given .event {
+                    when 'EMIT' { "\c[HIGH VOLTAGE SIGN] EMIT" }
+                    when 'DONE' { "\c[BLACK SQUARE FOR STOP] DONE" }
+                    when 'QUIT' { "\c[SKULL AND CROSSBONES] QUIT" }
+                    default { "? {.uc}" }
+                }
+                note colored($prefix, $color) ~ colored($event, "bold") ~
+                    " [{.id}] {.component}";
                 with .data -> $data {
                     note $data.trim.indent($prefix.chars);
                 }
