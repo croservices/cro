@@ -20,8 +20,17 @@ class Cro::Tools::Runner {
         has Str $.line;
     }
 
+    class Trace does Message {
+        has Str $.id;
+        has Str $.component;
+        has Str $.event;
+        has Str $.data;
+    }
+
     has Cro::Tools::Services $.services is required;
     has $.service-id-filter = *;
+    has Bool $.trace = False;
+    has Str @.trace-filters;
 
     method run(--> Supply) {
         supply {
@@ -108,15 +117,45 @@ class Cro::Tools::Runner {
                         %env{$_} = %endpoint-ports{$endpoint.id};
                     }
                 }
+                %env<CRO_TRACE> = '1' if $!trace;
                 my $proc = Proc::Async.new('perl6', '-Ilib', $cro-file.entrypoint);
                 whenever $proc.stdout.lines -> $line {
                     emit Output.new(:$service-id, :!on-stderr, :$line);
                 }
                 whenever $proc.stderr.lines -> $line {
-                    emit Output.new(:$service-id, :on-stderr, :$line);
+                    if $line ~~ &trace-parser {
+                        if @!trace-filters {
+                            my $lc-component = $<component>.lc;
+                            next unless $lc-component.contains(any(@!trace-filters));
+                        }
+                        emit Trace.new:
+                            :$service-id, :component(~$<component>),
+                            :id($<id>.substr(1, *-1)), :event(~$<event>),
+                            :data($<data> ?? decode(~$<data>) !! Nil);
+                    }
+                    else {
+                        emit Output.new(:$service-id, :on-stderr, :$line);
+                    }
                 }
                 return $proc, $proc.start(:ENV(%env), :cwd($path));
             }
         }
+    }
+
+    my token trace-parser {
+        ^
+        '[TRACE' $<id>=[<-[\]]>+] ']'
+        \s+
+        $<component>=[\S+]
+        \s+
+        $<event>=[\S+]
+        [
+            \s+
+            $<data>=[.+]
+        ]?
+    }
+
+    sub decode($_) {
+        .subst('\\n', "\n", :g).subst('\\\\', '\\', :g)
     }
 }

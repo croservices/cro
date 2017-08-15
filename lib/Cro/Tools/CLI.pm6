@@ -160,13 +160,25 @@ multi MAIN('run', *@service-name) {
 }
 
 multi MAIN('trace', *@service-name-or-filter) {
-    !!! 'trace'
+    my @service-name;
+    my @trace-filters;
+    for @service-name-or-filter {
+        if .starts-with(':') {
+            push @trace-filters, .lc;
+        }
+        else {
+            push @service-name, $_;
+        }
+    }
+    run-services
+        filter => @service-name ?? any(@service-name) !! *,
+        :trace, :@trace-filters;
 }
 
-sub run-services(:$filter = *) {
+sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
     my $runner = Cro::Tools::Runner.new(
         services => Cro::Tools::Services.new(base-path => $*CWD),
-        :$filter
+        :$filter, :$trace, :@trace-filters
     );
     react {
         my %service-id-colors;
@@ -209,6 +221,14 @@ sub run-services(:$filter = *) {
                 else {
                     note color($color), "\c[NOTEBOOK] {.service-id} ", RESET(),
                         .line;
+                }
+            }
+            when Cro::Tools::Runner::Trace {
+                my $color = %service-id-colors{.service-id};
+                my $prefix = "\c[EYEGLASSES] {.service-id} ";
+                note colored($prefix, $color) ~ "{.event.uc} [{.id}] {.component}";
+                with .data -> $data {
+                    note $data.trim.indent($prefix.chars);
                 }
             }
         }
