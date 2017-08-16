@@ -352,28 +352,43 @@ kept.
     );
     my $reply = await $client.send($message);
 
-In most cases, `dealer` will be preferable.
+In most cases, `dealer` will be preferable for scalability reasons.
 
-### Cro::ZeroMQ::Sender for send-only (PUSH, PUB)
+### Cro::ZeroMQ::Distributor for send-only (PUSH, PUB)
 
-These socket types have a `send` method that sends the message asynchronously
-and return immediately.
+The high level client for PUSH and PUB socket types has a `send` method, which
+sends the message asynchronously and return immediately. For example:
 
-    my $client = Cro::ZeroMQ::Sender.push(
+    my $client = Cro::ZeroMQ::Distributor.push(
         bind => 'tcp://work-source:5555'
     );
     $client.send($message);
 
-### Cro::ZeroMQ::Socket
+### Cro::ZeroMQ::Collector for receive-only (PULL, SUB)
 
-This provides an API that looks largely like a Perl 6 asynchronous socket, for
-situations where there's no simpler API that fits.
+The high level client for PULL and SUB socket types has a `Supply` method,
+which will emit received `Cro::ZeroMQ::Message` objects. A PULL will probably
+be more suited to a service rather than a client, but may be useful. A useful
+example of this with a SUB socket would be to create such a client in a web
+server, and then send all received messages out over a web socket:
 
-TODO: Describe these
+    my $client = Cro::ZeroMQ::Collector.sub(
+        connect => 'tcp://notifications:5555'
+    );
+    my $notifications = $client.Supply.publish; # Turn it into a live Supply
 
-### Cro::ZeroMQ::Proxy
+    my $application = route {
+        get -> 'notifications' {
+            web-socket {
+                supply {
+                    whenever $notifications {
+                        .emit;
+                    }
+                }
+            }
+        }
+    }
 
-This combines a `Cro::ZeroMQ::Service` with a `Cro::ZeroMQ::Socket` in order
-to get proxying behavior.
+### Cro::ZeroMQ::Proxy (ROUTER + DEALER, XSUB + XPUB)
 
 TODO: Describe these
