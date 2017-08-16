@@ -22,6 +22,11 @@ This is only a convention provided by Cro. The `body-text` property will try
 to decode `body-blob` as UTF-8; pass the `:enc` parameter to choose another
 encoding.
 
+The `identity` method returns a `List` of `Blob`, which one `Blob` per frame
+up to and including the first zero-length frame. It is intended for use when
+working with ROUTER sockets. If there is no zero-length frame in the message,
+it will throw an `Exception` of type `X::Cro::ZeroMQ::MissingIdentity`.
+
 The most basic way to construct a message to to pass an list of `Blob`s to the
 `new` method:
 
@@ -195,7 +200,8 @@ sense for pipelines that feel "server"-like, or that are the "main loop" of
 the service.
 
 There are various methods for constructing the most common kinds of pipeline.
-It is allowable (though not always sensible) to bind or connect endpoints.
+It is allowable (though not always sensible) to either bind or connect the
+endpoints.
 
 #### Replier (REP)
 
@@ -214,7 +220,7 @@ A more realistic example would include a transform implementing the service.
         method transformer(Supply $messages --> Supply) {
             supply {
                 whenever $messages {
-                    my $response = ...;
+                    my $response = Cro::ZeroMQ::Message.new(.body-text.uc);
                     emit $response;
                 }
             }
@@ -223,6 +229,37 @@ A more realistic example would include a transform implementing the service.
     my Cro::Service $rep = Cro::ZeroMQ::Service.rep(
         bind => 'tcp://*:5555',
         MyReplier
+    );
+
+#### Router (ROUTER)
+
+A service that receives messages prefixed with an identify, and processes
+them. A `REP` can only process one message at a time, which will not scale so
+well if multiple messages should be processed. A `ROUTER` socket allows for
+processing of many messages at a time. Each messges is prefixed with an
+idenity. **It is up to the message transform to include that in the response
+message**, so that it can be routed back to the correct client. (Note that the
+identity actually consists of one or more frames, followed by an empty frame.)
+
+    class MyAsyncReplier is Cro::Transform {
+        method consumes() { Cro::ZeroMQ::Message }
+        method produces() { Cro::ZeroMQ::Message }
+        method transformer(Supply $messages --> Supply) {
+            supply {
+                whenever $messages -> $msg {
+                    whenever start { self!process($msg.body) } -> $response {
+                        emit Cro::ZeroMQ::Message.new($msg.identity, $response);
+                    }
+                }
+            }
+        }
+        method !process($data) {
+            ...
+        }
+    }
+    my Cro::Service $rep = Cro::ZeroMQ::Service.router(
+        bind => 'tcp://*:5555',
+        MyAsyncReplier
     );
 
 #### Pull (PULL)
