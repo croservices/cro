@@ -240,7 +240,7 @@ send anything, then the service is a sink.
             }
         }
     }
-    my Cro::Service $rep = Cro::ZeroMQ::Service.pull(
+    my Cro::Service $pull = Cro::ZeroMQ::Service.pull(
         connect => 'tcp://some-publisher:5555',
         MyAggregator
     );
@@ -267,7 +267,7 @@ expects:
             }
         }
     }
-    my Cro::Service $rep = Cro::ZeroMQ::Service.pull-push(
+    my Cro::Service $pull-push = Cro::ZeroMQ::Service.pull-push(
         pull-connect => 'tcp://source:5555',
         push-connect => 'tcp://sink:5555',
         MyWorker
@@ -288,7 +288,7 @@ then the service is a sink.
             }
         }
     }
-    my Cro::Service $rep = Cro::ZeroMQ::Service.sub(
+    my Cro::Service $sub = Cro::ZeroMQ::Service.sub(
         connect => 'tcp://some-publisher:5555',
         MyHandler
     );
