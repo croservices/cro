@@ -375,7 +375,7 @@ server, and then send all received messages out over a web socket:
     my $client = Cro::ZeroMQ::Collector.sub(
         connect => 'tcp://notifications:5555'
     );
-    my $notifications = $client.Supply.publish; # Turn it into a live Supply
+    my $notifications = $client.Supply.share; # Turn it into a live Supply
 
     my $application = route {
         get -> 'notifications' {
