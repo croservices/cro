@@ -17,8 +17,8 @@ consumed in two ways:
 
 The `get`, `post`, `put`, `delete`, and `head` methods may be called on either
 the type object or an instance of `Cro::HTTP::Client`. They will all return a
-`Supply`. Since by default only a single HTTP response will be produced, it is
-possible to `await` it:
+`Promise`, which will be kept if the request is successful or broken if an
+error occurs.
 
     my $resp = await Cro::HTTP::Client.get('https://www.perl6.org/');
 
