@@ -13,6 +13,10 @@ consumed in two ways:
   insert into the request/response processing pipeline. An instance of
   `Cro::HTTP::Client` may be used concurrently.
 
+In general, if you are going to make a one-off request, just use the type
+object. If you are going to make many requests to the same server or set of
+servers, make an instance.
+
 ## Making basic requests
 
 The `get`, `post`, `put`, `delete`, and `head` methods may be called on either
@@ -300,3 +304,12 @@ initial request with a 401 response, set the `if-asked` option to `True`.
         password => $password,
         if-asked => True
     }
+
+## Persistent connections
+
+An instance of `Cro::HTTP::Client` will use persistent connections by default.
+When many requests are being made to the same server, this can eanble better
+throughput by not requring a new connection to be established each time. To
+not use persisted connections, pass `:!persistent` to the constructor. When
+using the type object (for example, `Cro::HTTP::Client.get($url)`, then no
+persistent connection cache will be used.
