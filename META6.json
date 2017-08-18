@@ -1,0 +1,31 @@
+{
+    "perl"          : "6.*",
+    "name"          : "Cro",
+    "version"       : "0.7",
+    "description"   : "Libraries for building reactive services in Perl 6.",
+    "authors"       : [ "Jonathan Worthington <jnthn@jnthn.net>" ],
+    "license"       : "Artistic-2.0",
+    "depends"       : [ "IO::Socket::Async::SSL", "JSON::Fast",
+                        "OO::Monitors", "Shell::Command",
+                        "File::Find", "Terminal::ANSIColor" ],
+    "provides"      : {
+                "cro": "bin/cro",
+                "Cro::Tools::CLI": "lib/Cro/Tools/CLI.pm6",
+                "Cro::Tools::CroFile": "lib/Cro/Tools/CroFile.pm6",
+                "Cro::Tools::Runner": "lib/Cro/Tools/Runner.pm6",
+                "Cro::Tools::Serve": "lib/Cro/Tools/Serve.pm6",
+                "Cro::Tools::Services": "lib/Cro/Tools/Services.pm6",
+                "Cro::Tools::Template": "lib/Cro/Tools/Template.pm6",
+                "Cro::Tools::TemplateLocator": "lib/Cro/Tools/TemplateLocator.pm6",
+                "Cro::Tools::Template::HTTPService": "lib/Cro/Tools/Template/HTTPService.pm6",
+                "Cro::Tools::Template::ZeroMQWorkSinkService": "lib/Cro/Tools/Template/ZeroMQWorksinkService.pm6",
+                "Cro::Tools::Template::ZeroMQWorkerService": "lib/Cro/Tools/Template/ZeroMQWorkerService.pm6",
+                "Cro::Tools::Web": "lib/Cro/Tools/Web.pm6"
+    },
+    "resources": [
+        "web/index.html",
+        "web/css/bootstrap.min.css",
+        "web/css/cro.css"
+    ],
+    "source-url"    : "https://github.com/jnthn/cro.git"
+}
