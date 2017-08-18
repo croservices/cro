@@ -22,7 +22,7 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
         use Cro::ZeroMQ::Service;
         use Cro::ZeroMQ::Message;
 
-        class Worker is Cro::Transform {
+        class Worker does Cro::Transform {
             method consumes() { Cro::ZeroMQ::Message }
             method produces() { Cro::ZeroMQ::Message }
             method transformer(Supply $messages --> Supply) {
