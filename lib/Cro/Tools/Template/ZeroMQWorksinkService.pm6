@@ -1,10 +1,10 @@
 use Cro::Tools::CroFile;
 use Cro::Tools::Template;
 
-class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
+class Cro::Tools::Template::ZeroMQWorksinkService does Cro::Tools::Template {
     method id(--> Str) { 'zeromq-worksink' }
 
-    method name(--> Str) { 'ZeroMQ Worker Service' }
+    method name(--> Str) { 'ZeroMQ Work Sink Service' }
 
     method options(--> List) { () }
 
@@ -25,7 +25,7 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
 
         my $work = $worker.Supply.share;
 
-        say "Listenint at tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>";
+        say "Listening at tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>";
         react {
             whenever $work {
                 say $work.perl;
