@@ -17,6 +17,9 @@ In general, if you are going to make a one-off request, just use the type
 object. If you are going to make many requests to the same server or set of
 servers, make an instance.
 
+By default, a HTTPS request will use ALPN to negotiate whether to do HTTP/2 or
+HTTP/1.1, and a HTTP request will always use HTTP/1.1.
+
 ## Making basic requests
 
 The `get`, `post`, `put`, `delete`, and `head` methods may be called on either
@@ -313,3 +316,18 @@ throughput by not requring a new connection to be established each time. To
 not use persisted connections, pass `:!persistent` to the constructor. When
 using the type object (for example, `Cro::HTTP::Client.get($url)`, then no
 persistent connection cache will be used.
+
+## HTTP version
+
+The `:http` option can be passed, either at construction or per request, to
+control which versions of HTTP should be used. It can be passed a single item
+or list. Valid options are `1.1` (which will implicitly handle HTTP/1.0 too)
+and `2`.
+
+    :http<1.1>      # HTTP/1.1 only
+    :http<2>        # HTTP/2 only
+    :http<1.1 2>    # HTTP/1.1 and HTTP/2 (HTTPS only; selected by ALPN)
+
+The default is `:http<1.1>` for a HTTP request, and `:http<1.1 2> for a HTTPS
+request. It is not legal to use `:http<1.1 2>` with a HTTP connection, as ALPN
+is the only supported mechanism for deciding which protocl to use.
