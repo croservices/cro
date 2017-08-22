@@ -16,5 +16,5 @@ setup of a build toolchain.
 
 ## Building
 
-Just run `npm build`. The output will end up in the `resources` directory of
-the enclosing application.
+Just run `npm run build`. The output will end up in the `resources` directory
+of the enclosing application.
