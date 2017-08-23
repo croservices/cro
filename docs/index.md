@@ -45,15 +45,15 @@ The full details, organized by module.
 
 ### Cro::WebSocket
 
-* [Cro::HTTP::Router::WebSocket](reference/cro-http-router-websocket.md)
-* [Cro::WebSocket::Client](reference/cro-websocket-client.md)
-* [Cro::WebSocket::Frame](reference/cro-websocket-frame.md)
-* [Cro::WebSocket::FrameParser](reference/cro-websocket-frameparser.md)
-* [Cro::WebSocket::FrameSerializer](reference/cro-websocket-frameserializer.md)
-* [Cro::WebSocket::Handler](reference/cro-websocket-handler.md)
-* [Cro::WebSocket::Message](reference/cro-websocket-message.md)
-* [Cro::WebSocket::MessageParser](reference/cro-websocket-messageparser.md)
-* [Cro::WebSocket::MessageSerializer](reference/cro-websocket-messageserializer.md)
+* [Cro::HTTP::Router::WebSocket](reference/cro-http-router-websocket)
+* [Cro::WebSocket::Client](reference/cro-websocket-client)
+* [Cro::WebSocket::Frame](reference/cro-websocket-frame)
+* [Cro::WebSocket::FrameParser](reference/cro-websocket-frameparser)
+* [Cro::WebSocket::FrameSerializer](reference/cro-websocket-frameserializer)
+* [Cro::WebSocket::Handler](reference/cro-websocket-handler)
+* [Cro::WebSocket::Message](reference/cro-websocket-message)
+* [Cro::WebSocket::MessageParser](reference/cro-websocket-messageparser)
+* [Cro::WebSocket::MessageSerializer](reference/cro-websocket-messageserializer)
 
 ### Cro::ZeroMQ
 
@@ -66,3 +66,5 @@ expected to be extended from the outside at this point. However, the following
 parts have stable APIs for the sake of extending the tools.
 
 * [Cro::Tools::Template](reference/cro-tools-template)
+
+---

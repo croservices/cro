@@ -236,3 +236,5 @@ The default set of serializers for a response are:
   an error. This is the only built-in body serializer that does not add a
   `content-length` header (meaning that the response serializer will use the
   chunked encoding).
+
+---
