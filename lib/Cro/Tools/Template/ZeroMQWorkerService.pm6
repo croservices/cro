@@ -30,7 +30,7 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
             method transformer(Supply $messages --> Supply) {
                 supply {
                     whenever $messages {
-                        say $message.perl;
+                        say $_.perl;
                         emit Cro::ZeroMQ::Message.new('The work is done!');
                     }
                 }
