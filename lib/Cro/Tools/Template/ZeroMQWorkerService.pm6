@@ -1,5 +1,6 @@
 use Cro::Tools::CroFile;
 use Cro::Tools::Template;
+use META6;
 
 class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
     method id(--> Str) { 'zeromq-worker' }
@@ -13,6 +14,7 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
     method generate(IO::Path $where, Str $id, Str $name, %options) {
         write-entrypoint($where.add('service.p6'), $id, %options);
         write-cro-file($where.add('.cro.yml'), $id, $name, %options);
+        write-meta($where.add('META6.json'), $name);
     }
 
     sub write-entrypoint($file, $id, %options) {
@@ -67,6 +69,28 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
             ]
         );
         $file.spurt($cro-file.to-yaml());
+    }
+
+    sub write-meta($file, $name) {
+        my $m = META6.new(
+            name => $name,
+            description => 'Write me!',
+            version => Version.new('0.0.1'),
+            perl-version => Version.new('6.*'),
+            depends => <Cro::ZMQ>,
+            tags => (''),
+            authors => (''),
+            auth => 'Write me!',
+            source-url => 'Write me!',
+            support => META6::Support.new(
+                source => 'Write me!'
+            ),
+            provides => {
+                'Routes.pm6' => 'lib/Routes.pm6'
+            },
+            license => 'Write me!'
+        );
+        spurt($file, $m.to-json);
     }
 
     sub env-name($id) {

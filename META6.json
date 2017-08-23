@@ -6,7 +6,7 @@
     "authors"       : [ "Jonathan Worthington <jnthn@jnthn.net>" ],
     "license"       : "Artistic-2.0",
     "depends"       : [ "IO::Socket::Async::SSL", "JSON::Fast",
-                        "OO::Monitors", "Shell::Command",
+                        "META6", "Shell::Command",
                         "File::Find", "Terminal::ANSIColor" ],
     "provides"      : {
                 "cro": "bin/cro",
