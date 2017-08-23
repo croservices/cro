@@ -214,22 +214,24 @@ be:
 
 A more realistic example would include a transform implementing the service.
 
-    class MyReplier is Cro::Transform {
-        method consumes() { Cro::ZeroMQ::Message }
-        method produces() { Cro::ZeroMQ::Message }
-        method transformer(Supply $messages --> Supply) {
-            supply {
-                whenever $messages {
-                    my $response = Cro::ZeroMQ::Message.new(.body-text.uc);
-                    emit $response;
-                }
+```
+class MyReplier is Cro::Transform {
+    method consumes() { Cro::ZeroMQ::Message }
+    method produces() { Cro::ZeroMQ::Message }
+    method transformer(Supply $messages --> Supply) {
+        supply {
+            whenever $messages {
+                my $response = Cro::ZeroMQ::Message.new(.body-text.uc);
+                emit $response;
             }
         }
     }
-    my Cro::Service $rep = Cro::ZeroMQ::Service.rep(
-        bind => 'tcp://*:5555',
-        MyReplier
-    );
+}
+my Cro::Service $rep = Cro::ZeroMQ::Service.rep(
+    bind => 'tcp://*:5555',
+    MyReplier
+);
+```
 
 #### Router (ROUTER)
 
@@ -241,46 +243,50 @@ idenity. **It is up to the message transform to include that in the response
 message**, so that it can be routed back to the correct client. (Note that the
 identity actually consists of one or more frames, followed by an empty frame.)
 
-    class MyAsyncReplier is Cro::Transform {
-        method consumes() { Cro::ZeroMQ::Message }
-        method produces() { Cro::ZeroMQ::Message }
-        method transformer(Supply $messages --> Supply) {
-            supply {
-                whenever $messages -> $msg {
-                    whenever start { self!process($msg.body) } -> $response {
-                        emit Cro::ZeroMQ::Message.new($msg.identity, $response);
-                    }
+```
+class MyAsyncReplier is Cro::Transform {
+    method consumes() { Cro::ZeroMQ::Message }
+    method produces() { Cro::ZeroMQ::Message }
+    method transformer(Supply $messages --> Supply) {
+        supply {
+            whenever $messages -> $msg {
+                whenever start { self!process($msg.body) } -> $response {
+                    emit Cro::ZeroMQ::Message.new($msg.identity, $response);
                 }
             }
         }
-        method !process($data) {
-            ...
-        }
     }
-    my Cro::Service $rep = Cro::ZeroMQ::Service.router(
-        bind => 'tcp://*:5555',
-        MyAsyncReplier
-    );
+    method !process($data) {
+        ...
+    }
+}
+my Cro::Service $rep = Cro::ZeroMQ::Service.router(
+    bind => 'tcp://*:5555',
+    MyAsyncReplier
+);
+```
 
 #### Pull (PULL)
 
 Used for a service that will pull messages and process them. Since it doesn't
 send anything, then the service is a sink.
 
-    class MyAggregator is Cro::Sink {
-        method consumes() { Cro::ZeroMQ::Message }
-        method sinker(Supply $messages --> Supply) {
-            supply {
-                whenever $messages {
-                    # Do something with the message.
-                }
+```
+class MyAggregator is Cro::Sink {
+    method consumes() { Cro::ZeroMQ::Message }
+    method sinker(Supply $messages --> Supply) {
+        supply {
+            whenever $messages {
+                # Do something with the message.
             }
         }
     }
-    my Cro::Service $pull = Cro::ZeroMQ::Service.pull(
-        connect => 'tcp://some-publisher:5555',
-        MyAggregator
-    );
+}
+my Cro::Service $pull = Cro::ZeroMQ::Service.pull(
+    connect => 'tcp://some-publisher:5555',
+    MyAggregator
+);
+```
 
 #### Pull/Push (PULL, PUSH)
 
@@ -315,20 +321,22 @@ expects:
 A service that reacts to received messages. Since it doesn't send anything,
 then the service is a sink.
 
-    class MyHandler is Cro::Sink {
-        method consumes() { Cro::ZeroMQ::Message }
-        method sinker(Supply $messages --> Supply) {
-            supply {
-                whenever $messages {
-                    # Do something with the message.
-                }
+```
+class MyHandler is Cro::Sink {
+    method consumes() { Cro::ZeroMQ::Message }
+    method sinker(Supply $messages --> Supply) {
+        supply {
+            whenever $messages {
+                # Do something with the message.
             }
         }
     }
-    my Cro::Service $sub = Cro::ZeroMQ::Service.sub(
-        connect => 'tcp://some-publisher:5555',
-        MyHandler
-    );
+}
+my Cro::Service $sub = Cro::ZeroMQ::Service.sub(
+    connect => 'tcp://some-publisher:5555',
+    MyHandler
+);
+```
 
 ### Cro::ZeroMQ::Client for request/response (REQ, DEALER)
 
@@ -372,23 +380,21 @@ be more suited to a service rather than a client, but may be useful. A useful
 example of this with a SUB socket would be to create such a client in a web
 server, and then send all received messages out over a web socket:
 
-    my $client = Cro::ZeroMQ::Collector.sub(
-        connect => 'tcp://notifications:5555'
-    );
-    my $notifications = $client.Supply.share; # Turn it into a live Supply
+```
+my $client = Cro::ZeroMQ::Collector.sub(
+    connect => 'tcp://notifications:5555'
+);
+my $notifications = $client.Supply.share; # Turn it into a live Supply
 
-    my $application = route {
-        get -> 'notifications' {
-            web-socket {
-                supply {
-                    whenever $notifications {
-                        .emit;
-                    }
+my $application = route {
+    get -> 'notifications' {
+        web-socket {
+            supply {
+                whenever $notifications {
+                    .emit;
                 }
             }
         }
     }
-
-### Cro::ZeroMQ::Proxy (ROUTER + DEALER, XSUB + XPUB)
-
-TODO: Describe these
+}
+```

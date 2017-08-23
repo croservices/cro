@@ -14,23 +14,25 @@ a simple "Hello, world" HTTP application, configuring it to listen on port 8888
 of localhost. A signal handler is added to allow for clean shutdown of the
 server upon Ctrl + C.
 
-    use Cro::HTTP::Router;
-    use Cro::HTTP::Server;
+```
+use Cro::HTTP::Router;
+use Cro::HTTP::Server;
 
-    my $application = route {
-        get -> {
-            content 'text/html', '<strong>Hello, world!</strong>';
-        }
+my $application = route {
+    get -> {
+        content 'text/html', '<strong>Hello, world!</strong>';
     }
+}
 
-    my Cro::Service $hello-service = Cro::HTTP::Server.new(
-        :host('localhost'), :port(8888), :$application
-    );
-    $hello-service.start;
-    react whenever signal(SIGINT) {
-        $hello-service.stop;
-        exit;
-    }
+my Cro::Service $hello-service = Cro::HTTP::Server.new(
+    :host('localhost'), :port(8888), :$application
+);
+$hello-service.start;
+react whenever signal(SIGINT) {
+    $hello-service.stop;
+    exit;
+}
+```
 
 ## Configuring HTTPS
 
@@ -137,6 +139,7 @@ The names of these places are named parameters that can be passed to the
 
 For example, the following piece of middleware:
 
+```
     class StrictTransportSecurity does Cro::Transform {
         has Duration:D $.max-age is required;
 
@@ -154,6 +157,7 @@ For example, the following piece of middleware:
             }
         }
     }
+```
 
 Could be applied as follows:
 

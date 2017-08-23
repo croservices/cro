@@ -8,6 +8,7 @@ parameter, which will be a `Supply` of incoming messages. It is expect
 to return a `Supply` that, when tapped, will process
 messages. Anything it emits will be considered a response message.
 
+```
 my $uc-ws = Cro::WebSocket::Handler.new(
     -> $incoming {
         supply {
@@ -18,12 +19,14 @@ my $uc-ws = Cro::WebSocket::Handler.new(
         }
     }
 )
+```
 
 The incoming `Supply` will be done when a `Close` frame is
 received. In some cases, the content of the closing frame may be of
 interest. In this case, an arity two block may be passed, which will
 receive a `Promise` that is kept with the close message.
 
+```
 my $uc-ws = Cro::WebSocket::Handler.new(
     -> $incoming, $close {
         supply {
@@ -37,6 +40,7 @@ my $uc-ws = Cro::WebSocket::Handler.new(
         }
     }
 )
+```
 
 If a message of type `Close` is emitted, then it will be sent and the
 tap on the `Supply` will be closed. Otherwise, when the returned
@@ -54,6 +58,7 @@ of a `Cro::WebSocket::Message`. In this case, it will be passed to the
 `new` method of `Cro::WebSocket::Message` and the resulting message
 sent. Therefore, the previous example could be written as simply:
 
+```
 my $uc-ws = Cro::WebSocket::Handler.new(
     -> $incoming {
         supply {
@@ -64,3 +69,4 @@ my $uc-ws = Cro::WebSocket::Handler.new(
         }
     }
 )
+```

@@ -4,37 +4,41 @@ This exports a subroutine `web-socket` that is to be used inside of a HTTP route
 
 A simple example:
 
-    my $chat = Supplier.new;
+```
+my $chat = Supplier.new;
 
-    get -> 'chat' {
-        web-socket -> $incoming {
-            supply {
-                whenever $incoming -> $message {
-                    $chat.emit(await $message.body-text);
-                }
-                whenever $chat -> $text {
-                    emit $text;
-                }
+get -> 'chat' {
+    web-socket -> $incoming {
+        supply {
+            whenever $incoming -> $message {
+                $chat.emit(await $message.body-text);
+            }
+            whenever $chat -> $text {
+                emit $text;
             }
         }
     }
+}
+```
 
 The second optional parameter to the block is a `Promise` that will be kept after `Supply` is `done`.
 
-    my $chat = Supplier.new;
-    
-    get -> 'chat' {
-        web-socket -> $incoming, $close {
-            supply {
-                whenever $incoming -> $message {
-                    $chat.emit(await $message.body-text);
-                }
-                whenever $chat -> $text {
-                    emit $text;
-                }
-                whenever $close {
-                    $chat.emit("A user left the chat");
-                }
+```
+my $chat = Supplier.new;
+
+get -> 'chat' {
+    web-socket -> $incoming, $close {
+        supply {
+            whenever $incoming -> $message {
+                $chat.emit(await $message.body-text);
+            }
+            whenever $chat -> $text {
+                emit $text;
+            }
+            whenever $close {
+                $chat.emit("A user left the chat");
             }
         }
     }
+}
+```

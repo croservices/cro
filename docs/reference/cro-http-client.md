@@ -91,12 +91,14 @@ type on every request. In this case, it can be set when constructing an
 instance of the client, and used by default (note that it will only be used
 if a body is set):
 
-    # Configure with JSON content type.
-    my $client = Cro::HTTP::Client.new: content-type => 'application/json';
+```
+# Configure with JSON content type.
+my $client = Cro::HTTP::Client.new: content-type => 'application/json';
 
-    # And later get it added by default.
-    my %panda = name => 'Bao Bao', eats => 'bamboo';
-    my $resp = await $client.post: 'we.love.pand.as/pandas', body => %panda;
+# And later get it added by default.
+my %panda = name => 'Bao Bao', eats => 'bamboo';
+my $resp = await $client.post: 'we.love.pand.as/pandas', body => %panda;
+```
 
 The `Cro::HTTP::Client` class uses a `Cro::HTTP::BodySerializer` in order to
 serialize request bodies for sending. Besides JSON, there are body parsers

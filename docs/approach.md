@@ -45,21 +45,23 @@ Cro components (sources, transforms, and sinks) can be put together to form
 pipelines. This process is called pipeline composition. Perhaps the simplest
 possible example is setting up an echo server:
 
-    class Echo does Cro::Transform {
-        method consumes() { Cro::TCP::Message }
-        method produces() { Cro::TCP::Message }
-        
-        method reply(Supply $source) {
-            # We could actually just `return $source` here, but the identity
-            # supply is written out here to illustrate what a transform will
-            # often look like.
-            supply {
-                whenever $source -> $message {
-                    emit $message;
-                }
+```
+class Echo does Cro::Transform {
+    method consumes() { Cro::TCP::Message }
+    method produces() { Cro::TCP::Message }
+
+    method reply(Supply $source) {
+        # We could actually just `return $source` here, but the identity
+        # supply is written out here to illustrate what a transform will
+        # often look like.
+        supply {
+            whenever $source -> $message {
+                emit $message;
             }
         }
     }
+}
+```
 
 Which can then be composed into a service and started as follows:
 
@@ -95,22 +97,24 @@ conveniences. First, various components and message types are needed:
 The HTTP application itself - a simple "Hello, world" - is a `Cro::Transform`
 that turns a request into a response:
 
-    class HTTPHello does Cro::Transform {
-        method consumes() { Cro::HTTP::Request }
-        method produces() { Cro::HTTP::Response }
+```
+class HTTPHello does Cro::Transform {
+    method consumes() { Cro::HTTP::Request }
+    method produces() { Cro::HTTP::Response }
 
-        method transformer($request-stream) {
-            supply {
-                whenever $request-stream -> $request {
-                    given Cro::HTTP::Response.new(:200status) {
-                        .append-header('Content-type', 'text/html');
-                        .set-body("<strong>Hello from Cro!</strong>");
-                        .emit;
-                    }
+    method transformer($request-stream) {
+        supply {
+            whenever $request-stream -> $request {
+                given Cro::HTTP::Response.new(:200status) {
+                    .append-header('Content-type', 'text/html');
+                    .set-body("<strong>Hello from Cro!</strong>");
+                    .emit;
                 }
             }
         }
     }
+}
+```
 
 These are composed into a service:
 
@@ -172,19 +176,21 @@ will return a `Supply` that the response messages will be emitted on.
 More complex pipelines are possible. For example, a (not entirely convenient,
 but functional) HTTP client would look like:
 
-    my Cro::Connector $conn = Cro.compose(
-        Cro::HTTP::RequestSerializer,
-        Cro::SSL::Connector,
-        Cro::HTTP::ResponseParser
-    );
+```
+my Cro::Connector $conn = Cro.compose(
+    Cro::HTTP::RequestSerializer,
+    Cro::SSL::Connector,
+    Cro::HTTP::ResponseParser
+);
 
-    my $req = supply {
-        my Cro::HTTP::Request $req .= new(:method<GET>, :target</>);
-        $req.add-header('Host', 'www.perl6.org');
-        emit $req;
+my $req = supply {
+    my Cro::HTTP::Request $req .= new(:method<GET>, :target</>);
+    $req.add-header('Host', 'www.perl6.org');
+    emit $req;
+}
+react {
+    whenever $conn.establish($req, :host<www.perl6.org>, :port(80)) {
+        say ~$response; # Dump headers
     }
-    react {
-        whenever $conn.establish($req, :host<www.perl6.org>, :port(80)) {
-            say ~$response; # Dump headers
-        }
-    }
+}
+```
