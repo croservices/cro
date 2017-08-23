@@ -46,7 +46,7 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
         react {
             whenever signal(SIGINT) {
                 say "Shutting down...";
-                $work.close;
+                $service.close;
                 done;
             }
         }
