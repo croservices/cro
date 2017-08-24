@@ -18,7 +18,7 @@
                 "Cro::Tools::Template": "lib/Cro/Tools/Template.pm6",
                 "Cro::Tools::TemplateLocator": "lib/Cro/Tools/TemplateLocator.pm6",
                 "Cro::Tools::Template::HTTPService": "lib/Cro/Tools/Template/HTTPService.pm6",
-                "Cro::Tools::Template::ZeroMQWorkSinkService": "lib/Cro/Tools/Template/ZeroMQWorksinkService.pm6",
+                "Cro::Tools::Template::ZeroMQWorkSinkService": "lib/Cro/Tools/Template/ZeroMQWorkSinkService.pm6",
                 "Cro::Tools::Template::ZeroMQWorkerService": "lib/Cro/Tools/Template/ZeroMQWorkerService.pm6",
                 "Cro::Tools::Web": "lib/Cro/Tools/Web.pm6"
     },
