@@ -49,17 +49,19 @@ variable.
 Endpoints are specified as a list under the `endpoints` key. For example, a
 service that accepts both HTTP and HTTPS would look as follows:
 
-    endpoints:
-        - id: http
-          name: HTTP (Insecure)
-          protocol: http
-          host-env: FLASHCARD_BACKEND_HTTP_HOST
-          port-env: FLASHCARD_BACKEND_HTTP_PORT
-        - id: https
-          name: HTTP (Secure)
-          protocol: https
-          host-env: FLASHCARD_BACKEND_HTTPS_HOST
-          port-env: FLASHCARD_BACKEND_HTTPS_PORT
+```
+endpoints:
+    - id: http
+      name: HTTP (Insecure)
+      protocol: http
+      host-env: FLASHCARD_BACKEND_HTTP_HOST
+      port-env: FLASHCARD_BACKEND_HTTP_PORT
+    - id: https
+      name: HTTP (Secure)
+      protocol: https
+      host-env: FLASHCARD_BACKEND_HTTPS_HOST
+      port-env: FLASHCARD_BACKEND_HTTPS_PORT
+```
 
 The `id` is used to identify the endpoint in commands and when referencing it
 from other services. The `name` is for display in the user interface; it is
@@ -92,15 +94,17 @@ configuration management, Kubernetes, and so forth when deploying the service.
 
 A `links` section might look like:
 
-    links:
-      - service: flashcard-backend
-        endpoint: https
-        host-env: FLASHCARD_BACKEND_HTTPS_HOST
-        port-env: FLASHCARD_BACKEND_HTTPS_PORT
-      - service: users
-        endpoint: https
-        host-env: USERS_HTTPS_HOST
-        port-env: USERS_HTTPS_PORT
+```
+links:
+  - service: flashcard-backend
+    endpoint: https
+    host-env: FLASHCARD_BACKEND_HTTPS_HOST
+    port-env: FLASHCARD_BACKEND_HTTPS_PORT
+  - service: users
+    endpoint: https
+    host-env: USERS_HTTPS_HOST
+    port-env: USERS_HTTPS_PORT
+```
 
 Where `service` is the ID of the service (defined by `id` in its `.cro.yml`),
 `endpoint` is the ID of the endpoint (from the target service's `.cro.yml`'s
@@ -117,8 +121,10 @@ service. This is a handy way to store development configuration and cut down
 a little of the setup work needed when other developers want to get the
 services running.
 
-    env:
-      - name: FLASH_DATABASE
-        value: test-database.internal:6555
-      - name: JWT_SECRET
-        value: my-dev-not-so-secret
+```
+env:
+  - name: FLASH_DATABASE
+    value: test-database.internal:6555
+  - name: JWT_SECRET
+    value: my-dev-not-so-secret
+```

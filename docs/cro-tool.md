@@ -51,14 +51,14 @@ accept HTTP/1.0, HTTP/1.1 and HTTP/2.0 requests.
 
 The following options are be supplied:
 
-* **`:!secure`**: generates a HTTP service instead of a HTTPS one (`:secure`
+* `:!secure`: generates a HTTP service instead of a HTTPS one (`:secure`
   is the default); implies `:!http2`, since ALPN is used to negotiate whether
   to use HTTP/2
-* **`:!http2`**: generates a service without HTTP 2 support
-* **`:!http1`**: generates a service without HTTP 1 support
-* **`:websocket`**: adds a dependency to the `Cro::WebSocket` module and adds
+* `:!http2`: generates a service without HTTP 2 support
+* `:!http1`: generates a service without HTTP 1 support
+* `:websocket`: adds a dependency to the `Cro::WebSocket` module and adds
   a stub web socket example
-* **`:link<service>`**: indicates that code to interact with the specified
+* `:link<service>`: indicates that code to interact with the specified
   other service should be stubbed; that service must exist in some folder
   beneath the current working directroy, and have a `.cro.yml` with the
   specified service name.

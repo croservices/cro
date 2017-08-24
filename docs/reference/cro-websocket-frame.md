@@ -7,12 +7,12 @@ on `parser`/`serializer` level.
 It exports `Opcode` enum that consists of possible frame opcodes, they
 are:
 
-- Continuation - 0
-- Text - 1
-- Binary - 2
-- Close - 8
-- Ping - 9
-- Pong - 10
+ - Continuation(0)
+ - Text(1)
+ - Binary(2)
+ - Close(8)
+ - Ping(9)
+ - Pong(0)
 
 It can be used with full name qualification as follows
 
@@ -20,7 +20,7 @@ It can be used with full name qualification as follows
 
 # Attributes
 
-The class has three attributes, all of them are marked as `rw``;
+The class has three attributes, all of them are marked as `rw`;
 
 ## fin
 
