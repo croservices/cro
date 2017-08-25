@@ -74,9 +74,7 @@ class Cro::Tools::Template::ZeroMQWorkSinkService does Cro::Tools::Template {
             support => META6::Support.new(
                 source => 'Write me!'
             ),
-            provides => {
-                'Routes.pm6' => 'lib/Routes.pm6'
-            },
+            provides => {},
             license => 'Write me!'
         );
         spurt($file, $m.to-json);
