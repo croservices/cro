@@ -1,13 +1,14 @@
 {
     "perl"          : "6.*",
-    "name"          : "Cro",
+    "name"          : "cro",
     "version"       : "0.7",
     "description"   : "Libraries for building reactive services in Perl 6.",
     "authors"       : [ "Jonathan Worthington <jnthn@jnthn.net>" ],
     "license"       : "Artistic-2.0",
     "depends"       : [ "IO::Socket::Async::SSL", "JSON::Fast",
                         "META6", "Shell::Command",
-                        "File::Find", "Terminal::ANSIColor" ],
+                        "File::Find", "Terminal::ANSIColor",
+                        "OO::Monitors", "YAMLish" ],
     "provides"      : {
                 "cro": "bin/cro",
                 "Cro::Tools::CLI": "lib/Cro/Tools/CLI.pm6",
