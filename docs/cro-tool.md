@@ -1,24 +1,10 @@
 # The Cro Development Tools
 
-Cro includes tools to help devlopers work more efficiently. Most features are
-available as both a command line tool (`cro`) and a web interface (launched
-using `cro web`). It is entirely possible to use Cro without these tools. They
-aim to provide some reasonable defaults, but may not be suitable for every
+Cro includes tools to help devlopers work more efficiently. Currently the tools
+are available through a command line interface; in the future a web interface
+will be added also. It is entirely possible to use Cro without these tools. They
+aim to provide some reasonable defaults, but will not be suitable for every
 project.
-
-## Running the Cro Web Interface
-
-The Cro web interface can be started using:
-
-    cro web
-
-To change the port that it runs on from the default, use:
-
-    cro web 8000
-
-To have it bind to a host other than `localhost`, use:
-
-    cro web 192.168.0.1:8080
 
 ## Stubbing Services
 
