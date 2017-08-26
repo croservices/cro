@@ -6,8 +6,6 @@ The essentials you need to know to get building with Cro.
 
 * [Creating HTTP Services](intro/http-server)
 * [Making HTTP Requests](intro/http-client)
-* [Working with Web Sockets](intro/web-sockets)
-* [Creating ZeroMQ Services](intro/zmq)
 
 ## Beyond The Basics
 
