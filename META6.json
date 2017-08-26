@@ -28,5 +28,5 @@
         "web/css/bootstrap.min.css",
         "web/css/cro.css"
     ],
-    "source-url"    : "https://github.com/jnthn/cro.git"
+    "source-url"    : "https://github.com/croservices/cro.git"
 }
