@@ -26,7 +26,10 @@
     "resources": [
         "web/index.html",
         "web/css/bootstrap.min.css",
-        "web/css/cro.css"
+        "web/css/cro.css",
+        "fake-ssl/ca-crt.pem",
+        "fake-ssl/server-crt.pem",
+        "fake-ssl/server-key.pem"
     ],
     "source-url"    : "https://github.com/croservices/cro.git"
 }
