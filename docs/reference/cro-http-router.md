@@ -292,7 +292,7 @@ Requests will be dispatched by `Cro::HTTP::Router` as soon as the headers are
 available; the request body, if any, will become available once it has arrived
 over the network. The `request` term provides the `Cro::HTTP::Request` object,
 which has various methods for accessing the request body (`body`, `body-text`,
-and `body-blob`), all returning a `Promise`. As a concenience, the router also
+and `body-blob`), all returning a `Promise`. As a convenience, the router also
 exports the subs `request-body`, `request-body-text`, and `request-body-blob`,
 which take a block. These routines will call the appropriate method on the
 request object, `await` it, and then invoke the block with it. For example:
@@ -422,7 +422,7 @@ By default, five body parsers are provided for requests:
 * `Cro::HTTP::BodyParser::BlobFallback` - used as a last resort and will match
   any message; uses `body-blob`
 
-Cro can be extended with further body parsers, which whould implement the
+Cro can be extended with further body parsers, which would implement the
 `Cro::HTTP::BodyParser` role. These can be added globally by passing them when
 setting up `Cro::HTTP::Server`. They can also be applied within the scope of a
 `route` block:
@@ -544,7 +544,7 @@ arguments on to `content` after setting the status code. They are:
 * `forbidden`, for HTTP 403 Forbidden
 * `conflict`, for HTTP 409 Conflict
 
-If the request handler evluates to `...` (that is, the Perl 6 syntax for stub
+If the request handler evaluates to `...` (that is, the Perl 6 syntax for stub
 code), then a HTTP 510 Not Implemented response will be produced. If evaluating
 the route handler produces an exception, then the exception will be passed on.
 It will then typically be handled by the response serializer, which will produce
@@ -657,7 +657,7 @@ to state:
 
     cache-control :no-store;
 
-However, given differring interpretations by different user-agents, it is wise
+However, given differing interpretations by different user-agents, it is wise
 to instead use:
 
     cache-control :no-store, :no-cache;

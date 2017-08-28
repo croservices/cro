@@ -14,7 +14,7 @@ described in RFC 2616.
 
 This regular expression should be used only for string checking and
 all conversion to DateTime should be done using `DateTimeGrammar`
-grammar and `DateTimeActions` class in this manneur:
+grammar and `DateTimeActions` class in this manner:
 
     my $str = Sun, '06 Nov 1994 08:49:37 GMT';
     my DateTime $time = DateTimeGrammar.parse(, actions => DateTimeActions.new).made;

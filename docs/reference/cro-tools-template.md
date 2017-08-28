@@ -25,7 +25,7 @@ example:
 ## Options
 
 Templates may be parameterized with one or more options, which are collected
-from the user. In the web UI, they are collected by a a generated form. At the
+from the user. In the web UI, they are collected by a generated form. At the
 command line tool:
 
 * If the user doesn't specify any options as command line arguments, then they
@@ -40,7 +40,7 @@ to return a `List` of `Option` objects (this type is lexically exported as the
 short name `Option` for convenience; `Cro::Tools::Template::Option` is its
 fully qualified name). Each option needs:
 
-* An `id` (used to identify it in the comamnd line options, and used to pass
+* An `id` (used to identify it in the command line options, and used to pass
   it back to your template)
 * A `name` (used to present to the user when prompting for the option)
 * A `type` (should be one of `Bool`, `Int`, or `Str`, or some `subset` type
@@ -83,7 +83,7 @@ The method `get-option-errors` may optionally be implemented to perform
 multi-option validation. It is expected to return an empty `List` when all is
 well, or a `List` of `Str` errors to indicate issues. It is passed a hash of
 the entered options. Here is the HTTP service template's implementation, as
-an example (it destructures the options hash for conveneince):
+an example (it destructures the options hash for convenience):
 
     method get-option-errors((:$http1, :$http2, :$secure, *%) --> List) { () }
         my @errors;
@@ -103,7 +103,7 @@ the stub:
 
     method generate(IO::Path $where, Str $id, Str $name, %options) { ... }
 
-The argumnets are:
+The arguments are:
 
 * The path where the service should be generated
 * The ID and name of the service, which should be placed into the generated

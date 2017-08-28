@@ -1,7 +1,7 @@
 # Cro Module Structure
 
 Cro is split into a number of modules, which may be installed independently.
-This means that containers for services can be kept samller, for example by
+This means that containers for services can be kept smaller, for example by
 only including the parts of Cro that they are using. It also allows for any
 modules depending on Cro to depend on just the parts they need.
 

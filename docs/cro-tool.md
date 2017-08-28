@@ -1,6 +1,6 @@
 # The Cro Development Tools
 
-Cro includes tools to help devlopers work more efficiently. Currently the tools
+Cro includes tools to help developers work more efficiently. Currently the tools
 are available through a command line interface; in the future a web interface
 will be added also. It is entirely possible to use Cro without these tools. They
 aim to provide some reasonable defaults, but will not be suitable for every
@@ -14,7 +14,7 @@ is:
     cro stub <service-type> <id> <path> ['options']
 
 Where `service-type` is the type of service to create, `id` is the ID of the
-service (to be used with other `cro` coammands), `path` is the location to
+service (to be used with other `cro` commands), `path` is the location to
 create the service, and `options` are a set of options specific to the service
 type. The options are written in a simplified version of Perl 6 colonpair
 syntax, where `:foo` enables an option, `:!foo` disables an option, and
@@ -46,7 +46,7 @@ The following options are be supplied:
   a stub web socket example
 * `:link<service>`: indicates that code to interact with the specified
   other service should be stubbed; that service must exist in some folder
-  beneath the current working directroy, and have a `.cro.yml` with the
+  beneath the current working directory, and have a `.cro.yml` with the
   specified service name.
 
 ## Running Services
@@ -91,7 +91,7 @@ To see only HTTP messages, do:
 
     cro trace :http;
 
-To restrict that futher to just requests, do:
+To restrict that further to just requests, do:
 
     cro trace :http :request;
 

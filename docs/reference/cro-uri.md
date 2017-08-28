@@ -24,7 +24,7 @@ named parameters:
 
 In case of parsing failure `X::Cro::Uri::ParseError` exception will be
 thrown. This exception has `uri-string` field that contains an
-erroreous string.
+erroneous string.
 
 ## user
 
@@ -35,7 +35,7 @@ specified, `Str` type object returns.
 
 Method retrieves value of `password` part of Uri. In case if name was
 not specified or the method was called on , `Str` type object returns.
-
+erroneous
 ## path-segments
 
 Method returns a list of path segments. For every path segment Unicode

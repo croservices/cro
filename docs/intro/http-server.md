@@ -7,7 +7,7 @@ out, we import it:
 use Cro::HTTP::Server;
 ```
 
-The server hosts an applicatin, which is something that transforms a
+The server hosts an application, which is something that transforms a
 `Cro::HTTP::Request` instance representing the request into a
 `Cro::HTTP::Resposne` instance representing the response. While it's possible
 to write that "by hand", it is far more convenient to use the HTTP router.
