@@ -45,9 +45,21 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         return @errors;
     }
 
+    sub write-fake-ssl($where) {
+        my $res = $where.add('RESOURCES/');
+        mkdir $res;
+        mkdir $res.add('fake-ssl');
+        for <fake-ssl/ca-crt.pem fake-ssl/server-crt.pem fake-ssl/server-key.pem> -> $fn {
+            with %?RESOURCES{$fn} {
+                copy($_, $res.add($fn));
+            }
+        }
+    }
+
     method generate(IO::Path $where, Str $id, Str $name, %options) {
         my $lib = $where.add('lib');
         mkdir $lib;
+        write-fake-ssl($where) if %options<secure>;
         write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>);
         write-entrypoint($where.add('service.p6'), $id, %options);
         write-cro-file($where.add('.cro.yml'), $id, $name, %options);
@@ -91,15 +103,15 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
     sub write-entrypoint($file, $id, %options) {
         my $env-name = env-name($id);
         my $http = %options<http1> && %options<http2>
-            ?? '1.1 2'
-            !! %options<http1> ?? '1.1' !! '2';
+            ?? <1.1 2>
+            !! %options<http1> ?? <1.1> !! <2>;
         my $entrypoint = q:c:to/CODE/;
             use Cro::HTTP::Log::File;
             use Cro::HTTP::Server;
             use Routes;
 
             my Cro::Service $http = Cro::HTTP::Server.new(
-                http => '{$http}',
+                http => <{$http}>,
                 host => %*ENV<{$env-name}_HOST> ||
                     die("Missing {$env-name}_HOST in environment"),
                 port => %*ENV<{$env-name}_PORT> ||
@@ -110,9 +122,15 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
             $entrypoint ~= q:c:to/CODE/;
                     ssl => %(
                         private-key-file => %*ENV<{$env-name}_SSL_KEY> ||
-                            die("Missing {$env-name}_SSL_KEY in environment"),
+                CODE
+            $entrypoint ~= Q:to/CODE/;
+                            %?RESOURCES<fake-ssl/server-key.pem>,
+                CODE
+            $entrypoint ~= q:to/CODE/;
                         certificate-file => %*ENV<{$env-name}_SSL_CERT> ||
-                            die("Missing {$env-name}_SSL_CERT in environment")
+                CODE
+            $entrypoint ~= Q:to/CODE/;
+                            %?RESOURCES<fake-ssl/server-crt.pem>
                     ),
                 CODE
         }
@@ -173,6 +191,9 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
             provides => {
                 'Routes.pm6' => 'lib/Routes.pm6'
             },
+            resources => %options<secure> ?? <fake-ssl/ca-crt.pem
+                                              fake-ssl/server-crt.pem
+                                              fake-ssl/server-key.pem> !! (),
             license => 'Write me!'
         );
         spurt($file, $m.to-json);
