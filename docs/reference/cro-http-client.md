@@ -313,8 +313,8 @@ initial request with a 401 response, set the `if-asked` option to `True`.
 ## Persistent connections
 
 An instance of `Cro::HTTP::Client` will use persistent connections by default.
-When many requests are being made to the same server, this can eanble better
-throughput by not requring a new connection to be established each time. To
+When many requests are being made to the same server, this can enable better
+throughput by not requiring a new connection to be established each time. To
 not use persisted connections, pass `:!persistent` to the constructor. When
 using the type object (for example, `Cro::HTTP::Client.get($url)`, then no
 persistent connection cache will be used.

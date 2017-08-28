@@ -1,6 +1,6 @@
 # Cro::WebSocket::Frame
 
-The `Cro::WebSocket::Frame` clas represents WebSocket frame as defined
+The `Cro::WebSocket::Frame` class represents WebSocket frame as defined
 per RFC 6455. The frame is assumed to be already `unmasked`/`masked`
 on `parser`/`serializer` level.
 

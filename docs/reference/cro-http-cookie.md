@@ -1,6 +1,6 @@
 # Cro::HTTP::Cookie
 
-The `Cro::HTTP::Cookie` class represents a cookie, as defiend in RFC 6265. In
+The `Cro::HTTP::Cookie` class represents a cookie, as defined in RFC 6265. In
 the context of a response or a useragent, all fields are relevant. In the
 context of a request being sent to a server, only the name and value have any
 significance, and the rest of the fields will be disregarded.
@@ -8,7 +8,7 @@ significance, and the rest of the fields will be disregarded.
 ## Properties
 
 The `Cro::HTTP::Cookie` class has the following properties, which are all
-read only. They can all be passed in the constuctor (`new`) or, to get a
+read only. They can all be passed in the constructor (`new`) or, to get a
 modified version of an existing instance, passed to `clone`.
 
 * `name` - the cookie name; constrained to only contain the characters

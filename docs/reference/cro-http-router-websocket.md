@@ -1,6 +1,6 @@
 # Cro::HTTP::Router::WebSocket
 
-This exports a subroutine `web-socket` that is to be used inside of a HTTP router `get` handler. This subroutine must take a code block, which takes a `Supply`. This `Supply` will process `Cro::WebSocket::Message` instances for messages recieved from the client when tapped. The block is expected to return a `Supply` that will emit response messages.
+This exports a subroutine `web-socket` that is to be used inside of a HTTP router `get` handler. This subroutine must take a code block, which takes a `Supply`. This `Supply` will process `Cro::WebSocket::Message` instances for messages received from the client when tapped. The block is expected to return a `Supply` that will emit response messages.
 
 A simple example:
 

@@ -52,7 +52,7 @@ and private key respectively, should be passed.
 ## Request body parsers and response body serializers
 
 Additional request body parsers (implementations of `Cro::HTTP::BodyParser`)
-and response body serializers (impelemntations of `Cro::HTTP::BodySerializer`)
+and response body serializers (implementations of `Cro::HTTP::BodySerializer`)
 can be added at the server level. Alternatively, the set of default set of
 body parsers and serializers can be replaced entirely.
 
@@ -121,7 +121,7 @@ that HTTP middleware can be inserted. There are, in order of processing:
 * **before** - operates on requests after they have been parsed, but before
   they reach the application. Consumes a `Cro::HTTP::Request` and produces a
   `Cro::HTTP::Request`.  This is a common place to put middleware that does
-  athentication, authorization, session handling, CSRF protection, and so
+  authentication, authorization, session handling, CSRF protection, and so
   forth.
 * **after** - operates on responses produced by the application. Consumes a
   `Cro::HTTP::Response` and produces a `Cro::HTTP::Response`. This is a common

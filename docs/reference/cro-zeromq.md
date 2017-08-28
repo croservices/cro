@@ -14,7 +14,7 @@ This class represents a ZeroMQ message. It does the `Cro::Message` role. A
 message to be sent (in a simple echo server, for example, it would be both).
 
 ZeroMQ messages may consist of multiple parts. The `parts` method returns
-an `List` of the parts that were receivered (or, if this is a message to be
+an `List` of the parts that were received (or, if this is a message to be
 sent, the parts added to send so far). Each part is represented as a `Blob`.
 Since a `List` is returned, this cannot be mutated. The `body-blob` method
 returns the last part, assuming that previous parts are some form of envelope.
@@ -238,8 +238,8 @@ my Cro::Service $rep = Cro::ZeroMQ::Service.rep(
 A service that receives messages prefixed with an identify, and processes
 them. A `REP` can only process one message at a time, which will not scale so
 well if multiple messages should be processed. A `ROUTER` socket allows for
-processing of many messages at a time. Each messges is prefixed with an
-idenity. **It is up to the message transform to include that in the response
+processing of many messages at a time. Each message is prefixed with an
+identity. **It is up to the message transform to include that in the response
 message**, so that it can be routed back to the correct client. (Note that the
 identity actually consists of one or more frames, followed by an empty frame.)
 
@@ -352,7 +352,7 @@ response has been received. Trying to do so will result in an exception.
 
 By contrast, a `dealer` is an asynchronous client. It will synthesize an ID
 for each request and insert it, followed by an empty frame, before sending the
-requst. Responses will cause the correct `Promise`s returned by `send` to be
+request. Responses will cause the correct `Promise`s returned by `send` to be
 kept.
 
     my $client = Cro::ZeroMQ::Client.dealer(

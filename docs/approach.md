@@ -144,7 +144,7 @@ the application at either end.
 
 The component at the center of a client pipeline will be a `Cro::Connector`,
 which establishes a connection. A `Cro::Connector` is able to establish a
-connection and produce a `Cro::Transform` that will send mesages it consumes
+connection and produce a `Cro::Transform` that will send messages it consumes
 using the connection and emit messages received from the network connection.
 Pipelines featuring a connector must not have a `Cro::Source` nor a
 `Cro::Sink`.
