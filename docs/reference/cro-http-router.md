@@ -317,7 +317,7 @@ post -> 'product' {
     # Get the body produced by the body parser.
     request-body -> %json-object {
         # Save it, and then...
-        created, 'application/json', %json-object;
+        created 'product/42', 'application/json', %json-object;
     }
 }
 ```
