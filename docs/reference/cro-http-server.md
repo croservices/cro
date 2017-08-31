@@ -83,6 +83,18 @@ body parsers to use as the `body-parsers` named parameter:
 If both `body-parsers` and `add-body-parsers` is used, then both will be used,
 with those in `add-body-parsers` again having higher precedence.
 
+If the class that represents a body parser or body serializer does not
+have attributes, passing type object is equivalent to passing an
+instance.
+
+    add-body-parsers => [
+        YAMLBodyParser.new
+    ]
+    # as well as
+    add-body-parsers => [
+        YAMLBodyParser
+    ]
+
 A similar scheme applies for body serializers. Use `add-body-serializers` to
 add extra ones to the defaults:
 
