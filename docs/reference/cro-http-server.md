@@ -62,8 +62,8 @@ To add extra body parsers to the set of defaults, pass a list of them to
     my Cro::Service $hello-service = Cro::HTTP::Server.new(
         :host('localhost'), :port(8888), :$application,
         add-body-parsers => [
-            YAMLBodyParser,
-            XMLBodyParser
+            YAMLBodyParser.new,
+            XMLBodyParser.new
         ]
     );
 
@@ -76,7 +76,7 @@ body parsers to use as the `body-parsers` named parameter:
         body-parsers => [
             # Don't parse any kind of body except a JSON one; anything else
             # will throw an exception when `.body` is called.
-            Cro::HTTP::BodyParser::JSON
+            Cro::HTTP::BodyParser::JSON.new
         ]
     );
 
@@ -89,8 +89,8 @@ add extra ones to the defaults:
     my Cro::Service $hello-service = Cro::HTTP::Server.new(
         :host('localhost'), :port(8888), :$application,
         add-body-serializers => [
-            YAMLBodySerializer,
-            XMLBodySerializer
+            YAMLBodySerializer.new,
+            XMLBodySerializer.new
         ]
     );
 
@@ -100,7 +100,7 @@ Or replace the set of body serializers entirely by passing `body-serializers`:
         :host('localhost'), :port(8888), :$application,
         body-serializers => [
             # The body can only ever be something that can be JSON serialized.
-            Cro::HTTP::BodySerializer::JSON
+            Cro::HTTP::BodySerializer::JSON.new
         ]
     );
 
