@@ -175,7 +175,7 @@ Could be applied as follows:
 
     my Cro::Service $hello-service = Cro::HTTP::Server.new(
         :host('localhost'), :port(8888), :$application,
-        after => ScriptTransportSecurity.new(Duration.new(30 * 24 * 60 * 60))
+        after => StrictTransportSecurity.new(Duration.new(30 * 24 * 60 * 60))
     );
 
 ## HTTP versions
