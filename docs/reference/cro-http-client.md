@@ -114,7 +114,7 @@ A `Blob`:
         content-type => 'image/jpeg',
         body => slurp('baobao.jpg', :bin);
 
-Form data formatted according to 'application/x-www-form-urlencoded` (this is
+Form data formatted according to `application/x-www-form-urlencoded` (this is
 the default in a web browser):
 
     my $resp = await Cro::HTTP::Client.post: 'we.love.pand.as/pandas',
@@ -260,7 +260,7 @@ objects.
 
 By default, `Cro::HTTP::Client` will follow HTTP redirect responses, with a
 limit of 5 redirects being enforced in order to avoid circular redirects. If
-there are more than 5 redirections, `X::Cro::HTTP::Client::TooManyRedirects'
+there are more than 5 redirections, `X::Cro::HTTP::Client::TooManyRedirects`
 will be thrown.
 
 This behavior can be configured when constructing a new `Cro::HTTP::Client` or
@@ -330,6 +330,6 @@ and `2`.
     :http<2>        # HTTP/2 only
     :http<1.1 2>    # HTTP/1.1 and HTTP/2 (HTTPS only; selected by ALPN)
 
-The default is `:http<1.1>` for a HTTP request, and `:http<1.1 2> for a HTTPS
+The default is `:http<1.1>` for a HTTP request, and `:http<1.1 2>` for a HTTPS
 request. It is not legal to use `:http<1.1 2>` with a HTTP connection, as ALPN
-is the only supported mechanism for deciding which protocl to use.
+is the only supported mechanism for deciding which protocol to use.

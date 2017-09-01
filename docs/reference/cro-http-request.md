@@ -54,7 +54,7 @@ The `add-cookie` method has two multi candidates:
   header line to include the cookie name and value specified in the
   `Cro::HTTP::Cookie` instance. If there is already a cookie with that
   name in the `Cookie` header value, it will be replaced with the new value.
-* `add-cookie`(Str $name, Str() $value)` - creates a `Cro::HTTP::Cookie`
+* `add-cookie(Str $name, Str() $value)` - creates a `Cro::HTTP::Cookie`
   instance from specified name and value (to ensure they do not contain any
   disallowed characters), and delegate to the first `add-cookie` candidate
 

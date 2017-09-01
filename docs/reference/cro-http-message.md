@@ -200,13 +200,13 @@ serialized to be sent over the network.
 
 The following body serializers are in the default set for serializing requests:
 
-* `Cro::HTTP::BodySeiralizer::WWWFormUrlEncoded` - used when the `content-type`
+* `Cro::HTTP::BodySerializer::WWWFormUrlEncoded` - used when the `content-type`
   header has been set to `application/x-www-form-urlencoded` and the body was
   set to a `List` or a `Hash`, *or* when the body is an instance of
   `Cro::HTTP::Body::WWWFormUrlEncoded`. If a `List` is provided then all of
   the list elements must be pairs. If there is no `content-type` header, it
   will be added.
-* `Cro::HTTP::BodySeiralizer::MultiPartFormData` - used when the `content-type`
+* `Cro::HTTP::BodySerializer::MultiPartFormData` - used when the `content-type`
   header has been set to `application/x-www-form-urlencoded` and the body was
   set to a `List`, *or* when the body is an instance of
   `Cro::HTTP::Body::MultiPartFormData`. If a `List` is provided then all of
@@ -231,7 +231,7 @@ The default set of serializers for a response are:
 * `Cro::HTTP::BodySerializer::JSON` (described above)
 * `Cro::HTTP::BodySerializer::StrFallback` (described above)
 * `Cro::HTTP::BodySerializer::BlobFallback` (described above)
-* `Cro::HTTP::BodySerializer::SupplyFalback` - used when the body has been set
+* `Cro::HTTP::BodySerializer::SupplyFallback` - used when the body has been set
   to a `Supply`. This `Supply` must emit `Blob`s; anything else will result in
   an error. This is the only built-in body serializer that does not add a
   `content-length` header (meaning that the response serializer will use the

@@ -131,7 +131,7 @@ Unlike some routing engines, `Cro::HTTP::Router` does not purely consider the
 routes based upon their order of declaration. The rules are as follows:
 
 * Longest literal initial segments win. For example, for a request to `GET
-  /catagory/search`, the route `get -> 'category', 'search' { }` would win over
+  /category/search`, the route `get -> 'category', 'search' { }` would win over
   `get -> 'category', $name { }` no matter what order they were declared in.
 * Declared segments always beat slurpy segments. For example, given `GET
   /tree/describe`, the route `get -> 'tree', $operation { }` would win over
@@ -197,7 +197,7 @@ This will also happily accept zero or one values, giving an empty and
 my $app = route {
     # Require a single city to search in, and allow multiple selection of
     # interesting numbers of rooms.
-    get -> 'appartments', Str :$city!, :@rooms {
+    get -> 'apartments', Str :$city!, :@rooms {
         ...
     }
 }
@@ -359,7 +359,7 @@ if none match. The arguments may be `Block`s, `Pair`s, or a mixture. This
 allows switching on `Content-type` of the request body:
 
 ```
-put -> 'product', $id, 'image {
+put -> 'product', $id, 'image' {
     request-body-blob
         'image/gif' => -> $gif {
             ...
@@ -373,7 +373,7 @@ put -> 'product', $id, 'image {
 Or switching on `Content-type`, but providing a block at the end as a fallback:
 
 ```
-put -> 'product', $id, 'image {
+put -> 'product', $id, 'image' {
     request-body-blob
         'image/gif' => -> $gif {
             ...
@@ -600,7 +600,7 @@ Custom body serializers implement the `Cro::HTTP::BodySerializer` role. They
 can decide when they are applicable by considering the type of the body and/or
 the response headers (most typically the `content-type` header).
 
-Body serializers can be applied when configuring `Cro:HTTP::Server`, in which
+Body serializers can be applied when configuring `Cro::HTTP::Server`, in which
 case they will be applicable to all requests. They may also be applied within
 a given `route` block:
 
@@ -685,7 +685,7 @@ sub product-routes() is export {
 And then its routes included into a top-level routing table:
 
 ```
-use OurSerivce::Products;
+use OurService::Products;
 
 my $app = route {
     get -> { ... }
@@ -709,7 +709,7 @@ sub product-routes() is export {
 The URL structure could be preserved by including it with a prefix:
 
 ```
-use OurSerivce::Products;
+use OurService::Products;
 
 my $app = route {
     get -> { ... }
