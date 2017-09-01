@@ -29,7 +29,7 @@ To get a list of header values matching a particular name (case-insensitive),
 use `header-list`. This will return an empty list if there is no header with
 the specified name.
 
-    my @links = $resp.headers('link');
+    my @links = $resp.header-list('link');
 
 The `has-header` method is useful for checking if a header is present in the
 request without caring about its value; again, matching is case-insensitive.
