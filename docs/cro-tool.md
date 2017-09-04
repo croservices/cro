@@ -11,16 +11,18 @@ project.
 A new service can be stubbed using the `cro stub` command. The general usage
 is:
 
-    cro stub <service-type> <id> <path> ['options']
+    cro stub <service-type> <service-id> <path> ['options']
 
-Where `service-type` is the type of service to create, `id` is the ID of the
-service (to be used with other `cro` commands), `path` is the location to
-create the service, and `options` are a set of options specific to the service
-type. The options are written in a simplified version of Perl 6 colonpair
-syntax, where `:foo` enables an option, `:!foo` disables an option, and
-`:foo<bar>` is the option `foo` with the value `bar`. For example:
+Where `service-type` is the type of service to create, `service-id` is the ID of
+the service (to be used with other `cro` commands; `service-name` is this by
+default), `path` is the location to create the service, and `options` are
+a set of options specific to the service type. The options are written in a
+simplified version of Perl 6 colonpair syntax, where `:foo` enables an option,
+`:!foo` disables an option, and `:foo<bar>` is the option `foo` with the value
+`bar`. For example:
 
-    cro stub http foo services/foo ':!secure :websocket :link<bar>'
+    cro stub http foo services/foo ':!secure :websocket'
+    cro stub http bar services/bar ':!secure :websocket :link<foo>'
 
 The stubbed services take port and certificate configuration from environment
 variables, and when there are relations between services their addresses are
@@ -44,12 +46,14 @@ The following options are be supplied:
 * `:!http1`: generates a service without HTTP 1 support
 * `:websocket`: adds a dependency to the `Cro::WebSocket` module and adds
   a stub web socket example
-* `:link<service>`: indicates that code to interact with the specified
+* `:link<service-id>`: indicates that code to interact with the specified
   other service should be stubbed; that service must exist in some folder
   beneath the current working directory, and have a `.cro.yml` with the
-  specified service name.
+  specified service id.
 
 ## Running Services
+
+    cro run [<service-name> ...]
 
 The `cro run` command is used to run services. It automatically sets up file
 watching and restarts services when there are source changes to the services
@@ -60,8 +64,9 @@ files in the current working directory and its subdirectories), use:
 
     cro run
 
-To run a specific service, write its name (which must appear in a `.cro.yml`
-file in the current working directory or one of its subdirectories):
+To run a specific service, write its `service-name` or `service-id` (which must
+appear as a `name` or `id`, repectively in a `.cro.yml` file in the current
+working directory or one of its subdirectories):
 
     cro run flashcard-backend 
 
@@ -69,10 +74,12 @@ It's also possible to list multiple services:
 
     cro run flashbard-backend users frontend
 
-The output of the services will be displayed, prefixed with the service name.
+The output of the services will be displayed, prefixed with the `service-name`.
 Sending SIGINT (hitting Ctrl+C) will kill all of the services.
 
 ## Tracing Services
+
+    cro trace <service-name-or-filter>
 
 The `cro trace` command is much like `cro run`, except it turns on pipeline
 debugging in the services. This makes it possible to see the traffic that each
@@ -89,19 +96,21 @@ the TCP message messages from the trace, do:
 
 To see only HTTP messages, do:
 
-    cro trace :http;
+    cro trace :http
 
 To restrict that further to just requests, do:
 
-    cro trace :http :request;
+    cro trace :http :request
 
-Anything not starting with a `:` is taken as a service name. The order is
+Anything not starting with a `:` is taken as a `service-name`. The order is
 unimportant, so these are equivalent:
 
     cro trace :http flashcard-backend
     cro trace flashcard-backend :http
 
 ## Serving Static Content
+
+    cro serve <host-port> [<directory>]
 
 Sometimes it is useful to set up a HTTP server to serve some static content.
 Serve the current directory on port 8080 of localhost with:
@@ -112,6 +121,6 @@ Or specify a directory to serve:
 
     cro serve 8080 static_content/
 
-A hostname to bind to may be provided before the port also:
+An IP address to bind to may also be provided before the port number:
 
     cro serve 192.168.0.1:8080 static_content/
