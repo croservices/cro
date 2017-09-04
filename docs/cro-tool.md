@@ -13,13 +13,18 @@ is:
 
     cro stub <service-type> <service-id> <path> ['options']
 
-Where `service-type` is the type of service to create, `service-id` is the ID of
-the service (to be used with other `cro` commands; `service-name` is this by
-default), `path` is the location to create the service, and `options` are
-a set of options specific to the service type. The options are written in a
-simplified version of Perl 6 colonpair syntax, where `:foo` enables an option,
-`:!foo` disables an option, and `:foo<bar>` is the option `foo` with the value
-`bar`. For example:
+Where
+
+* `service-type` is the type of service to create
+* `service-id` is the ID of the service (to be used with other `cro` commands;
+  this will also be used as the service's default descriptive `name` in `.cro.yml`),
+* `path` is the location to create the service
+* `options` are a set of options specific to the service type
+
+If the options are not specified, then they will be requested interactively. To
+provide the options, place them in quotes using Perl 6 colonpair-like syntax, where
+`:foo` enables an option, `:!foo` disables an option, and `:foo<bar>` is the option
+`foo` with the value `bar`. For example:
 
     cro stub http foo services/foo ':!secure :websocket'
     cro stub http bar services/bar ':!secure :websocket :link<foo>'
@@ -37,7 +42,7 @@ accept HTTP/1.0, HTTP/1.1 and HTTP/2.0 requests.
 
     cro stub http flashcard-backend backend/flashcards
 
-The following options are be supplied:
+The following options may be supplied:
 
 * `:!secure`: generates a HTTP service instead of a HTTPS one (`:secure`
   is the default); implies `:!http2`, since ALPN is used to negotiate whether
@@ -53,7 +58,7 @@ The following options are be supplied:
 
 ## Running Services
 
-    cro run [<service-name> ...]
+    cro run [<service-id> ...]
 
 The `cro run` command is used to run services. It automatically sets up file
 watching and restarts services when there are source changes to the services
@@ -64,9 +69,9 @@ files in the current working directory and its subdirectories), use:
 
     cro run
 
-To run a specific service, write its `service-name` or `service-id` (which must
-appear as a `name` or `id`, repectively in a `.cro.yml` file in the current
-working directory or one of its subdirectories):
+To run a specific service, write its `service-id` (which must appear as the `id`
+field in a `.cro.yml` file in the current working directory or one of its
+subdirectories):
 
     cro run flashcard-backend 
 
@@ -79,7 +84,7 @@ Sending SIGINT (hitting Ctrl+C) will kill all of the services.
 
 ## Tracing Services
 
-    cro trace <service-name-or-filter>
+    cro trace <service-id-or-filter>
 
 The `cro trace` command is much like `cro run`, except it turns on pipeline
 debugging in the services. This makes it possible to see the traffic that each
