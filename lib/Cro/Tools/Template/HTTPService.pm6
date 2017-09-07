@@ -12,7 +12,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
             id => 'secure',
             name => 'Secure (HTTPS)',
             type => Bool,
-            default => True
+            default => False
         ),
         Option.new(
             id => 'http1',
