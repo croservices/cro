@@ -24,7 +24,9 @@ sub get-available-templates(Supplier $warnings?) is export {
         }
     }
 
-    my @template-modules = @modules-found.grep(*.starts-with('Cro::Tools::Template::')).unique;
+    my @template-modules = @modules-found
+        .grep(*.starts-with('Cro::Tools::Template::'))
+        .unique;
 
     my @templates;
     for @template-modules {
@@ -32,6 +34,9 @@ sub get-available-templates(Supplier $warnings?) is export {
         given ::($_) {
             when Cro::Tools::Template {
                 push @templates, $_;
+            }
+            default {
+                .so
             }
         }
         CATCH {
