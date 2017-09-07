@@ -117,7 +117,10 @@ class Cro::Tools::Runner {
                         %env{$_} = %endpoint-ports{$endpoint.id};
                     }
                 }
-                %env<CRO_TRACE> = '1' if $!trace;
+                if $!trace {
+                    %env<CRO_TRACE> = '1';
+                    %env<CRO_TRACE_MACHINE_READABLE> = '1';
+                }
                 my $proc = Proc::Async.new('perl6', '-Ilib', $cro-file.entrypoint);
                 whenever $proc.stdout.lines -> $line {
                     emit Output.new(:$service-id, :!on-stderr, :$line);
