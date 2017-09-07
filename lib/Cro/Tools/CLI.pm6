@@ -219,7 +219,7 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
                         .line;
                 }
                 else {
-                    note color($color), "\c[NOTEBOOK] {.service-id} ", RESET(),
+                    say color($color), "\c[NOTEBOOK] {.service-id} ", RESET(),
                         .line;
                 }
             }
