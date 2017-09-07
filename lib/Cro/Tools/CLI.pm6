@@ -235,7 +235,7 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
                 note colored($prefix, $color) ~ colored($event, "bold") ~
                     " [{.id}] {.component}";
                 with .data -> $data {
-                    note $data.trim.indent($prefix.chars);
+                    note $data.trim.indent($prefix.chars + 2);
                 }
             }
         }
