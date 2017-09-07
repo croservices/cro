@@ -159,7 +159,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
     sub write-cro-file($file, $id, $name, %options) {
         my $id-uc = env-name($id);
         my $cro-file = Cro::Tools::CroFile.new(
-            :$id, :$name, :entrypoint<service.p6>, :entrypoints[
+            :$id, :$name, :entrypoint<service.p6>, :endpoints[
                 Cro::Tools::CroFile::Endpoint.new(
                     id => %options<secure> ?? 'https' !! <https>,
                     name => %options<secure> ?? 'HTTPS' !! 'HTTP',
