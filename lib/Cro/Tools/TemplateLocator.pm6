@@ -2,7 +2,7 @@ use Cro::Tools::Template;
 use File::Find;
 use JSON::Fast;
 
-sub get-available-templates(Supplier $warnings?) is export {
+sub get-available-templates($pattern, Supplier $warnings?) is export {
     my @modules-found;
 
     for $*REPO.repo-chain {
@@ -25,14 +25,14 @@ sub get-available-templates(Supplier $warnings?) is export {
     }
 
     my @template-modules = @modules-found
-        .grep(*.starts-with('Cro::Tools::Template::'))
+        .grep(*.starts-with("{$pattern.^name}::"))
         .unique;
 
     my @templates;
     for @template-modules {
         require ::($_);
         given ::($_) {
-            when Cro::Tools::Template {
+            when $pattern {
                 push @templates, $_;
             }
             default {

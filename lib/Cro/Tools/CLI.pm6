@@ -15,7 +15,7 @@ multi MAIN('web', Str $host-port = '10203') {
 
 multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
     my %options = parse-options($options);
-    my @templates = get-available-templates();
+    my @templates = get-available-templates(Cro::Tools::Template);
     my $found = @templates.first(*.id eq $service-type);
     if $found ~~ Cro::Tools::Template {
         say "Stubbing a {$found.name} '$id' in '$path'...\n";
