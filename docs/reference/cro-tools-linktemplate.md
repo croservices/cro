@@ -38,7 +38,7 @@ For example:
         my $setup-variable = q:c/${$service}-{$endpoint}/;
         my $setup-code = q:c:to/CODE/;
             my {$var-name} = Cro::HTTP::Client.new:
-                base-uri => "http://%*ENV<{$host-env}>:%*ENV{$host-port}/";
+                base-uri => "http://%*ENV<{$host-env}>:%*ENV<{port-env}>/";
             CODE
         return Cro::Tools::GeneratedLink.new:
             use => 'Cro::HTTP::Client', :$setup-code, :$setup-variable
