@@ -11,28 +11,38 @@ project.
 A new service can be stubbed using the `cro stub` command. The general usage
 is:
 
-    cro stub <service-type> <service-id> <path> ['options']
+    cro stub <service-type> <service-id> <path> ['link-and-options']
 
 Where
 
 * `service-type` is the type of service to create
-* `service-id` is the ID of the service (to be used with other `cro` commands;
-  this will also be used as the service's default descriptive `name` in `.cro.yml`),
+* `service-id` is the ID of the service (to be used with other `cro`
+  commands; this will also be used as the service's default descriptive
+  `name` in `.cro.yml`),
 * `path` is the location to create the service
-* `options` are a set of options specific to the service type
+* `links-and-options` specifies links to other services that should be added
+  to the stub, together with options specific to the service type
 
-If the options are not specified, then they will be requested interactively. To
-provide the options, place them in quotes using Perl 6 colonpair-like syntax, where
-`:foo` enables an option, `:!foo` disables an option, and `:foo<bar>` is the option
-`foo` with the value `bar`. For example:
+If the links and options are not specified, then they will be requested
+interactively. To provide the options, place them in quotes using Perl 6
+colonpair-like syntax, where `:foo` enables an option, `:!foo` disables an
+option, and `:foo<bar>` is the option `foo` with the value `bar`. For example:
 
     cro stub http foo services/foo ':!secure :websocket'
-    cro stub http bar services/bar ':!secure :websocket :link<foo>'
+    cro stub http bar services/bar ':!secure :websocket'
 
 The stubbed services take port and certificate configuration from environment
 variables, and when there are relations between services their addresses are
 also injected using environment variables. This is convenient when setting up
 container deployment.
+
+Links cause the stubbed service to include code that creates some kind of
+"client" that can communicate with another endpoint. These go in with the
+options, having the form `:link<service-id:endpoint-id>`. The `service-id` is
+the `id` field from the target `.cro.yml`, and `endpoint-id` is the `id` field
+of an entry in the `endpoints` list of that `.cro.yml` file.
+
+    cro stub http foo services/foo ':link<flash-storage:http>'
 
 ### HTTP Services
 
@@ -44,17 +54,13 @@ accept HTTP/1.0, HTTP/1.1 and HTTP/2.0 requests.
 
 The following options may be supplied:
 
-* `:!secure`: generates a HTTP service instead of a HTTPS one (`:secure`
-  is the default); implies `:!http2`, since ALPN is used to negotiate whether
-  to use HTTP/2
+* `:secure`: generates a HTTPS service instead of a HTTP one (`:!secure` is
+  the default); implies `:http1 :http2` by default, using ALPN to negotiate
+  whether to use HTTP/2
 * `:!http2`: generates a service without HTTP 2 support
 * `:!http1`: generates a service without HTTP 1 support
 * `:websocket`: adds a dependency to the `Cro::WebSocket` module and adds
   a stub web socket example
-* `:link<service-id>`: indicates that code to interact with the specified
-  other service should be stubbed; that service must exist in some folder
-  beneath the current working directory, and have a `.cro.yml` with the
-  specified service id.
 
 ## Running Services
 
@@ -129,3 +135,39 @@ Or specify a directory to serve:
 An IP address to bind to may also be provided before the port number:
 
     cro serve 192.168.0.1:8080 static_content/
+
+## Working with service links
+
+The `cro link` subcommand is used to manage the `links` section of `.cro.yml`
+files. These describes how one Cro service uses another, resulting in the
+injection of environment variables specifying the host and port where the
+service can be found. In production, these would be set by a container engine
+such as Kubernetes, by some kind of configuration management system, or even
+just hardcoded into a wrapper script.
+
+To add a service link, use `add`:
+
+    cro link add <from-service-id> <to-service-id> [<to-endpoint-id>]
+
+Where `from-service-id` is the `id` of the `.cro.yml` that whose links should
+be modified, `to-service-id` is the `id` of the `.cro.yml` of the service that
+will be consumed, and `to-endpoint-id` is the `id` of an endpoint in that
+service's `.cro.yml`. This command will, provided there is a link template
+matching the protocol of the service linked to, produce some stub code that
+you can paste into your service code at the appropriate place (Cro is not so
+crazy as to think it can edit your code under you!)
+
+If `to-endpoint-id` is not specified, and the `to-service-id` service has only
+one endpoint, then that one will be used by default. Otherwise, the ambiguity
+will be whined about.
+
+To re-generate the code for an existing link, do:
+
+    cro link code <from-service-id> <to-service-id> [<to-endpoint-id>]
+
+To remove a link, use:
+
+    cro link rm <from-service-id> <to-service-id> [<to-endpoint-id>]
+
+Which simply removes the entry from the `links` section of the `.cro.yml` that
+is identified by `from-service-id`.
