@@ -4,6 +4,7 @@
 
 The essentials you need to know to get building with Cro.
 
+* [Getting Started](intro/getstarted)
 * [Creating HTTP Services](intro/http-server)
 * [Making HTTP Requests](intro/http-client)
 
