@@ -14,6 +14,7 @@
                 "Cro::Tools::CLI": "lib/Cro/Tools/CLI.pm6",
                 "Cro::Tools::CroFile": "lib/Cro/Tools/CroFile.pm6",
                 "Cro::Tools::LinkTemplate": "lib/Cro/Tools/LinkTemplate.pm6",
+                "Cro::Tools::LinkTemplate::HTTP": "lib/Cro/Tools/LinkTemplate/HTTP.pm6",
                 "Cro::Tools::Runner": "lib/Cro/Tools/Runner.pm6",
                 "Cro::Tools::Serve": "lib/Cro/Tools/Serve.pm6",
                 "Cro::Tools::Services": "lib/Cro/Tools/Services.pm6",
