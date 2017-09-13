@@ -52,6 +52,13 @@ The actual exception type will be either `X::Cro::HTTP::Error::Client` for
 when setting up retries that should distinguish server errors from client
 errors).
 
+To set a base URL for every client's request, base URL can be passed
+to `Cro::HTTP::Client` instance as `base-uri` argument.
+
+    my $client = Cro::HTTP::Client.new(base-uri => "http://persistent.url.com");
+    await $client.get('/first');   # http://persistent.url.com/first
+    await $client.get('/another'); # http://persistent.url.com/another
+
 ## Adding extra request headers
 
 One or more headers can be set for a request by passing an array to the
