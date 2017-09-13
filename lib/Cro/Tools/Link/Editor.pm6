@@ -2,14 +2,14 @@ use Cro::Tools::CroFile;
 use File::Find;
 
 my sub check-services($from-service, $to-service, $to-endpoint?) {
-    my @ymls = find(dir => '.', name => / \.cro\.yml$/);
+    my @ymls = find(dir => $*CWD, name => / \.cro\.yml$/);
     my ($path, $from, $to, $endpoint);
-    for @ymls {
-        my $cro-file = Cro::Tools::CroFile.parse($_.IO.slurp);
+    for @ymls -> $p {
+        my $cro-file = Cro::Tools::CroFile.parse($p.IO.slurp);
         given $cro-file.id {
             when $from-service {
                 $from = $cro-file;
-                $path = $_.IO;
+                $path = $p.IO;
             }
             when $to-service {
                 $to = $cro-file;
@@ -44,7 +44,7 @@ my sub check-services($from-service, $to-service, $to-endpoint?) {
     ($path, $from, $to, $endpoint);
 }
 
-sub add($from-service, $to-service, $to-endpoint?) {
+our sub add($from-service, $to-service, $to-endpoint?) {
     my ($path, $from, $to, $endpoint) = check-services($from-service,
                                                        $to-service,
                                                        $to-endpoint);
@@ -55,10 +55,10 @@ sub add($from-service, $to-service, $to-endpoint?) {
         host-env => $endpoint.host-env,
         port-env => $endpoint.port-env;
     $from.links.push($link);
-    spurt $path.add('.cro.yml'), $from.to-yaml;
+    spurt $path, $from.to-yaml;
 }
 
-sub rm($from-service, $to-service, $to-endpoint?) {
+our sub rm($from-service, $to-service, $to-endpoint?) {
     my ($path, $from, $to, $endpoint) = check-services($from-service,
                                                        $to-service,
                                                        $to-endpoint);
@@ -68,7 +68,7 @@ sub rm($from-service, $to-service, $to-endpoint?) {
                           !! not  .service eq $to-service
                         });
     if $links != $from.links.elems {
-        spurt $path.add('.cro.yml'), $from.to-yaml;
+        spurt $path, $from.to-yaml;
     } else {
         die 'Such link does not exist. Did you mean `add`?';
     }
