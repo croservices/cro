@@ -161,7 +161,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         my $cro-file = Cro::Tools::CroFile.new(
             :$id, :$name, :entrypoint<service.p6>, :endpoints[
                 Cro::Tools::CroFile::Endpoint.new(
-                    id => %options<secure> ?? 'https' !! <https>,
+                    id => %options<secure> ?? 'https' !! <http>,
                     name => %options<secure> ?? 'HTTPS' !! 'HTTP',
                     protocol => %options<secure> ?? 'https' !! 'http',
                     host-env => $id-uc ~ '_HOST',
