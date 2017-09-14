@@ -1,3 +1,4 @@
+use Cro::Tools::Link::Editor;
 use Cro::Tools::Runner;
 use Cro::Tools::Template;
 use Cro::Tools::TemplateLocator;
@@ -157,6 +158,21 @@ multi MAIN('run') {
 
 multi MAIN('run', *@service-name) {
     run-services(filter => any(@service-name));
+}
+
+multi MAIN('link', $command, $from-service-id, $to-service-id, $to-endpoint-id?) {
+    die 'Unknown command' unless $command eq 'add'|'code'|'rm';
+    given $command {
+        when 'add' {
+            add-link($from-service-id, $to-service-id, $to-endpoint-id);
+        }
+        when 'code' {
+            code-link($from-service-id, $to-service-id, $to-endpoint-id);
+        }
+        when 'rm' {
+            rm-link($from-service-id, $to-service-id, $to-endpoint-id);
+        }
+    }
 }
 
 multi MAIN('trace', *@service-name-or-filter) {
