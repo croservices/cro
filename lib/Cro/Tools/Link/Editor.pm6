@@ -56,6 +56,7 @@ our sub add($from-service, $to-service, $to-endpoint?) {
         port-env => $endpoint.port-env;
     $from.links.push($link);
     spurt $path, $from.to-yaml;
+    print-endpoint($to-service, $endpoint);
 }
 
 our sub rm($from-service, $to-service, $to-endpoint?) {
@@ -72,4 +73,27 @@ our sub rm($from-service, $to-service, $to-endpoint?) {
     } else {
         die 'Such link does not exist. Did you mean `add`?';
     }
+}
+
+my sub print-endpoint($to-service, $ep) {
+    use Cro::Tools::TemplateLocator;
+    use Cro::Tools::LinkTemplate;
+    my @templates = get-available-templates(Cro::Tools::LinkTemplate);
+    for @templates {
+        if $ep.protocol eq $_.protocol {
+            my $g-link = $_.generate($to-service, $ep.id,
+                                    (host-env => $ep.host-env,
+                                     port-env => $ep.port-env));
+            say "use $_" for $g-link.use;
+            say $g-link.setup-code;
+            last;
+        }
+    }
+}
+
+our sub code($from-service, $to-service, $to-endpoint?) {
+    my ($path, $from, $to, $ep) = check-services($from-service,
+                                                       $to-service,
+                                                       $to-endpoint);
+    print-endpoint($to-service, $ep);
 }
