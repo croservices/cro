@@ -16,7 +16,7 @@ Incoming connections are represented by `Cro::Connection`; implementations
 include:
 
 * Cro::TCP::ServerConnection
-* Cro::SSL::ServerConnection
+* Cro::TLS::ServerConnection
 
 A `Cro::Source` is a source of either messages or connections. For example,
 `Cro::TCP::Listener` produces `Cro::TCP::ServerConnection` objects.
@@ -36,7 +36,7 @@ Some messages or connections can be replied to with one or more messages. These
 do the `Cro::Replyable` role. Anything that produces a replyable is also
 responsible for providing something that can process the reply messages. This
 "something" may either be a transform or a sink. Examples of replyables include
-`Cro::TCP::ServerConnection` and `Cro::SSL::ServerConnection`, which give a
+`Cro::TCP::ServerConnection` and `Cro::TLS::ServerConnection`, which give a
 `Cro::Sink` replier that sends `Cro::TCP::Message` objects back to the client.
 
 ## Composition
@@ -179,7 +179,7 @@ but functional) HTTP client would look like:
 ```
 my Cro::Connector $conn = Cro.compose(
     Cro::HTTP::RequestSerializer,
-    Cro::SSL::Connector,
+    Cro::TLS::Connector,
     Cro::HTTP::ResponseParser
 );
 

@@ -16,9 +16,9 @@ The `Cro::Core` package contains key Cro infrastructure:
 
 All other Cro modules ultimately depend on this.
 
-## Cro::SSL
+## Cro::TLS
 
-The `Cro::SSL` package contains the `Cro::SSL` module, which provides SSL
+The `Cro::TLS` package contains the `Cro::TLS` module, which provides TLS
 support.
 
 ## Cro::HTTP
@@ -32,7 +32,7 @@ This module includes:
 * HTTP/1.1 and HTTP/2 request/response parsers and serializers
 * HTTP version selection and connection management infrastructure
 
-It depends on `Cro::Core` and `Cro::SSL`.
+It depends on `Cro::Core` and `Cro::TLS`.
 
 ## Cro::WebSocket
 
@@ -55,7 +55,7 @@ The Cro development tools. Includes:
 * The `cro` command line tool
 * The `cro web` web interface for Cro development
 
-It depends on `Cro::WebSocket`, and thus `Cro::HTTP`, `Cro::SSL`, and
+It depends on `Cro::WebSocket`, and thus `Cro::HTTP`, `Cro::TLS`, and
 `Cro::Core`. Therefore, it always provides support for stubbing HTTP services.
 If `Cro::ZeroMQ` is installed then it will provide the option to stub ZeroMQ
 services also.

@@ -32,9 +32,9 @@
         "web/index.html",
         "web/css/bootstrap.min.css",
         "web/css/cro.css",
-        "fake-ssl/ca-crt.pem",
-        "fake-ssl/server-crt.pem",
-        "fake-ssl/server-key.pem"
+        "fake-tls/ca-crt.pem",
+        "fake-tls/server-crt.pem",
+        "fake-tls/server-key.pem"
     ],
     "source-url"    : "https://github.com/croservices/cro.git"
 }

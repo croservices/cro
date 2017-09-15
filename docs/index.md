@@ -26,9 +26,9 @@ The full details, organized by module.
 
 * [Cro::Uri](reference/cro-uri)
 
-### Cro::SSL
+### Cro::TLS
 
-* [Cro::SSL](reference/cro-ssl)
+* [Cro::TLS](reference/cro-tls)
 
 ### Cro::HTTP
 

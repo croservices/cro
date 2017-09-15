@@ -45,11 +45,11 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         return @errors;
     }
 
-    sub write-fake-ssl($where) {
+    sub write-fake-tls($where) {
         my $res = $where.add('RESOURCES/');
         mkdir $res;
-        mkdir $res.add('fake-ssl');
-        for <fake-ssl/ca-crt.pem fake-ssl/server-crt.pem fake-ssl/server-key.pem> -> $fn {
+        mkdir $res.add('fake-tls');
+        for <fake-tls/ca-crt.pem fake-tls/server-crt.pem fake-tls/server-key.pem> -> $fn {
             with %?RESOURCES{$fn} {
                 copy($_, $res.add($fn));
             }
@@ -59,7 +59,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
     method generate(IO::Path $where, Str $id, Str $name, %options) {
         my $lib = $where.add('lib');
         mkdir $lib;
-        write-fake-ssl($where) if %options<secure>;
+        write-fake-tls($where) if %options<secure>;
         write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>);
         write-entrypoint($where.add('service.p6'), $id, %options);
         write-cro-file($where.add('.cro.yml'), $id, $name, %options);
@@ -120,17 +120,17 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
 
         if %options<secure> {
             $entrypoint ~= q:c:to/CODE/;
-                    ssl => %(
-                        private-key-file => %*ENV<{$env-name}_SSL_KEY> ||
+                    tls => %(
+                        private-key-file => %*ENV<{$env-name}_TLS_KEY> ||
                 CODE
             $entrypoint ~= Q:to/CODE/;
-                            %?RESOURCES<fake-ssl/server-key.pem>,
+                            %?RESOURCES<fake-tls/server-key.pem>,
                 CODE
             $entrypoint ~= q:to/CODE/;
-                        certificate-file => %*ENV<{$env-name}_SSL_CERT> ||
+                        certificate-file => %*ENV<{$env-name}_TLS_CERT> ||
                 CODE
             $entrypoint ~= Q:to/CODE/;
-                            %?RESOURCES<fake-ssl/server-crt.pem>
+                            %?RESOURCES<fake-tls/server-crt.pem>
                     ),
                 CODE
         }
@@ -191,9 +191,9 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
             provides => {
                 'Routes.pm6' => 'lib/Routes.pm6'
             },
-            resources => %options<secure> ?? <fake-ssl/ca-crt.pem
-                                              fake-ssl/server-crt.pem
-                                              fake-ssl/server-key.pem> !! (),
+            resources => %options<secure> ?? <fake-tls/ca-crt.pem
+                                              fake-tls/server-crt.pem
+                                              fake-tls/server-key.pem> !! (),
             license => 'Write me!'
         );
         spurt($file, $m.to-json);
