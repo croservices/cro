@@ -13,7 +13,7 @@ that uses one of the Cro base images.
   base image is applicable, but at least saves installing the `Cro::Core`
   library.
 * **`cro-http`** - includes the `Cro::HTTP` distribution, which in turn
-  depends on `Cro::SSL` and `Cro::Core`. Includes libraries required for SSL
+  depends on `Cro::TLS` and `Cro::Core`. Includes libraries required for TLS
   to work. Ideal for web services.
 * **`cro-http-websocket`** - as for `cro-core-http`, but also includes
   the `Cro::WebSocket` distribution. Ideal for web servies that also use web

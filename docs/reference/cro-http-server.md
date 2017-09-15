@@ -37,16 +37,16 @@ react whenever signal(SIGINT) {
 ## Configuring HTTPS
 
 By default, `Cro::HTTP::Server` will operates as a HTTP server. To set it up
-as a HTTPS server instead, use the `ssl` named parameter. It expects to receive
-a hash of arguments providing the SSL configuration, which it will in turn pass
+as a HTTPS server instead, use the `tls` named parameter. It expects to receive
+a hash of arguments providing the TLS configuration, which it will in turn pass
 to the constructor of `Cro::TLS::Listener`. Typically, `certificate-file` and
 `private-key-file`, specifying the locations of files containing a certificate
 and private key respectively, should be passed.
 
-    my %ssl = private-key-file => 'server.pem',
+    my %tls = private-key-file => 'server.pem',
               certificate-file => 'cert.pem';
     my Cro::Service $hello-service = Cro::HTTP::Server.new(
-        :host('localhost'), :port(8888), :%ssl, :$application
+        :host('localhost'), :port(8888), :%tls, :$application
     );
 
 ## Request body parsers and response body serializers
@@ -186,9 +186,9 @@ supported. It can be passed a single item or list. Valid options are `1.1`
 
     :http<1.1>      # HTTP/1.1 only
     :http<2>        # HTTP/2 only
-    :http<1.1 2>    # HTTP/1.1 and HTTP/2 (SSL only; selected by ALPN)
+    :http<1.1 2>    # HTTP/1.1 and HTTP/2 (TLS only; selected by ALPN)
 
-The default is `:http<1.1>` for a HTTP server. For a HTTPS server, if the SSL
+The default is `:http<1.1>` for a HTTP server. For a HTTPS server, if the TLS
 library (`IO::Socket::Async::SSL`) detects that ALPN support is available then
 it will default to `:http<1.1 2>`; otherwise it will default to `:http<1.1>`.
 If `:http<1.1 2>` is specified and ALPN support is not available, then an
