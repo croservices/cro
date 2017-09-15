@@ -13,6 +13,7 @@
                 "cro": "bin/cro",
                 "Cro::Tools::CLI": "lib/Cro/Tools/CLI.pm6",
                 "Cro::Tools::CroFile": "lib/Cro/Tools/CroFile.pm6",
+                "Cro::Tools::Link::Editor": "lib/Cro/Tools/Link/Editor.pm6",
                 "Cro::Tools::LinkTemplate": "lib/Cro/Tools/LinkTemplate.pm6",
                 "Cro::Tools::LinkTemplate::HTTP": "lib/Cro/Tools/LinkTemplate/HTTP.pm6",
                 "Cro::Tools::LinkTemplate::HTTPS": "lib/Cro/Tools/LinkTemplate/HTTPS.pm6",
