@@ -32,7 +32,20 @@ class Cro::Tools::Runner {
     has Bool $.trace = False;
     has Str @.trace-filters;
 
+    my enum State (started => 1, waiting => 0);
+
+    class ServiceStatus {
+        has $.proc,
+        has $.service,
+        has %.endpoint-ports;
+        has %.env;
+        has State $.state is rw;
+        has @.dependencies;
+    }
+
     method run(--> Supply) {
+        my %services;
+
         supply {
             my class RunningService {
                 has $.path;
@@ -43,17 +56,93 @@ class Cro::Tools::Runner {
             }
             my %running-services;
 
+            sub enable-service($proc, $service, %endpoint-ports, %env) {
+                my $path = $service.path;
+                my $cro-file = $service.cro-file;
+
+                for $cro-file.links -> $link {
+                    with $link.host-env {
+                        %env{$_} = 'localhost'
+                    }
+                    with $link.port-env {
+                        my $port = %services{$link.service}.endpoint-ports{$link.endpoint};
+                        unless $port {
+                            warn "{$service.cro-file.id}: There is no endpoint {$link.endpoint} in {$link.service}";
+                        }
+                        %env{$_} = $port;
+                    }
+                }
+
+                my $proc-exit = $proc.start(:ENV(%env), :cwd($path));
+                %services{$cro-file.id} = ServiceStatus.new(
+                    :$service, state => started, :%endpoint-ports
+                );
+
+                whenever $proc.ready {
+                    add-service $service, RunningService.new:
+                                          :$path, :%endpoint-ports, :$proc, :$proc-exit, :$cro-file;
+                    emit Started.new(service-id => $cro-file.id, :$cro-file, :%endpoint-ports);
+                    # Enable services that rely on current
+                    my %splitted = %services.List.classify({ .value.state });
+                    my $wait = %splitted<waiting>;
+                    my $started = %splitted<started>.map(*.key);
+                    for @$wait {
+                        last unless $_;
+                        $_ .= value;
+                        if .dependencies ⊆ $started.Set {
+                            # Recursive scheme
+                            enable-service(.proc,
+                                           .service,
+                                           .endpoint-ports,
+                                           .env);
+                            $started = %services.List.grep(*.value.state == started).map(*.key);
+                        }
+                    }
+                }
+            }
+
+            my $first-service = Promise.new;
+            $first-service.then(
+                {
+                    sleep 5;
+                    my @wait = %services.grep(*.value.state == waiting);
+                    if @wait {
+                        warn "Some services specified as dependencies did not run in 5 seconds.";
+                        say "These are:";
+                        say "- {$_.key}" for @wait;
+                    };
+                }
+            );
+
             whenever $!services.services -> $service {
+                $first-service.keep unless $first-service.status ~~ Kept;
                 my $path = $service.path;
                 my $cro-file = $service.cro-file;
                 my $service-id = $cro-file.id;
                 if $service-id ~~ $!service-id-filter {
                     my %endpoint-ports = assign-ports($cro-file.endpoints);
-                    my ($proc, $proc-exit) = service-proc($path, $cro-file, %endpoint-ports);
-                    whenever $proc.ready {
-                        add-service $service, RunningService.new:
-                            :$path, :%endpoint-ports, :$proc, :$proc-exit, :$cro-file;
-                        emit Started.new(:$service-id, :$cro-file, :%endpoint-ports);
+                    my ($proc, %env) = service-proc($cro-file, %endpoint-ports);
+                    if $cro-file.links.elems == 0 {
+                        # No dependencies, just start it
+                        enable-service($proc, $service, %endpoint-ports, %env);
+                    }
+                    else {
+                        my @dependencies;
+                        for $cro-file.links -> $link {
+                            unless (%services{$link.service}) {
+                                @dependencies.push: $link.service;
+                            }
+                        }
+                        if @dependencies {
+                            %services{$service-id} = ServiceStatus.new(:$proc, :$service,
+                                                                       :%endpoint-ports,
+                                                                       :%env, state => waiting,
+                                                                       :@dependencies);
+                        }
+                        else {
+                            # All dependencies are enabled
+                            enable-service($proc, $service, %endpoint-ports, %env);
+                        }
                     }
                 }
             }
@@ -70,7 +159,8 @@ class Cro::Tools::Runner {
                 try $running-service.proc.kill(SIGINT);
                 whenever $running-service.proc-exit {
                     given $running-service {
-                        (.proc, .proc-exit) = service-proc(.path, .cro-file, .endpoint-ports);
+                        (.proc, my %env) = service-proc(.cro-file, .endpoint-ports);
+                        .proc-exit = .proc.start(:ENV(%env), :cwd(.path))
                     }
                     emit Restarted.new:
                         service-id => $running-service.cro-file.id,
@@ -106,7 +196,7 @@ class Cro::Tools::Runner {
                 }    
             }
 
-            sub service-proc($path, $cro-file, %endpoint-ports) {
+            sub service-proc($cro-file, %endpoint-ports) {
                 my $service-id = $cro-file.id;
                 my %env = %*ENV;
                 for $cro-file.endpoints -> $endpoint {
@@ -140,7 +230,7 @@ class Cro::Tools::Runner {
                         emit Output.new(:$service-id, :on-stderr, :$line);
                     }
                 }
-                return $proc, $proc.start(:ENV(%env), :cwd($path));
+                ($proc, %env);
             }
         }
     }
