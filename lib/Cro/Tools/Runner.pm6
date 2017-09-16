@@ -101,7 +101,7 @@ class Cro::Tools::Runner {
                         }
                     }
                     else {
-                        return $next-try-port;
+                        return $next-try-port++;
                     }
                 }    
             }
