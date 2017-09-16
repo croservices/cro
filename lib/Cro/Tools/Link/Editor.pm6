@@ -54,6 +54,12 @@ our sub add-link($from-service, $to-service, $to-endpoint?) {
         endpoint => $endpoint.id,
         host-env => $endpoint.host-env,
         port-env => $endpoint.port-env;
+    for $from.links {
+        if $_ eqv $link {
+            note "Link from $from-service to $to-service already exists.";
+            return;
+        }
+    }
     $from.links.push($link);
     spurt $path, $from.to-yaml;
     print-endpoint($to-service, $endpoint);
