@@ -200,6 +200,10 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
         my %service-id-colors;
 
         whenever $runner.run() {
+            when Cro::Tools::Runner::UnableToStart {
+                my $color = %service-id-colors{.service-id} = next-color();
+                note color($color), "\c[WARNING SIGN] {.service-id} cannot be started", RESET();
+            }
             when Cro::Tools::Runner::Started {
                 my $color = %service-id-colors{.service-id} = next-color();
                 say colored

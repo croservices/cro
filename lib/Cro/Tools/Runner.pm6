@@ -26,6 +26,9 @@ class Cro::Tools::Runner {
         has Str $.event;
         has Str $.data;
     }
+    class UnableToStart does Message {
+        has $.cro-file;
+    }
 
     has Cro::Tools::Services $.services is required;
     has $.service-id-filter = *;
@@ -88,7 +91,7 @@ class Cro::Tools::Runner {
                     my $started = %splitted<started>.map(*.key);
                     for @$wait {
                         last unless $_;
-                        $_ .= value;
+                        .=value;
                         if .dependencies ⊆ $started.Set {
                             # Recursive scheme
                             enable-service(.proc,
@@ -102,17 +105,15 @@ class Cro::Tools::Runner {
             }
 
             my $first-service = Promise.new;
-            $first-service.then(
-                {
-                    sleep 5;
+            whenever $first-service {
+                whenever Promise.in(2) {
                     my @wait = %services.grep(*.value.state == waiting);
-                    if @wait {
-                        warn "Some services specified as dependencies did not run in 5 seconds.";
-                        say "These are:";
-                        say "- {$_.key}" for @wait;
-                    };
+                    for @wait {
+                        emit UnableToStart.new(service-id => .key,
+                                               cro-file => .value.service.cro-file);
+                    }
                 }
-            );
+            }
 
             whenever $!services.services -> $service {
                 $first-service.keep unless $first-service.status ~~ Kept;
