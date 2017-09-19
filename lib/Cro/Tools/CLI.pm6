@@ -2,6 +2,7 @@ use Cro::Tools::Link::Editor;
 use Cro::Tools::Runner;
 use Cro::Tools::Template;
 use Cro::Tools::TemplateLocator;
+use File::Find;
 use Terminal::ANSIColor;
 
 proto MAIN(|) is export {*}
@@ -149,6 +150,23 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
                 ?? "Unrecognized option '@unrec[0]'."
                 !! "Unrecognized options: @unrec.map({ "'$_'" }).join(", ").";
         }
+    }
+}
+
+multi MAIN('services') {
+    my @services = find(dir => $*CWD, name => / \.cro\.yml$/);
+    for @services -> $path {
+        my $cro-file = Cro::Tools::CroFile.parse($path.IO.slurp);
+        with $cro-file {
+            say colored("{.id} ({.name})", "bold"), RESET();
+            say $path.relative($*CWD);
+            for .endpoints {
+                say "🔌 Endpoint {.id} ({.name})";
+                say "  Host environment variable: {.host-env}";
+                say "  Port environment variable: {.port-env}";
+            }
+        }
+        say '';
     }
 }
 
