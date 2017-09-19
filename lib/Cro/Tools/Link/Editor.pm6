@@ -103,3 +103,41 @@ our sub code-link($from-service, $to-service, $to-endpoint?) {
                                                        $to-endpoint);
     print-endpoint($to-service, $ep);
 }
+
+our sub show-link($service?) {
+    my @ymls = find(dir => $*CWD, name => / \.cro\.yml$/);
+    my (@inner, @outer);
+    for @ymls {
+        my $cro-file = Cro::Tools::CroFile.parse(.IO.slurp);
+        # $service can be undefined here, so provide an impossible backup value
+        if $cro-file.id eq ($service // '') {
+            ($service ?? @inner !! @outer).append: $cro-file;
+        } else {
+            @outer.append: $cro-file;
+        }
+    }
+    if $service && !@inner {
+        die "No such service $service";
+    }
+
+    with $service {
+        say "Links from $service:";
+        for @inner[0].links {
+            say " - to ｢{.service}｣-｢{.endpoint}｣ by ｢{.host-env}:{.port-env}｣"
+        }
+        say "Links to $service:";
+        for @outer -> $cro-file { # All other services
+            for $cro-file.links.grep({ .service eq $service }) {
+                say " - from ｢{$cro-file.id}｣ to ｢{.endpoint}｣ by ｢{.host-env}:{.port-env}｣"
+            }
+        }
+    }
+    without $service {
+        for @outer {
+            say "Links from {$_.id}:";
+            for .links {
+                say " - to ｢{.service}｣-｢{.endpoint}｣ by ｢{.host-env}:{.port-env}｣";
+            }
+        }
+    }
+}

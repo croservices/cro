@@ -163,6 +163,9 @@ multi MAIN('run', *@service-name) {
 multi MAIN('link', 'add', $from-service-id, $to-service-id, $to-endpoint-id?) {
     add-link($from-service-id, $to-service-id, $to-endpoint-id);
 }
+multi MAIN('link', 'show', $service-id?) {
+    show-link($service-id);
+}
 multi MAIN('link', 'code', $from-service-id, $to-service-id, $to-endpoint-id?) {
     code-link($from-service-id, $to-service-id, $to-endpoint-id);
 }
