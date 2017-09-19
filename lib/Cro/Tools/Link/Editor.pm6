@@ -90,8 +90,8 @@ my sub print-endpoint($to-service, $ep) {
             my $g-link = $_.generate($to-service, $ep.id,
                                     (host-env => $ep.host-env,
                                      port-env => $ep.port-env));
-            say "use $_" for $g-link.use;
-            say $g-link.setup-code;
+            say "use $_;" for $g-link.use;
+            say "\n" ~ $g-link.setup-code;
             last;
         }
     }
