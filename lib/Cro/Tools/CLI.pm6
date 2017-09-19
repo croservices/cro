@@ -152,14 +152,6 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
     }
 }
 
-multi MAIN('run') {
-    run-services();
-}
-
-multi MAIN('run', *@service-name) {
-    run-services(filter => any(@service-name));
-}
-
 multi MAIN('link', 'add', $from-service-id, $to-service-id, $to-endpoint-id?) {
     add-link($from-service-id, $to-service-id, $to-endpoint-id);
 }
@@ -171,6 +163,14 @@ multi MAIN('link', 'code', $from-service-id, $to-service-id, $to-endpoint-id?) {
 }
 multi MAIN('link', 'rm', $from-service-id, $to-service-id, $to-endpoint-id?) {
     rm-link($from-service-id, $to-service-id, $to-endpoint-id);
+}
+
+multi MAIN('run') {
+    run-services();
+}
+
+multi MAIN('run', *@service-name) {
+    run-services(filter => any(@service-name));
 }
 
 multi MAIN('trace', *@service-name-or-filter) {
