@@ -56,21 +56,21 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         }
     }
 
-    method generate(IO::Path $where, Str $id, Str $name, %options, :@links) {
+    method generate(IO::Path $where, Str $id, Str $name, %options, $links) {
         my $lib = $where.add('lib');
         mkdir $lib;
         write-fake-tls($where) if %options<secure>;
-        write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, :@links);
-        write-entrypoint($where.add('service.p6'), $id, %options);
+        write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, $links);
+        write-entrypoint($where.add('service.p6'), $id, %options, $links);
         write-cro-file($where.add('.cro.yml'), $id, $name, %options);
         write-meta($where.add('META6.json'), $name, %options);
     }
 
-    sub write-app-module($file, $name, $include-websocket, :@links) {
+    sub write-app-module($file, $name, $include-websocket, $links) {
         my $module = "use Cro::HTTP::Router;\n";
         $module ~= "use Cro::HTTP::Router::WebSocket;\n" if $include-websocket;
-        $module ~= 'sub routes(';
-        $module ~= @links ?? ':$' ~ @links.map({ .setup-variable }).join(', :$') !! '';
+        $module ~= "\nsub routes(";
+        $module ~= $links ?? ':' ~ $links.map({ .setup-variable }).join(', :') !! '';
         $module ~= ") is export \{\n";
         $module ~= q:s:to/CODE/;
                 route {
@@ -101,16 +101,23 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         $file.spurt($module);
     }
 
-    sub write-entrypoint($file, $id, %options) {
+    sub write-entrypoint($file, $id, %options, $links) {
         my $env-name = env-name($id);
         my $http = %options<http1> && %options<http2>
             ?? <1.1 2>
             !! %options<http1> ?? <1.1> !! <2>;
         my $entrypoint = q:c:to/CODE/;
-            use Cro::HTTP::Log::File;
-            use Cro::HTTP::Server;
-            use Routes;
+        use Cro::HTTP::Log::File;
+        use Cro::HTTP::Server;
+        use Routes;
+        CODE
+        $entrypoint ~= $links ?? ("use {$_};\n" for @$links.map(*.use).flat.unique) !! '';
+        $entrypoint ~= "\n";
+        if $links {
+            $entrypoint ~= .setup-code ~ "\n" for @$links;
+        }
 
+        $entrypoint ~= q:c:to/CODE/;
             my Cro::Service $http = Cro::HTTP::Server.new(
                 http => <{$http}>,
                 host => %*ENV<{$env-name}_HOST> ||
@@ -136,8 +143,10 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                 CODE
         }
 
+        my $vars-list = $links ?? ':' ~ $links.map({ .setup-variable }).join(', :') !! '';
+        my $routes = 'routes(' ~ ($vars-list) ~ ')';
         $entrypoint ~= q:c:to/CODE/;
-                application => routes(),
+                application => {$routes},
                 after => [
                     Cro::HTTP::Log::File.new(logs => $*OUT, errors => $*ERR)
                 ]

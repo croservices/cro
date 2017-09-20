@@ -1,4 +1,5 @@
 use Cro::Tools::Link::Editor;
+use Cro::Tools::LinkTemplate;
 use Cro::Tools::Runner;
 use Cro::Tools::Template;
 use Cro::Tools::TemplateLocator;
@@ -17,6 +18,41 @@ multi MAIN('web', Str $host-port = '10203') {
 
 multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
     my %options = parse-options($options);
+    my $links = %options.grep({ .key eq 'link' }).first.value;
+    %options .= grep({ not .key eq 'link' });
+
+    my $generated-links;
+    if $links {
+        my @services = find(dir => $*CWD, name => / \.cro\.yml$/);
+        my @link-templates = get-available-templates(Cro::Tools::LinkTemplate);
+
+        for @$links -> $link {
+            my ($service, $endp) = $link.split(':');
+            unless $service|$endp {
+                conk "`$link` is incorrect link format; Use 'service:endpoint'.";
+            }
+            my $cro-file;
+            for @services {
+                my $file = Cro::Tools::CroFile.parse($_.IO.slurp);
+                if $file.id eq $service && $file.endpoints.grep(*.id eq $endp) {
+                    $cro-file = $file; last;
+                }
+            }
+            unless $cro-file {
+                conk "There is no connection point to service $service with endpoint {$endp}.";
+            }
+            my $endpoint = $cro-file.endpoints.grep(*.id eq $endp).first;
+            my $gl-template = @link-templates.grep(*.protocol eq $endpoint.protocol)[0];
+            unless $gl-template ~~ Cro::Tools::LinkTemplate {
+                conk "There is no link template for protocol {$endpoint.protocol}.";
+            }
+            my $generated = $gl-template.generate($service,    $endpoint.id,
+                                                  (host-env => $endpoint.host-env,
+                                                   port-env => $endpoint.port-env));
+            $generated-links.push: $generated;
+        }
+    }
+
     my @templates = get-available-templates(Cro::Tools::Template);
     my $found = @templates.first(*.id eq $service-type);
     if $found ~~ Cro::Tools::Template {
@@ -34,7 +70,7 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
         try {
             my $where = $path.IO;
             mkdir $where;
-            $found.generate($where, $id, $id, %options);
+            $found.generate($where, $id, $id, %options, $generated-links);
             CATCH {
                 default {
                     note "Oops, stub generation failed: {.message}\n";
@@ -337,12 +373,20 @@ sub parse-options($options) {
         }
     }
     with Options.parse($options) {
-        hash $<option>.map: -> $/ {
-            ~$<key> =>
-                $<neg>    ?? False     !!
-                $<value>  ?? ~$<value> !!
-                             True
+        my %opts;
+        my @links;
+        for $<option> -> $/ {
+            if ~$<key> eq 'link' {
+                @links .= append(~$<value>);
+            } else {
+                %opts{~$<key>} =
+                  $<neg>    ?? False     !!
+                  $<value>  ?? ~$<value> !!
+                               True
+            }
         }
+        %opts<link> = @links;
+        return %opts;
     }
     else {
         conk "Could not parse options.";

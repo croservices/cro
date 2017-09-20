@@ -16,5 +16,5 @@ role Cro::Tools::Template {
 
     method get-option-errors(%options --> List) { () }
 
-    method generate(IO::Path $where, Str $id, Str $name, %options, :@links) { ... }
+    method generate(IO::Path $where, Str $id, Str $name, %options, $links) { ... }
 }
