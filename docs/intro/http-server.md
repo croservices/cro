@@ -42,7 +42,7 @@ my $application = route {
         content 'text/html', 'Post request to /poster page';
     }
     get -> 'articles', $author, $name {
-        # Returns an article for `/articles/anonymous/first_post` URL
+        content 'text/html', "<h1>{$name}<h1><em>By {$author}</em>";
     }
 }
 ```
@@ -51,18 +51,19 @@ An application created with `route` can be easily used with
 `Cro::HTTP::Server`:
 
 ```
-# Creating a server...
+# Create the HTTP service object
 my Cro::Service $service = Cro::HTTP::Server.new(
     :host('localhost'), :port(2314), :$application
 );
-# Running it
+
+# Run it
 $service.start;
-# Add up a react block to keep running until Ctrl-C signal
+
+# Cleanly shut down on Ctrl-C
 react whenever signal(SIGINT) {
-    $hello-service.stop;
+    $service.stop;
     exit;
 }
-
 ```
 
 And the application is up and running, so it's time to improve it: add
