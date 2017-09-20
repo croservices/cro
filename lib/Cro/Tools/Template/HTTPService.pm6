@@ -56,22 +56,23 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         }
     }
 
-    method generate(IO::Path $where, Str $id, Str $name, %options) {
+    method generate(IO::Path $where, Str $id, Str $name, %options, :@links) {
         my $lib = $where.add('lib');
         mkdir $lib;
         write-fake-tls($where) if %options<secure>;
-        write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>);
+        write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, :@links);
         write-entrypoint($where.add('service.p6'), $id, %options);
         write-cro-file($where.add('.cro.yml'), $id, $name, %options);
         write-meta($where.add('META6.json'), $name, %options);
     }
 
-    sub write-app-module($file, $name, $include-websocket) {
+    sub write-app-module($file, $name, $include-websocket, :@links) {
         my $module = "use Cro::HTTP::Router;\n";
         $module ~= "use Cro::HTTP::Router::WebSocket;\n" if $include-websocket;
+        $module ~= 'sub routes(';
+        $module ~= @links ?? ':$' ~ @links.map({ .setup-variable }).join(', :$') !! '';
+        $module ~= ") is export \{\n";
         $module ~= q:s:to/CODE/;
-
-            sub routes() is export {
                 route {
                     get -> {
                         content 'text/html', "<h1> $name </h1>";
