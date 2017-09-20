@@ -6,7 +6,7 @@ class Cro::Tools::LinkTemplate::WS does Cro::Tools::LinkTemplate {
         my $setup-variable = "\$$service-$endpoint";
         my $setup-code = q:c:to/CODE/;
         constant %ca := { ca-file => 'secret-location/ca-crt.pem' };
-        my $conn = Cro::WebSocket::Client.connect('ws://%*ENV<{$host-env}>:%*ENV<{$port-env}>/start', :%ca);
+        my {$setup-code} = Cro::WebSocket::Client.connect('ws://%*ENV<{$host-env}>:%*ENV<{$port-env}>/start', :%ca);
         CODE
         Cro::Tools::GeneratedLink.new(use => 'Cro::WebSocket::Client', :$setup-code, :$setup-variable)
     }

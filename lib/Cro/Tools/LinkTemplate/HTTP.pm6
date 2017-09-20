@@ -5,7 +5,7 @@ class Cro::Tools::LinkTemplate::HTTP does Cro::Tools::LinkTemplate {
     method generate(Str $service, Str $endpoint, (:$host-env!, :$port-env!)) {
         my $setup-variable = "\$$service-$endpoint";
         my $setup-code = q:c:to/CODE/;
-        my $client = Cro::HTTP::Client.new:
+        my {$setup-variable} = Cro::HTTP::Client.new:
                        base-uri => "http://%*ENV<{$host-env}>:%*ENV<{$port-env}>/";
         CODE
         Cro::Tools::GeneratedLink.new(use => 'Cro::HTTP::Client', :$setup-code, :$setup-variable)
