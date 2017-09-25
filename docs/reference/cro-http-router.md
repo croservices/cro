@@ -281,6 +281,7 @@ my $app = route {
         say "Request headers:";
         for request.headers {
             say "{.name}: {.value}";
+            content 'text/plain', 'Response';
         }
     }
 }
