@@ -7,4 +7,4 @@ perl6:
 
 install:
     - rakudobrew build-zef
-    - zef --debug --depsonly install
+    - zef --debug --deps-only install .
