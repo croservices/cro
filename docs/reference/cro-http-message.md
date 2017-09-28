@@ -104,7 +104,7 @@ content (marked by the presence of the `Content-length` header). When the body
 has been full received, then a `done` will be emitted on the `Supply`.
 
     react {
-        whenever $resp.body-stream -> $blob {
+        whenever $resp.body-byte-stream -> $blob {
             say "Got bytes: " ~ $blob.gist;
         }
     }
@@ -119,7 +119,7 @@ emitted on `body-byte-stream` joined into a single `Blob`.
 #### As a text Str
 
 The `body-text` method returns a `Promise` that is kept when all of the data
-emitted on the `body-body-stream` has been received and then decoded to a `Str`.
+emitted on the `body-byte-stream` has been received and then decoded to a `Str`.
 
     my Str $text = await $resp.body-text();
 
