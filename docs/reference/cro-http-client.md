@@ -210,6 +210,15 @@ Or to add extra body parsers atop of the default set use `add-body-parsers`:
     my $client = Cro::HTTP::Client.new:
         add-body-parsers => [ My::BodyParser::XML ];
 
+To get the response body as a `Supply` that will emit the bytes as they
+arrive over the network, use the `body-byte-stream` method:
+
+    react {
+        whenever $resp.body-byte-stream -> $chunk {
+            say "Got chunk: $chunk.gist()";
+        }
+    }
+
 To get the entire response body as a `Blob`, use the `body-blob` method:
 
     my Blob $body = await $resp.body-blob();
