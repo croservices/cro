@@ -23,7 +23,7 @@ trying to follow along by building this from scratch.
 So we're at a food festival. Or a beer festival. Or any event with a bunch of
 stuff that we could try. But...what to try? If only there was some app where
 pepole could leave their tips about what's hot and what's not, and we could
-see them in real time! If there'd been such a thing at the least beer festival
+see them in real time! If there'd been such a thing at the last beer festival
 I went to, I might have been spared that green tea beer...
 
 So, we'll make a SPA that supports:
@@ -123,7 +123,7 @@ the service. Open the file in the browser to check that it's being served.
 
 ## Setting up the frontend build toolchain
 
-Next up, we'll get set up for the frontend. First of all, we'll sub a
+Next up, we'll get set up for the frontend. First of all, we'll stub a
 `package.json` file, which will contain our development and frontend
 JavaScript dependencies. We use `npm init` and provide some answers:
 
@@ -176,7 +176,7 @@ While that runs: what's webpack for? It helps out in various ways:
 
 * It sets up compilation for us from modern JavaScript (with handy features
   like module imports, lambdas and `let` variable declarations) into a
-  JavaScript version that works in a web browsers
+  JavaScript version that works in web browsers
 * It lets us use JavaScript modules, managed using the `npm` package manager,
   and have them concatenated into a single JavaScript file
 * It can also help with CSS and image assets
@@ -215,7 +215,7 @@ $ mkdir frontend
 $ echo 'document.write("Hello from JS")' > frontend/index.js
 ```
 
-Now, we'd like a way to run webpack convenient from our local installation of
+Now, we'd like a way to run webpack conveniently from our local installation of
 it. One way is to edit `package.json` and add an entry to the `scripts`
 section:
 
@@ -252,7 +252,7 @@ add:
 ```
 
 Finally, we need to serve the JavaScript. Edit `lib/Routes.pm6` and add a new
-route like this (which will serve anything in under `static/js`, preparing us
+route like this (which will serve anything under `static/js`, preparing us
 for multiple bundles in the future should we need that):
 
 ```
@@ -286,11 +286,10 @@ application is a concurrent system, and in Cro requests are processed on a
 thread pool. This means two requests may be processed at the same time!
 
 To handle this, we'll use the OO::Monitors module. A monitor is like a class,
-but it enforces enforces mutual exclusion on its methods - that is, only one
-thread may be inside the methods on a particular instance at a time. Thus,
-provided we don't leak out our internal state (making defensive copies if we
-do have to return parts of it), the state inside of the  monitor object is
-protected.
+but it enforces mutual exclusion on its methods - that is, only one thread
+may be inside the methods on a particular instance at a time. Thus, provided
+we don't leak out our internal state (making defensive copies if we do have
+to return parts of it), the state inside of the  monitor object is protected.
 
 First, let's add `OO::Monitors` to our `META6.json` depends section, so that
 part of the file looks like:
@@ -417,7 +416,7 @@ given $tipsy.latest-tips.head(2).list -> @tips {
     is @tips[0].tip, 'Not so keen on the fish burrito!',
         'Correct first tip retrieved on initial tap of latest-tips';
     is @tips[1].tip, 'The lamb kebabs are good!',
-        'Correct second tip retrieved on initial tap latest-tips';
+        'Correct second tip retrieved on initial tap of latest-tips';
 }
 
 react {
@@ -467,7 +466,7 @@ monitor Tipsy {
 
 We keep a counter of IDs to give each tip its own unique ID. We have a hash
 mapping IDs to `Tip` objects. We then have a `Supplier` that we will use to
-send the notify any interested parties when there are new tips.
+notify any interested parties when there are new tips.
 
 The `add-tip` method's first 3 lines are straightforward, the final one is a
 little curious: why the `start`? The answer is that, with supplies, the sender
@@ -560,7 +559,7 @@ var App = () => <p>Hello React!</p>;
 render(<App />, document.getElementById('app'));
 ```
 
-And add an `div` tag with the ID `app` to our `index.html`:
+And add a `div` tag with the ID `app` to our `index.html`:
 
 ```
 <html>
@@ -726,7 +725,7 @@ import { tipsyReducer } from './reducer';
 ```
 
 Next up, we'll create a Redux store, which is the thing that holds the latest
-versino of the state produced by the reducer. We create it simply by passing
+version of the state produced by the reducer. We create it simply by passing
 our reducer to `createStore`:
 
 ```
@@ -887,7 +886,7 @@ Next up, the JavaScript part. The question is where to put the network bit?
 Our reducer should be pure. The answer is the `redux-thunk` module that we
 installed earlier, but didn't yet use. This allows us to write action creators
 that return a function. This function will be passed the dispatcher, and it
-can call it to dispatch actions. Typicall, we will dispatch one action when an
+can call it to dispatch actions. Typically, we will dispatch one action when an
 asynchronous operation starts, which we can use to indicate that on the UI,
 and a further one once it has completed, so we can again indicate that the
 operation completed in the UI.
