@@ -4,9 +4,12 @@ Here's a list of things to do to get Cro running on your machine.
 
 ## Install Perl 6
 
-Cro runs in Perl 6, which can be downloaded at https://perl6.org/downloads/
+Cro services are written in Perl 6; if you have not yet installed that,
+[see this instructions](https://perl6.org/downloads/). Note that you will
+need a fairly modern Perl 6; the ones included in packages can be very old.
 
-When you install Perl 6, the `zef` module manager is also installed.
+Provided you install Perl 6 using Rakudo Star, the `zef` module manager will
+also be installed.
 
 ## Install Cro
 
@@ -15,6 +18,9 @@ Install Cro from the command line using `zef`:
 ```
 zef install --/test cro
 ```
+
+This includes the `cro` development tool, as well as the Cro core, HTTP, and
+web sockets libraries.
 
 ## Write a Cro service
 
@@ -39,10 +45,9 @@ react whenever signal(SIGINT) {
     $service.stop;
     exit;
 }
-
 ```
 
-## Run the Cro program
+## Run the Cro service
 
 To start the service, just run the script from the command line:
 
@@ -56,24 +61,24 @@ There should now be a page saying 'Hello Cro!' at http://localhost:10000
 
 Congratulations, you have successfully installed Cro!
 
-Now learn more about building a simple HTTP application here: 
-[Creating HTTP Services](intro/http-server).
-
+Now learn more about [building a HTTP service](intro/http-server).
 
 ## Extra credit: use `cro stub` and `cro run`
 
-[Note: this part needs more testing...]
-
-The `cro stub` command generates files and reasonable defaults for you in your current directory.
-Here we use it to create a simple HTTP service:
+The `cro stub` command generates stub services for you, to get started more
+quickly and with better defaults. Here we use it to create a simple HTTP
+service, with ID `hello` and in the `hello` directory:
 
 ```
 cro stub http hello hello
 ```
 
-The `cro run` command will start your service (and automatically restart the service if you change a file):
+The `cro run` command will start your service (and automatically restart the
+service if you change a file):
 
 ```
 cro run
 ```
-You can change the service by editing files in the `hello/` subdirectory, for example `hello/service.p6`
+
+You can change the service by editing files in the `hello/` subdirectory. The
+HTTP routes, for example, are in `hello/lib/Routes.pm6`.
