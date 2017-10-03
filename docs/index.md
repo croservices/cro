@@ -33,25 +33,38 @@ The full details, organized by module.
 
 ### Cro::HTTP
 
+Client side:
+
 * [Cro::HTTP::Client](docs/reference/cro-http-client)
 * [Cro::HTTP::Client::CookieJar](docs/reference/cro-http-client-cookiejar)
+
+Server side:
+
+* [Cro::HTTP::Router](docs/reference/cro-http-router)
+* [Cro::HTTP::Server](docs/reference/cro-http-server)
+
+Requests, responses, and related types:
+
 * [Cro::HTTP::Cookie](docs/reference/cro-http-cookie)
 * [Cro::HTTP::DateTime](docs/reference/cro-http-datetime)
 * [Cro::HTTP::Message](docs/reference/cro-http-message)
 * [Cro::HTTP::Request](docs/reference/cro-http-request)
 * [Cro::HTTP::Response](docs/reference/cro-http-response)
-* [Cro::HTTP::Router](docs/reference/cro-http-router)
-* [Cro::HTTP::Server](docs/reference/cro-http-server)
 
 ### Cro::WebSocket
 
+For application developers:
+
 * [Cro::HTTP::Router::WebSocket](docs/reference/cro-http-router-websocket)
 * [Cro::WebSocket::Client](docs/reference/cro-websocket-client)
+* [Cro::WebSocket::Message](docs/reference/cro-websocket-message)
+
+Pipeline components:
+
 * [Cro::WebSocket::Frame](docs/reference/cro-websocket-frame)
 * [Cro::WebSocket::FrameParser](docs/reference/cro-websocket-frameparser)
 * [Cro::WebSocket::FrameSerializer](docs/reference/cro-websocket-frameserializer)
 * [Cro::WebSocket::Handler](docs/reference/cro-websocket-handler)
-* [Cro::WebSocket::Message](docs/reference/cro-websocket-message)
 * [Cro::WebSocket::MessageParser](docs/reference/cro-websocket-messageparser)
 * [Cro::WebSocket::MessageSerializer](docs/reference/cro-websocket-messageserializer)
 
@@ -65,6 +78,7 @@ The development tools are mostly without API docs, as they are mostly not
 expected to be extended from the outside at this point. However, the following
 parts have stable APIs for the sake of extending the tools.
 
+* [Cro::Tools::LinkTemplate](docs/reference/cro-tools-linktemplate)
 * [Cro::Tools::Template](docs/reference/cro-tools-template)
 
 ---
