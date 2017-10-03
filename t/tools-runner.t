@@ -85,7 +85,12 @@ with-test-dir -> $test-dir {
     ok $log.line ~~ /200/, 'Got log line mentioning status code';
 
     $run-tap.close;
-    dies-ok { await Cro::HTTP::Client.get("http://localhost:$port/") },
+    dies-ok {
+            my $request = Cro::HTTP::Client.get("http://localhost:$port/");
+            await Promise.anyof($request, Promise.in(10));
+            die "Timed out" unless $request;
+            await $request;
+        },
         'Service is shut down when tap closed';
 }
 
