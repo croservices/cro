@@ -15,9 +15,12 @@ sub with-test-dir(&test-case) {
 
 sub test-request($url) {
     my $got-body;
-    for ^10 -> $i {
+    for ^20 -> $i {
         sleep 1;
-        my $got = await Cro::HTTP::Client.get($url);
+        my $request = Cro::HTTP::Client.get($url);
+        await Promise.anyof($request, Promise.in(5));
+        die "Timed out after 10s" unless $request;
+        my $got = await $request;
         $got-body = await $got.body-text;
         last;
         CATCH {
