@@ -18,11 +18,7 @@
     width: 100%;
 }
 
-#dashboard {
-    margin-top: 55px;
-}
-
-#stub {
+.content {
     margin-top: 55px;
 }
 

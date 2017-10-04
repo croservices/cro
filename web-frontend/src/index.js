@@ -15,7 +15,7 @@ const store = createStore(combineReducers({
 const history = syncHistoryWithStore(browserHistory, store);
 
 // Temporary components, to move out later
-var Dashboard = props => (
+var Overview = props => (
     <div id="dashboard" className="container">
       Dashboard goes here
     </div>
@@ -23,6 +23,11 @@ var Dashboard = props => (
 var Stub = props => (
     <div id="stub" className="container">
       Stub service UI goes here
+    </div>
+);
+var Logs = props => (
+    <div id="logs" className="container">
+      Logs and Traces go here
     </div>
 );
 
@@ -34,21 +39,31 @@ var Navigation = props => (
         </Navbar.Brand>
         </Navbar.Header>
       <Nav>
-        <NavItem onClick={() => browserHistory.push("/")}>Dashboard</NavItem>
+        <NavItem onClick={() => browserHistory.push("/")}>Overview</NavItem>
         <NavItem onClick={() => browserHistory.push("/stub")}>Stub Service</NavItem>
-        <NavItem href="http://cro.services/docs">Documentation</NavItem>
+        <NavItem onClick={() => browserHistory.push("/logs")}>Logs and Traces</NavItem>
       </Nav>
     </Navbar>
 );
 
 ReactDOM.render(
     <Provider store={store}>
-	  <div>
-      <Navigation />
-	  <Router history={history}>
-        <Route path="/" component={Dashboard} />
-        <Route path="/stub" component={Stub} />
-      </Router>
+      <div>
+        <Navigation />
+        <div className="container content">
+          <div className="row">
+            <div className="col-sm-4">
+                Service list
+            </div>
+            <div className="col-sm-8">
+                <Router history={history}>
+                <Route path="/" component={Overview} />
+                <Route path="/stub" component={Stub} />
+                <Route path="/logs" component={Logs} />
+                </Router>
+            </div>
+          </div>
+        </div>
       </div>
     </Provider>,
     document.getElementById('app')
