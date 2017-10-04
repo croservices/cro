@@ -21976,18 +21976,25 @@ var store = (0, _redux.createStore)((0, _redux.combineReducers)({
 var history = (0, _reactRouterRedux.syncHistoryWithStore)(_reactRouter.browserHistory, store);
 
 // Temporary components, to move out later
-var Dashboard = function Dashboard(props) {
+var Overview = function Overview(props) {
   return _react2.default.createElement(
     'div',
-    { className: 'container' },
+    { id: 'dashboard', className: 'container' },
     'Dashboard goes here'
   );
 };
 var Stub = function Stub(props) {
   return _react2.default.createElement(
     'div',
-    { className: 'container' },
+    { id: 'stub', className: 'container' },
     'Stub service UI goes here'
+  );
+};
+var Logs = function Logs(props) {
+  return _react2.default.createElement(
+    'div',
+    { id: 'logs', className: 'container' },
+    'Logs and Traces go here'
   );
 };
 
@@ -22018,7 +22025,7 @@ var Navigation = function Navigation(props) {
         { onClick: function onClick() {
             return _reactRouter.browserHistory.push("/");
           } },
-        'Dashboard'
+        'Overview'
       ),
       _react2.default.createElement(
         _reactBootstrap.NavItem,
@@ -22029,8 +22036,10 @@ var Navigation = function Navigation(props) {
       ),
       _react2.default.createElement(
         _reactBootstrap.NavItem,
-        { href: 'http://cro.services/docs' },
-        'Documentation'
+        { onClick: function onClick() {
+            return _reactRouter.browserHistory.push("/logs");
+          } },
+        'Logs and Traces'
       )
     )
   );
@@ -22044,10 +22053,28 @@ _reactDom2.default.render(_react2.default.createElement(
     null,
     _react2.default.createElement(Navigation, null),
     _react2.default.createElement(
-      _reactRouter.Router,
-      { history: history },
-      _react2.default.createElement(_reactRouter.Route, { path: '/', component: Dashboard }),
-      _react2.default.createElement(_reactRouter.Route, { path: '/stub', component: Stub })
+      'div',
+      { className: 'container content' },
+      _react2.default.createElement(
+        'div',
+        { className: 'row' },
+        _react2.default.createElement(
+          'div',
+          { className: 'col-sm-4' },
+          'Service list'
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'col-sm-8' },
+          _react2.default.createElement(
+            _reactRouter.Router,
+            { history: history },
+            _react2.default.createElement(_reactRouter.Route, { path: '/', component: Overview }),
+            _react2.default.createElement(_reactRouter.Route, { path: '/stub', component: Stub }),
+            _react2.default.createElement(_reactRouter.Route, { path: '/logs', component: Logs })
+          )
+        )
+      )
     )
   )
 ), document.getElementById('app'));
