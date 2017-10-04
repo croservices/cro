@@ -12,6 +12,20 @@
     border-right: 1px solid #eee;
 }
 
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#dashboard {
+    margin-top: 55px;
+}
+
+#stub {
+    margin-top: 55px;
+}
+
 .main {
     padding: 20px;
 }

@@ -16,12 +16,12 @@ const history = syncHistoryWithStore(browserHistory, store);
 
 // Temporary components, to move out later
 var Dashboard = props => (
-    <div className="container">
+    <div id="dashboard" className="container">
       Dashboard goes here
     </div>
 );
 var Stub = props => (
-    <div className="container">
+    <div id="stub" className="container">
       Stub service UI goes here
     </div>
 );
