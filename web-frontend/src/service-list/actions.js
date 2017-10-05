@@ -38,12 +38,12 @@ export function serviceStop(id) {
 export function serviceTrace(id) {
     return (dispatch, getState) => {
         // Get current state from a Map with switches states
-        var state = getState().switches.get(id);
+        var state = getState().services.get(id).status;
         $.ajax({
             url: '/service',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id, action: 'flip', state: state }),
+            data: JSON.stringify({ id, action: 'flip', state }),
             success: () => dispatch({
                 type: 'SERVICE_FLIP', switch_state: state === 'ON' ? 'OFF' : 'ON'
             })
