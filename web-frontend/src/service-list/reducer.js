@@ -8,8 +8,9 @@ const initialState = {
 export function serviceListReducer(state = initialState, action) {
     switch (action.type) {
     case Action.Types.SERVICE_START:
-        state.services.get(action.id).status = 'Started';
-        return { ...state, services: services }
+        let updated_services = state.services;
+        updated_services.get(action.id).status = 'Started';
+        return { ...state, services: updated_services }
     }
     
 }
