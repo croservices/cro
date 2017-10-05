@@ -22,7 +22,7 @@ trying to follow along by building this from scratch.
 
 So we're at a food festival. Or a beer festival. Or any event with a bunch of
 stuff that we could try. But...what to try? If only there was some app where
-pepole could leave their tips about what's hot and what's not, and we could
+people could leave their tips about what's hot and what's not, and we could
 see them in real time! If there'd been such a thing at the last beer festival
 I went to, I might have been spared that green tea beer...
 
@@ -244,7 +244,7 @@ bundle.js  2.5 kB       0  [emitted]  main
 
 ## Serving and using the bundle
 
-Next up, edit `static/index.html`, and just before the closing `</body>` tag
+Next up, edit `static/index.html`, and just before the closing </body> tag
 add:
 
 ```
@@ -306,7 +306,7 @@ To make sure you really have that module available, ask zef to install it if
 it's missing:
 
 ```
-$ zef install --depsonly .
+$ zef install --deps-only .
 ```
 
 We'll put our business logic in a separate module, `lib/Tipsy.pm6`, and write
@@ -615,7 +615,7 @@ var App = () => (
 );
 ```
 
-Another `npm run build`, refresh, and it should some something that looks a
+Another `npm run build`, refresh, and it should show something that looks a
 lot like one would expect from the UI. But how do we get data to populate the
 UI? And how do we do stuff when the button is clicked? For that, we'll bring
 in the final piece of the client side puzzle: Redux.
@@ -891,7 +891,7 @@ asynchronous operation starts, which we can use to indicate that on the UI,
 and a further one once it has completed, so we can again indicate that the
 operation completed in the UI.
 
-First, let's setup `react-thunk`, which is a pice of middleware. Back in
+First, let's setup `react-thunk`, which is a piece of middleware. Back in
 `frontend/index.js`, add:
 
 ```
@@ -1511,7 +1511,7 @@ declare their dependencies, so getting started for a new developer is just a
 case of:
 
 ```
-zef install --depsonly .
+zef install --deps-only .
 npm install .
 npm run build
 cro run
