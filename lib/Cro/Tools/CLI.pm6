@@ -8,10 +8,15 @@ use Terminal::ANSIColor;
 
 proto MAIN(|) is export {*}
 
-multi MAIN('web', Str $host-port = '10203') {
+multi MAIN('web', Str $host-port = '10203',
+           :$filter = *, :$trace = False, :@trace-filters) {
     use Cro::Tools::Web;
     my ($host, $port) = parse-host-port($host-port);
-    my $service = web $host, $port;
+    my $runner = Cro::Tools::Runner.new(
+        services => Cro::Tools::Services.new(base-path => $*CWD),
+        :$filter, :$trace, :@trace-filters
+    );
+    my $service = web $host, $port, $runner;
     say "Cro web interface running at http://$host:$port/";
     stop-on-sigint($service);
 }
