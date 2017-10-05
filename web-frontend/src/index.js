@@ -1,18 +1,35 @@
+import { connect } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, combineReducers } from 'redux';
+import WSAction from 'redux-websocket-action';
+import ServiceListApp from './service-list/index';
+import serviceListReducer from './service-list/reducer';
+import thunkMiddleware from 'redux-thunk';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import { Router, Route, browserHistory } from 'react-router';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 // Build up reducers from the various components.
 const store = createStore(combineReducers({
-   routing: routerReducer
-}));
+    routing: routerReducer,
+    serviceListReducer
+}), composeWithDevTools(applyMiddleware(thunkMiddleware)));
 
 // Set up history.
 const history = syncHistoryWithStore(browserHistory, store);
+
+['services-road'].forEach(endpoint => {
+    let host = window.location.host;
+    let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
+        retryCount: 3,
+        reconnectInterval: 3
+    });
+    wsAction.start();
+});
 
 // Temporary components, to move out later
 var Overview = props => (
@@ -53,7 +70,7 @@ ReactDOM.render(
         <div className="container content">
           <div className="row">
             <div className="col-sm-4">
-                Service list
+                <ServiceListApp />
             </div>
             <div className="col-sm-8">
                 <Router history={history}>
