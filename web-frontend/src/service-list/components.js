@@ -16,7 +16,7 @@ var Service = props => (
         {props.service.status == 'Running' &&
          <button onClick={() => props.onServiceStop(props.service.id)} className="serviceControl" type="button">🛑</button>
         }
-        <input className="serviceControl" id="checkBox" type="checkbox" />
+        <input onChange={(e) => props.onServiceTraceFlip(props.service.id, e.target.checked)} className="serviceControl" id="checkBox" type="checkbox" />
     </div> </div>
 );
 
@@ -27,7 +27,8 @@ var App = props => (
                 <Service service={v[1]}
                  onServiceStart={props.onServiceStart}
                  onServiceStop={props.onServiceStop}
-                 onServiceRestart={props.onServiceRestart} />
+                 onServiceRestart={props.onServiceRestart}
+                 onServiceTraceFlip={props.onServiceTraceFlip} />
                 </div>
         ))}
         </div>

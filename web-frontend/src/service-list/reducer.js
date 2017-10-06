@@ -11,7 +11,7 @@ export default function serviceListReducer(state = initialState, action) {
         updated_services.get(action.id).status = 'Running';
         return { ...state, services: updated_services }
     case ActionTypes.SERVICE_STARTED:
-        var service = { name: action.name, id: action.id, status: 'Running' };
+        var service = { name: action.name, id: action.id, status: 'Running', trace: 'OFF' };
         let new_services = state.services;
         new_services.set(service.name, service);
         return { ...state, services: new_services };
@@ -22,6 +22,10 @@ export default function serviceListReducer(state = initialState, action) {
     case ActionTypes.SERVICE_STOPPED:
         var updated_services = state.services;
         updated_services.get(action.id).status = 'Stopped';
+        return { ...state, services: updated_services };
+    case ActionTypes.SERVICE_FLIP:
+        var updated_services = state.services;
+        updated_services.get(action.id).trace = action.switch_state;
         return { ...state, services: updated_services };
     default:
         return state;

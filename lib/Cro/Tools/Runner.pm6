@@ -56,6 +56,14 @@ class Cro::Tools::Runner {
     method restart($service-id) {
         $!commands.emit({action => 'restart', id => $service-id});
     }
+    method traceFlip($service-id) {
+        $!trace = !$!trace;
+        my $restarted = Promise.new;
+        self.restart($service-id, :$restarted);
+        # XXX fix
+        await Promise.in(1);
+        $!trace = !$!trace;
+    }
 
     method run(--> Supply) {
         my %services;

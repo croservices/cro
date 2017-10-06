@@ -11,12 +11,13 @@ sub web(Str $host, Int $port, $runner) is export {
         }
         post -> 'service' {
             request-body -> %json {
-                unless %json<action> eq 'start'|'restart'|'stop' {
+                unless %json<action> eq 'start'|'restart'|'stop'|'traceFlip' {
                     bad-request;
                 }
                 $runner.stop(%json<id>) if %json<action> eq 'stop';
                 $runner.start(%json<id>) if %json<action> eq 'start';
                 $runner.restart(%json<id>) if %json<action> eq 'restart';
+                $runner.traceFlip(%json<id>) if %json<action> eq 'traceFlip';
                 content 'text/html', '';
             }
         }
@@ -40,6 +41,10 @@ sub web(Str $host, Int $port, $runner) is export {
                             WS_ACTION => True,
                             :%action
                         }
+                    }
+                    when Cro::Tools::Runner::Output {
+                    }
+                    when Cro::Tools::Runner::Trace {
                     }
                 }
             }
