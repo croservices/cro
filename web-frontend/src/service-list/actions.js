@@ -3,6 +3,7 @@ import $ from 'jquery';
 export const SERVICE_STARTED = 'SERVICE_STARTED';
 export const SERVICE_UNABLE_TO_START = 'SERVICE_UNABLE_TO_START';
 export const SERVICE_RESTARTED = 'SERVICE_RESTARTED';
+export const SERVICE_STOPPED = 'SERVICE_STOPPED';
 export const SERVICE_LOG = 'SERVICE_LOG';
 export const SERVICE_TRACE = 'SERVICE_TRACE';
 // User actions
@@ -24,15 +25,15 @@ function sendAction(id, action, type) {
 }
 
 export function serviceStart(id) {
-    return sendAction(id, 'start', SERVICE_START);
+    return sendAction(id, 'start', SERVICE_STARTED + '_skip');
 }
 
 export function serviceRestart(id) {
-    return sendAction(id, 'restart', SERVICE_RESTART);
+    return sendAction(id, 'restart', SERVICE_RESTARTED + '_skip');
 }
 
 export function serviceStop(id) {
-    return sendAction(id, 'stop', SERVICE_STOP);
+    return sendAction(id, 'stop', SERVICE_STOPPED);
 }
 
 export function serviceTrace(id) {

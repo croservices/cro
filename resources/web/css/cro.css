@@ -38,3 +38,24 @@
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
+
+.serviceCreds {
+    margin-left: 5px;
+    float: left;
+}
+
+.service {
+    height: 80px;
+    background-color: #f0f0f0;
+    border: 2px solid #b4b4b4;
+    border-radius: 15px;
+}
+
+.serviceManageBox {
+    display: inline;
+    float: right;
+}
+
+.serviceId {
+    color: gray;
+}
