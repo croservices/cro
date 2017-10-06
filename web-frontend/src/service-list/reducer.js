@@ -13,7 +13,7 @@ export default function serviceListReducer(state = initialState, action) {
     case ActionTypes.SERVICE_STARTED:
         var service = { name: action.name, id: action.id, status: 'Running', trace: 'OFF' };
         let new_services = state.services;
-        new_services.set(service.name, service);
+        new_services.set(service.id, service);
         return { ...state, services: new_services };
     case ActionTypes.SERVICE_RESTARTED:
         var updated_services = state.services;
