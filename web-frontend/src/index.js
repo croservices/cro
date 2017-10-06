@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom';
 import WSAction from 'redux-websocket-action';
 import ServiceListApp from './service-list/index';
 import serviceListReducer from './service-list/reducer';
+import StubApp from './stub-service/index';
+import stubReducer from './stub-service/reducer';
 import thunkMiddleware from 'redux-thunk';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Provider } from 'react-redux';
@@ -16,13 +18,14 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 // Build up reducers from the various components.
 const store = createStore(combineReducers({
     routing: routerReducer,
-    serviceListReducer
+    serviceListReducer,
+    stubReducer
 }), composeWithDevTools(applyMiddleware(thunkMiddleware)));
 
 // Set up history.
 const history = syncHistoryWithStore(browserHistory, store);
 
-['services-road'].forEach(endpoint => {
+['services-road', 'stub-road'].forEach(endpoint => {
     let host = window.location.host;
     let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
         retryCount: 3,
@@ -39,7 +42,7 @@ var Overview = props => (
 );
 var Stub = props => (
     <div id="stub" className="container">
-      Stub service UI goes here
+        <StubApp />
     </div>
 );
 var Logs = props => (

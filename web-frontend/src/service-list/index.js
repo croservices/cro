@@ -11,7 +11,7 @@ function mapDispatch(dispatch) {
         onServiceStop: id => dispatch(Actions.serviceStop(id)),
         onServiceStart: id => dispatch(Actions.serviceStart(id)),
         onServiceRestart: id => dispatch(Actions.serviceRestart(id)),
-        onServiceTraceFlip: id => dispatch(Actions.serviceTraceFlip(id)),
+        onServiceTraceFlip: id => dispatch(Actions.serviceTraceFlip(id))
     }
 }
 
