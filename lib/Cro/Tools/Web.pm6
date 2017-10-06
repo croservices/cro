@@ -2,6 +2,8 @@ use Cro::HTTP::Router::WebSocket;
 use Cro::HTTP::Router;
 use Cro::HTTP::Server;
 use Cro::Tools::Runner;
+use Cro::Tools::Template;
+use Cro::Tools::TemplateLocator;
 use JSON::Fast;
 
 sub web(Str $host, Int $port, $runner) is export {
@@ -19,6 +21,33 @@ sub web(Str $host, Int $port, $runner) is export {
                 $runner.restart(%json<id>) if %json<action> eq 'restart';
                 $runner.traceFlip(%json<id>) if %json<action> eq 'traceFlip';
                 content 'text/html', '';
+            }
+        }
+        get -> 'stub-road' {
+            web-socket -> $incoming {
+                my @templates = get-available-templates(Cro::Tools::Template);
+                supply {
+                    my @result = ();
+                    for @templates -> $_ {
+                        my %result;
+                        %result<id> = .id;
+                        %result<name> = .name;
+                        my @options;
+                        @options.push((.id, .name,
+                                       .type.^name,
+                                       # We don't send blocks (yet?)
+                                       .default ~~ Bool ?? .default !! False).List) for .options;
+                        %result<options> = @options;
+                        @result.push(%result);
+                    }
+                    emit to-json {
+                        WS_ACTION => True,
+                        action => {
+                            type => 'STUB_TEMPLATES',
+                            templates => @result
+                        }
+                    };
+                }
             }
         }
         get -> 'services-road' {
