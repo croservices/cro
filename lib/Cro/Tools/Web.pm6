@@ -9,12 +9,32 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> {
             content 'text/html', %?RESOURCES<web/index.html>.slurp;
         }
+        post -> 'service' {
+            request-body -> %json {
+                unless %json<action> eq 'start'|'restart'|'stop' {
+                    bad-request;
+                }
+                $runner.stop(%json<id>) if %json<action> eq 'stop';
+                $runner.start(%json<id>) if %json<action> eq 'start';
+                $runner.restart(%json<id>) if %json<action> eq 'restart';
+                content 'text/html', '';
+            }
+        }
         get -> 'services-road' {
             web-socket -> $incoming {
                 supply whenever $runner.run() -> $_ {
                     when Cro::Tools::Runner::Started {
-                        note "Service {.cro-file.name} is started!";
                         my %action = type => 'SERVICE_STARTED',
+                                     id   => .cro-file.id,
+                                     name => .cro-file.name;
+                        emit to-json {
+                            WS_ACTION => True,
+                            :%action
+                        }
+                    }
+                    when Cro::Tools::Runner::Restarted {
+                        my %action = type => 'SERVICE_RESTARTED',
+                                     id   => .cro-file.id,
                                      name => .cro-file.name;
                         emit to-json {
                             WS_ACTION => True,
