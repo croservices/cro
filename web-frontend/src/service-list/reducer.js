@@ -5,7 +5,6 @@ const initialState = {
 }
 
 export default function serviceListReducer(state = initialState, action) {
-    console.log(action);
     switch (action.type) {
     case ActionTypes.SERVICE_START:
         var updated_services = state.services;
