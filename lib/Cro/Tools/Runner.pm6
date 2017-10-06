@@ -34,6 +34,7 @@ class Cro::Tools::Runner {
     has $.service-id-filter = *;
     has Bool $.trace = False;
     has Str @.trace-filters;
+    has Supplier $!commands = Supplier.new;
 
     my enum State (started => 1, waiting => 0);
 
@@ -44,6 +45,16 @@ class Cro::Tools::Runner {
         has %.env;
         has State $.state is rw;
         has @.dependencies;
+    }
+
+    method stop($service-id) {
+        $!commands.emit({action => 'stop', id => $service-id});
+    }
+    method start($service-id) {
+        $!commands.emit({action => 'start', id => $service-id});
+    }
+    method restart($service-id) {
+        $!commands.emit({action => 'restart', id => $service-id});
     }
 
     method run(--> Supply) {
@@ -144,6 +155,27 @@ class Cro::Tools::Runner {
                             # All dependencies are enabled
                             enable-service($proc, $service, %endpoint-ports, %env);
                         }
+                    }
+                }
+            }
+
+            whenever $!commands.Supply -> %command {
+                given %command<action> {
+                    when 'stop' {
+                        # TODO: improve
+                        %running-services{%command<id>}.proc.kill(SIGINT);
+                    }
+                    when 'start' {
+                        given (%running-services{%command<id>}) {
+                            (.proc, my %env) = service-proc(.cro-file, .endpoint-ports);
+                            .proc-exit = .proc.start(:ENV(%env), :cwd(.path));
+                            emit Started.new(service-id => .cro-file.id, cro-file => .cro-file,
+                                             endpoint-ports => .endpoint-ports)
+                        }
+                    }
+                    when 'restart' {
+                        my $service = %running-services{%command<id>};
+                        restart-service($service);
                     }
                 }
             }
