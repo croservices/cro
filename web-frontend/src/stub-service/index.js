@@ -8,7 +8,10 @@ function mapProps(state) {
 
 function mapDispatch(dispatch) {
     return {
-        onStubSelect: index => dispatch(Actions.stubSelect(index))
+        onStubSelect: index => dispatch(Actions.stubSelect(index)),
+        onChangeIdText: text => dispatch(Actions.stubChangeIdText(text)),
+        onChangeOption: (id, value) => dispatch(Actions.stubChangeOption(id, value)),
+        onStub: (type, id, opts) => dispatch(Actions.stubStub(type, id, opts))
     }
 }
 
