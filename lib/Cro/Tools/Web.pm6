@@ -23,6 +23,12 @@ sub web(Str $host, Int $port, $runner) is export {
                 content 'text/html', '';
             }
         }
+        post -> 'stub' {
+            request-body -> %json {
+                # TODO - stubbing
+                content 'text/html', '';
+            }
+        }
         get -> 'stub-road' {
             web-socket -> $incoming {
                 my @templates = get-available-templates(Cro::Tools::Template);
