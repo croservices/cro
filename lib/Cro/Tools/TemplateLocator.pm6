@@ -30,18 +30,17 @@ sub get-available-templates($pattern, Supplier $warnings?) is export {
 
     my @templates;
     for @template-modules {
-        require ::($_);
+        try require ::($_);
+        if $! {
+            $warnings.emit(~$!) if $warnings;
+            next;
+        }
         given ::($_) {
             when $pattern {
                 push @templates, $_;
             }
             default {
                 .so
-            }
-        }
-        CATCH {
-            default {
-                $warnings.emit(~$_) if $warnings;
             }
         }
     }
