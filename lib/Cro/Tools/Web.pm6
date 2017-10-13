@@ -7,6 +7,7 @@ use Cro::Tools::TemplateLocator;
 use JSON::Fast;
 
 sub web(Str $host, Int $port, $runner) is export {
+    my $stub-events = Supplier.new;
     my $application = route {
         get -> {
             content 'text/html', %?RESOURCES<web/index.html>.slurp;
@@ -31,7 +32,37 @@ sub web(Str $host, Int $port, $runner) is export {
         }
         post -> 'stub' {
             request-body -> %json {
-                # TODO - stubbing
+                my @templates = get-available-templates(Cro::Tools::Template);
+                my $found = @templates.first(*.id eq %json<type>);
+                my %options = %json<options>>>.Hash;
+                my $generated-links;
+                if $found.get-option-errors(%options) -> @errors {
+                    $stub-events.emit: {
+                        WS_ACTION => True,
+                        action => { type => 'STUB_OPTIONS_ERROR_OCCURED',
+                                    errors => @errors }
+                    }
+                }
+                else {
+                    try {
+                        my $where = $*CWD.add(%json<id>);
+                        mkdir $where;
+                        $found.generate($where, %json<id>, %json<id>, %options, $generated-links);
+                        $stub-events.emit: {
+                            WS_ACTION => True,
+                            action => { type => 'STUB_STUBBED' }
+                        }
+                    }
+                    CATCH {
+                        default {
+                            $stub-events.emit: {
+                                WS_ACTION => True,
+                                action => { type => 'STUB_',
+                                            errors => $_ }
+                            }
+                        }
+                    }
+                }
                 content 'text/html', '';
             }
         }
@@ -39,6 +70,10 @@ sub web(Str $host, Int $port, $runner) is export {
             web-socket -> $incoming {
                 my @templates = get-available-templates(Cro::Tools::Template);
                 supply {
+                    whenever $stub-events.Supply {
+                        emit to-json $_;
+                        CATCH {.note}
+                    }
                     my @result = ();
                     for @templates -> $_ {
                         my %result;
