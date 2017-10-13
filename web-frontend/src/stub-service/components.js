@@ -3,24 +3,25 @@ import React from 'react';
 var Template = props => (
     <div>
       {props.template !== null &&<div>
-            <div>{props.template.name}</div>
-                <div>{props.template.id}</div>
-                    {props.template.options.map((opt, index) => (
-                        <div key={index}>
+            <h3>{props.template.name} <small>{props.template.id}</small></h3>
+                {props.template.options.map((opt, index) => (
+                    <div className="checkbox" key={index}>
+                      <label className="control-label">
+                        <input type="checkbox" onChange={(e) => props.onChangeOption(opt[0], e.target.checked)}/>
                           {opt[1]}
-                          <input onChange={(e) => props.onChangeOption(opt[0], e.target.checked)} type="checkbox"/>
-                        </div>
-                    ))}
-       Service id:
-       <input type="text" pattern="^[A-Za-z0-9_]{1,32}$" value={props.id} onChange={e => props.onChangeIdText(e.target.value)} />
-       <input type="button" value="Stub" onClick={(e) => props.onStub(props.idText, props.template.id, props.options)} />
+                      </label>
+                    </div>
+                ))}
+       <label className="control-label" htmlFor="idTextInput">New service id</label>
+       <input type="text" className="from-control" id="idTextInput" pattern="^[A-Za-z0-9_]+$" value={props.id} onChange={e => props.onChangeIdText(e.target.value)} />
+       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStub(props.idText, props.template.id, props.options)} />
        </div>}
     </div>
 );
 
 var App = props => (
     <div>
-      <select onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
+      <select className="from-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
         {props.stubReducer.templates.map(t => (
             <option key={t.id} value={t.id}>{t.name}</option>
         ))}
