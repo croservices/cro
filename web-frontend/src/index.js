@@ -13,14 +13,12 @@ import { Router, Route, browserHistory } from 'react-router';
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 
-import { composeWithDevTools } from 'redux-devtools-extension';
-
 // Build up reducers from the various components.
 const store = createStore(combineReducers({
     routing: routerReducer,
     serviceListReducer,
     stubReducer
-}), composeWithDevTools(applyMiddleware(thunkMiddleware)));
+}), applyMiddleware(thunkMiddleware));
 
 // Set up history.
 const history = syncHistoryWithStore(browserHistory, store);
