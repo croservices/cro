@@ -85,12 +85,8 @@ sub web(Str $host, Int $port, $runner) is export {
                         emit-action($_, 'SERVICE_UNABLE_TO_START')
                     }
                     when Cro::Tools::Runner::Output {
-                        # say "Output";
-                        # .note;
                     }
                     when Cro::Tools::Runner::Trace {
-                        # say "Tracer";
-                        # .note;
                     }
                 }
             }
