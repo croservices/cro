@@ -1,9 +1,9 @@
 import React from 'react';
 
 var Service = props => (
-    <div> <div className="serviceCreds">
-        <div className="serviceName">{props.service.name}</div>
-        <div className="serviceId">{props.service.id}</div>
+    <div>
+      <div className="serviceCreds">
+        <h5>{props.service.name} <small>{props.service.id}</small></h5>
       </div>
       <div className="serviceManageBox">
         <div className="serviceStatus">{props.service.status}</div>
@@ -16,7 +16,7 @@ var Service = props => (
                 {props.service.status == 'Running' &&
                     <button className="btn" onClick={() => props.onServiceStop(props.service.id)} className="serviceControl" type="button">🛑</button>
                     }
-                    <input onChange={(e) => props.onServiceTraceFlip(props.service.id, e.target.checked)} className="serviceControl" id="checkBox" type="checkbox" />
+                    <input className="form-check-input" onChange={(e) => props.onServiceTraceFlip(props.service.id, e.target.checked)} name="traceSwitch" type="checkbox" />
       </div>
     </div>
 );
