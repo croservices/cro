@@ -6,14 +6,17 @@ class Cro::Tools::Runner {
         has $.service-id;
     }
 
-    class Started does Message {
+    role ServiceMessage does Message {
         has $.cro-file;
+        has $.tracing;
+    }
+
+    class Started does ServiceMessage {
         has %.endpoint-ports;
     }
 
-    class Restarted does Message {
-        has $.cro-file;
-    }
+    class Restarted does ServiceMessage {}
+    class Stopped does ServiceMessage {}
 
     class Output does Message {
         has Bool $.on-stderr;
@@ -47,7 +50,7 @@ class Cro::Tools::Runner {
         has %.endpoint-ports;
         has %.env;
         has State $.state is rw;
-        has Bool $.tracing;
+        has Bool $.tracing is rw;
         has @.dependencies;
     }
 
@@ -60,13 +63,11 @@ class Cro::Tools::Runner {
     method restart($service-id) {
         $!commands.emit({action => 'restart', id => $service-id});
     }
-    method traceFlip($service-id) {
-        $!trace = !$!trace;
-        my $restarted = Promise.new;
-        self.restart($service-id, :$restarted);
-        # XXX fix
-        await Promise.in(1);
-        $!trace = !$!trace;
+    method trace($service-id, $command) {
+        $!commands.emit({action => 'trace', :$command, id => $service-id})
+    }
+    method trace-all($command) {
+        $!commands.emit({action => 'trace-all', :$command});
     }
 
     method run(--> Supply) {
@@ -104,7 +105,7 @@ class Cro::Tools::Runner {
                         restart-service(%services{$cro-file.id});
                     }
                     %services{$cro-file.id}.state = StartedState;
-                    emit Started.new(service-id => $cro-file.id, :$cro-file, :%endpoint-ports);
+                    emit Started.new(service-id => $cro-file.id, :$cro-file, :%endpoint-ports, tracing => $!trace);
                     # Enable services that rely on current
                     my %splitted = %services.List.classify({ .value.state });
                     my $wait = %splitted<WaitingState> // ();
@@ -157,20 +158,39 @@ class Cro::Tools::Runner {
             whenever $!commands.Supply -> %command {
                 given %command<action> {
                     when 'stop' {
-                        # TODO: improve
-                        %services{%command<id>}.proc.kill(SIGINT);
+                        $_ = %services{%command<id>};
+                        unless .state == StoppedState {
+                            .state = StoppedState;
+                            .proc.kill(SIGINT);
+                            emit Stopped.new(service-id => .cro-file.id, cro-file => .cro-file, tracing => .tracing);
+                        }
                     }
                     when 'start' {
-                        given (%services{%command<id>}) {
-                            (.proc, my %env) = service-proc(.cro-file, .endpoint-ports);
+                        $_ = %services{%command<id>};
+                        if .status == StoppedState {
+                            .status = StartedState;
+                            (.proc, my %env) = service-proc(.cro-file, .endpoint-ports, trace => .tracing);
                             .proc-exit = .proc.start(:ENV(%env), :cwd(.path));
                             emit Started.new(service-id => .cro-file.id, cro-file => .cro-file,
-                                             endpoint-ports => .endpoint-ports)
+                                             endpoint-ports => .endpoint-ports, tracing => .tracing)
                         }
                     }
                     when 'restart' {
                         my $service = %services{%command<id>};
                         restart-service($service);
+                    }
+                    when 'trace' {
+                        my $service = %services{%command<id>};
+                        if $service.tracing ^^ (%command<command> eq 'on') {
+                            $service.tracing = !$service.tracing;
+                            restart-service($service);
+                        }
+                    }
+                    when 'trace-all' {
+                        for %services.keys -> $s {
+                            $s.tracing = %command<command> eq 'on';
+                            restart-service($s);
+                        }
                     }
                 }
             }
@@ -179,12 +199,13 @@ class Cro::Tools::Runner {
                 try $service.proc.kill(SIGINT);
                 whenever $service.proc-exit {
                     given $service {
-                        (.proc, my %env) = service-proc(.cro-file, .endpoint-ports);
-                        .proc-exit = .proc.start(:ENV(%env), :cwd(.path))
+                        (.proc, my %env) = service-proc(.cro-file, .endpoint-ports, trace => .tracing);
+                        .proc-exit = .proc.start(:ENV(%env), :cwd(.path));
+                        emit Restarted.new:
+                            service-id => $service.cro-file.id,
+                            cro-file => $service.cro-file,
+                            tracing => .tracing;
                     }
-                    emit Restarted.new:
-                        service-id => $service.cro-file.id,
-                        cro-file => $service.cro-file;
                 }
             }
 
@@ -216,7 +237,7 @@ class Cro::Tools::Runner {
                 }    
             }
 
-            sub service-proc($cro-file, %endpoint-ports) {
+            sub service-proc($cro-file, %endpoint-ports, :$trace) {
                 my $service-id = $cro-file.id;
                 my %env = %*ENV;
                 for $cro-file.endpoints -> $endpoint {
@@ -227,7 +248,7 @@ class Cro::Tools::Runner {
                         %env{$_} = %endpoint-ports{$endpoint.id};
                     }
                 }
-                if $!trace {
+                if $trace // $!trace {
                     %env<CRO_TRACE> = '1';
                     %env<CRO_TRACE_MACHINE_READABLE> = '1';
                 }
