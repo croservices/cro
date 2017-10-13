@@ -13,13 +13,19 @@ sub web(Str $host, Int $port, $runner) is export {
         }
         post -> 'service' {
             request-body -> %json {
-                unless %json<action> eq 'start'|'restart'|'stop'|'traceFlip' {
+                my @commands = <start restart stop
+                              trace-on trace-off
+                              trace-all-on trace-all-off>;
+                unless %json<action> ⊆ @commands {
                     bad-request;
                 }
-                $runner.stop(%json<id>) if %json<action> eq 'stop';
-                $runner.start(%json<id>) if %json<action> eq 'start';
-                $runner.restart(%json<id>) if %json<action> eq 'restart';
-                $runner.traceFlip(%json<id>) if %json<action> eq 'traceFlip';
+                $runner.start(%json<id>)        if %json<action> eq 'start';
+                $runner.stop(%json<id>)         if %json<action> eq 'stop';
+                $runner.restart(%json<id>)      if %json<action> eq 'restart';
+                $runner.trace(%json<id>, 'on')  if %json<action> eq 'trace-on';
+                $runner.trace(%json<id>, 'off') if %json<action> eq 'trace-off';
+                $runner.trace-all('on')         if %json<action> eq 'trace-all-on';
+                $runner.trace-all('off')        if %json<action> eq 'trace-all-off';
                 content 'text/html', '';
             }
         }
@@ -59,27 +65,32 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> 'services-road' {
             web-socket -> $incoming {
                 supply whenever $runner.run() -> $_ {
+                    sub emit-action($_, $type) {
+                        my %action = :$type, id => .cro-file.id,
+                                     name => .cro-file.name,
+                                     tracing => .tracing;
+                        emit to-json { WS_ACTION => True, :%action }
+                    }
+
                     when Cro::Tools::Runner::Started {
-                        my %action = type => 'SERVICE_STARTED',
-                                     id   => .cro-file.id,
-                                     name => .cro-file.name;
-                        emit to-json {
-                            WS_ACTION => True,
-                            :%action
-                        }
+                        emit-action($_, 'SERVICE_STARTED');
                     }
                     when Cro::Tools::Runner::Restarted {
-                        my %action = type => 'SERVICE_RESTARTED',
-                                     id   => .cro-file.id,
-                                     name => .cro-file.name;
-                        emit to-json {
-                            WS_ACTION => True,
-                            :%action
-                        }
+                        emit-action($_, 'SERVICE_RESTARTED')
+                    }
+                    when Cro::Tools::Runner::Stopped {
+                        emit-action($_, 'SERVICE_STOPPED')
+                    }
+                    when Cro::Tools::Runner::UnableToStart {
+                        emit-action($_, 'SERVICE_UNABLE_TO_START')
                     }
                     when Cro::Tools::Runner::Output {
+                        # say "Output";
+                        # .note;
                     }
                     when Cro::Tools::Runner::Trace {
+                        # say "Tracer";
+                        # .note;
                     }
                 }
             }
