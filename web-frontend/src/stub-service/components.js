@@ -7,15 +7,17 @@ var Template = props => (
                 {props.template.options.map((opt, index) => (
                     <div className="checkbox" key={index}>
                       <label className="control-label">
-                        <input type="checkbox" onChange={(e) => props.onChangeOption(opt[0], e.target.checked)}/>
+                        <input type="checkbox" onChange={(e) => props.onChangeOption(opt[0], e.target.checked)} />
                           {opt[1]}
                       </label>
                     </div>
                 ))}
        <label className="control-label" htmlFor="idTextInput">New service id</label>
        <input type="text" className="from-control" id="idTextInput" pattern="^[A-Za-z0-9_]+$" value={props.id} onChange={e => props.onChangeIdText(e.target.value)} />
-       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStub(props.idText, props.template.id, props.options)} />
+       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStub(props.idText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
        </div>}
+    {props.notify}
+    {props.option_errors}
     </div>
 );
 
@@ -28,7 +30,7 @@ var App = props => (
     </select>
         <Template idText={props.stubReducer.idText}
             template={props.stubReducer.current}
-            options={props.stubReducer.options}
+            notify={props.stubReducer.notify}
             onChangeIdText={props.onChangeIdText}
             onChangeOption={props.onChangeOption}
             onStub={props.onStub} />

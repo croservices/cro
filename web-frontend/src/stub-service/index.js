@@ -11,7 +11,7 @@ function mapDispatch(dispatch) {
         onStubSelect: index => dispatch(Actions.stubSelect(index)),
         onChangeIdText: text => dispatch(Actions.stubChangeIdText(text)),
         onChangeOption: (id, value) => dispatch(Actions.stubChangeOption(id, value)),
-        onStub: (type, id, opts) => dispatch(Actions.stubStub(type, id, opts))
+        onStub: (id, type, opts) => dispatch(Actions.stubStub(id, type, opts))
     }
 }
 
