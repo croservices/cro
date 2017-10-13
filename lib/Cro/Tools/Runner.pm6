@@ -183,13 +183,13 @@ class Cro::Tools::Runner {
                         my $service = %services{%command<id>};
                         if $service.tracing ^^ (%command<command> eq 'on') {
                             $service.tracing = !$service.tracing;
-                            restart-service($service);
+                            restart-service($service) if $service.status != StoppedState;
                         }
                     }
                     when 'trace-all' {
                         for %services.keys -> $s {
                             $s.tracing = %command<command> eq 'on';
-                            restart-service($s);
+                            restart-service($s) if $s.status != StoppedState;
                         }
                     }
                 }
