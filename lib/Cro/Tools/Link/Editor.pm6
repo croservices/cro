@@ -104,8 +104,10 @@ our sub code-link($from-service, $to-service, $to-endpoint?) {
     print-endpoint($to-service, $ep);
 }
 
-our sub show-link($service?) {
+our sub links-graph($service?) {
     my @ymls = find(dir => $*CWD, name => / \.cro\.yml$/);
+    # @inner - possibly includes service to get links 'from';
+    # @outer - includes all other services to process
     my (@inner, @outer);
     for @ymls {
         my $cro-file = Cro::Tools::CroFile.parse(.IO.slurp);
@@ -119,7 +121,13 @@ our sub show-link($service?) {
     if $service && !@inner {
         die "No such service $service";
     }
+    {:@inner, :@outer};
+}
 
+our sub show-link($service?) {
+    my %services = links-graph($service);
+    my @inner = %services<inner>.flat;
+    my @outer = %services<outer>.flat;
     with $service {
         say "Links from $service:";
         for @inner[0].links {

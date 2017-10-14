@@ -1,6 +1,7 @@
 use Cro::HTTP::Router::WebSocket;
 use Cro::HTTP::Router;
 use Cro::HTTP::Server;
+use Cro::Tools::Link::Editor;
 use Cro::Tools::Runner;
 use Cro::Tools::Template;
 use Cro::Tools::TemplateLocator;
@@ -71,6 +72,31 @@ sub web(Str $host, Int $port, $runner) is export {
                             }
                         }
                     }
+                }
+            }
+        }
+        get -> 'overview-road' {
+            web-socket -> $incoming {
+                supply {
+                    my @elements;
+                    my %services = links-graph();
+                    for %services<outer>.flat -> $cro-file {
+                        @elements.push: { data => { id => $cro-file.id } };
+                        for $cro-file.links {
+                            @elements.push: { data => { id => .endpoint,
+                                                        source => $cro-file.id,
+                                                        target => .service
+                                                      }
+                                            }
+                        }
+                    }
+                    emit to-json {
+                        WS_ACTION => True,
+                        action => {
+                            type => 'OVERVIEW_GRAPH',
+                            graph => @elements
+                        }
+                    };
                 }
             }
         }
