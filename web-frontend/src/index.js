@@ -6,6 +6,8 @@ import ServiceListApp from './service-list/index';
 import serviceListReducer from './service-list/reducer';
 import StubApp from './stub-service/index';
 import stubReducer from './stub-service/reducer';
+import LogsApp from './logs/index';
+import LogsReducer from './logs/reducer';
 import thunkMiddleware from 'redux-thunk';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Provider } from 'react-redux';
@@ -17,7 +19,8 @@ import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 const store = createStore(combineReducers({
     routing: routerReducer,
     serviceListReducer,
-    stubReducer
+    stubReducer,
+    logsReducer
 }), applyMiddleware(thunkMiddleware));
 
 // Set up history.
@@ -40,12 +43,12 @@ var Overview = props => (
 );
 var Stub = props => (
     <div id="stub" className="container">
-        <StubApp />
+      <StubApp />
     </div>
 );
 var Logs = props => (
     <div id="logs" className="container">
-      Logs and Traces go here
+      <LogsApp />
     </div>
 );
 
@@ -55,7 +58,7 @@ var Navigation = props => (
         <Navbar.Brand>
           <a href="#" onClick={() => browserHistory.push("/")}>Cro Development Tool</a>
         </Navbar.Brand>
-        </Navbar.Header>
+      </Navbar.Header>
       <Nav>
         <NavItem onClick={() => browserHistory.push("/")}>Overview</NavItem>
         <NavItem onClick={() => browserHistory.push("/stub")}>Stub Service</NavItem>
@@ -71,14 +74,14 @@ ReactDOM.render(
         <div className="container content">
           <div className="row">
             <div className="col-sm-4">
-                <ServiceListApp />
+              <ServiceListApp />
             </div>
             <div className="col-sm-8">
-                <Router history={history}>
+              <Router history={history}>
                 <Route path="/" component={Overview} />
                 <Route path="/stub" component={Stub} />
                 <Route path="/logs" component={Logs} />
-                </Router>
+              </Router>
             </div>
           </div>
         </div>
