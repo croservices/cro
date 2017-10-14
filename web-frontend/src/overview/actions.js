@@ -1,0 +1,2 @@
+export const OVERVIEW_GRAPH = 'OVERVIEW_GRAPH';
+

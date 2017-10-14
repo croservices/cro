@@ -23,7 +23,6 @@ export default function logsReducer(state = initialState, action) {
         channels.set(action.id, log);
         return {...state, channels };
     case ActionTypes.LOGS_SELECT_CHANNEL:
-        console.log(action.id);
         return {...state, current: action.id};
     case ActionTypes.SERVICE_GOTO_LOGS:
         state.current = action.id;

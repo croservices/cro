@@ -8,6 +8,8 @@ import StubApp from './stub-service/index';
 import stubReducer from './stub-service/reducer';
 import LogsApp from './logs/index';
 import logsReducer from './logs/reducer';
+import OverviewApp from './overview/index';
+import overviewReducer from './overview/reducer';
 import thunkMiddleware from 'redux-thunk';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Provider } from 'react-redux';
@@ -21,13 +23,14 @@ const store = createStore(combineReducers({
     routing: routerReducer,
     serviceListReducer,
     stubReducer,
-    logsReducer
+    logsReducer,
+    overviewReducer
 }), composeWithDevTools(applyMiddleware(thunkMiddleware)));
 
 // Set up history.
 const history = syncHistoryWithStore(browserHistory, store);
 
-['services-road', 'stub-road', 'logs-road'].forEach(endpoint => {
+['overview-road', 'services-road', 'stub-road', 'logs-road'].forEach(endpoint => {
     let host = window.location.host;
     let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
         retryCount: 3,
@@ -38,19 +41,13 @@ const history = syncHistoryWithStore(browserHistory, store);
 
 // Temporary components, to move out later
 var Overview = props => (
-    <div id="dashboard">
-      Dashboard goes here
-    </div>
+      <OverviewApp />
 );
 var Stub = props => (
-    <div id="stub">
       <StubApp />
-    </div>
 );
 var Logs = props => (
-    <div id="logs">
       <LogsApp />
-    </div>
 );
 
 var Navigation = props => (
