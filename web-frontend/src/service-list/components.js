@@ -4,19 +4,24 @@ var Service = props => (
     <div>
       <div className="serviceCreds">
         <h5>{props.service.name} <small>{props.service.id}</small></h5>
+        <button className="logLink btn btn-primary" onClick={() => props.onGotoLogs(props.service.id)}>Logs</button>
       </div>
       <div className="serviceManageBox">
-        <div className="serviceStatus">{props.service.status}</div>
+        <h5>{props.service.status}</h5>
         {props.service.status !== 'Running' &&
-            <button className="btn" onClick={() => props.onServiceStart(props.service.id)} className="serviceControl" type="button">▶</button>
+            <button className="btn-primary" onClick={() => props.onServiceStart(props.service.id)}><span className="glyphicon glyphicon-play"></span></button>
             }
             {props.service.status == 'Running' &&
-                <button className="btn" onClick={() => props.onServiceRestart(props.service.id)} className="serviceControl" type="button">🔄</button>
+                <button className="btn-primary" onClick={() => props.onServiceRestart(props.service.id)}><span className="glyphicon glyphicon-repeat"></span></button>
                 }
                 {props.service.status == 'Running' &&
-                    <button className="btn" onClick={() => props.onServiceStop(props.service.id)} className="serviceControl" type="button">🛑</button>
+                    <button className="btn btn-primary" onClick={() => props.onServiceStop(props.service.id)}><span className="glyphicon glyphicon-stop"></span></button>
                     }
-                    <input className="form-check-input" onChange={(e) => props.onServiceTraceFlip(props.service.id, e.target.checked)} name="traceSwitch" type="checkbox" />
+                    <div className="checkbox">
+                      <label>
+                        <input onChange={(e) => props.onServiceTraceFlip(props.service.id, e.target.checked)} name="traceSwitch" type="checkbox" /> Trace
+                      </label>
+                    </div>
       </div>
     </div>
 );
@@ -29,7 +34,8 @@ var App = props => (
                      onServiceStart={props.onServiceStart}
                      onServiceStop={props.onServiceStop}
                      onServiceRestart={props.onServiceRestart}
-                     onServiceTraceFlip={props.onServiceTraceFlip} />
+                     onServiceTraceFlip={props.onServiceTraceFlip}
+                     onGotoLogs={props.onGotoLogs} />
           </div>
       ))}
     </div>

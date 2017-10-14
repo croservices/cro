@@ -7,13 +7,14 @@ import serviceListReducer from './service-list/reducer';
 import StubApp from './stub-service/index';
 import stubReducer from './stub-service/reducer';
 import LogsApp from './logs/index';
-import LogsReducer from './logs/reducer';
+import logsReducer from './logs/reducer';
 import thunkMiddleware from 'redux-thunk';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import { Router, Route, browserHistory } from 'react-router';
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 // Build up reducers from the various components.
 const store = createStore(combineReducers({
@@ -21,12 +22,12 @@ const store = createStore(combineReducers({
     serviceListReducer,
     stubReducer,
     logsReducer
-}), applyMiddleware(thunkMiddleware));
+}), composeWithDevTools(applyMiddleware(thunkMiddleware)));
 
 // Set up history.
 const history = syncHistoryWithStore(browserHistory, store);
 
-['services-road', 'stub-road'].forEach(endpoint => {
+['services-road', 'stub-road', 'logs-road'].forEach(endpoint => {
     let host = window.location.host;
     let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
         retryCount: 3,
@@ -37,17 +38,17 @@ const history = syncHistoryWithStore(browserHistory, store);
 
 // Temporary components, to move out later
 var Overview = props => (
-    <div id="dashboard" className="container">
+    <div id="dashboard">
       Dashboard goes here
     </div>
 );
 var Stub = props => (
-    <div id="stub" className="container">
+    <div id="stub">
       <StubApp />
     </div>
 );
 var Logs = props => (
-    <div id="logs" className="container">
+    <div id="logs">
       <LogsApp />
     </div>
 );

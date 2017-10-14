@@ -7,13 +7,13 @@ var Template = props => (
                 {props.template.options.map((opt, index) => (
                     <div className="checkbox" key={index}>
                       <label className="control-label">
-                        <input type="checkbox" onChange={(e) => props.onChangeOption(opt[0], e.target.checked)} />
+                        <input type="checkbox" checked={opt[3]} onChange={(e) => props.onChangeOption(opt[0], e.target.checked)} />
                           {opt[1]}
                       </label>
                     </div>
                 ))}
        <label className="control-label" htmlFor="idTextInput">New service id</label>
-       <input type="text" className="from-control" id="idTextInput" pattern="^.+$" value={props.id} onChange={e => props.onChangeIdText(e.target.value)} />
+       <input type="text" className="form-control" id="idTextInput" pattern="^.+$" value={props.idText} onChange={e => props.onChangeIdText(e.target.value)} />
        <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStubSent(props.idText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
        </div>}
     <label>{props.notify}</label>
@@ -40,7 +40,7 @@ var Template = props => (
 
 var App = props => (
     <div>
-      <select className="from-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
+      <select className="form-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
         {props.stubReducer.templates.map(t => (
             <option key={t.id} value={t.id}>{t.name}</option>
         ))}

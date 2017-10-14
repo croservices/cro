@@ -34,6 +34,7 @@ export default function serviceListReducer(state = initialState, action) {
     case ActionTypes.SERVICE_FLIP:
         var updated_services = state.services;
         updated_services.get(action.id).trace = action.switch_state;
+        updated_services.get(action.id).status = 'Switching...';
         return { ...state, services: updated_services };
     default:
         return state;
