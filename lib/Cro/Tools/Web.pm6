@@ -8,10 +8,17 @@ use JSON::Fast;
 
 sub web(Str $host, Int $port, $runner) is export {
     my $stub-events = Supplier.new;
-    sub send-event(%content) {
-        $stub-events.emit: {
-            WS_ACTION => True,
-            action => %content
+    my $logs-events = Supplier.new;
+    sub send-event($channel, %content) {
+        my $msg = { WS_ACTION => True,
+                    action => %content };
+        given $channel {
+            when 'stub' {
+                $stub-events.emit: $msg;
+            }
+            when 'logs' {
+                $logs-events.emit: $msg;
+            }
         }
     }
 
@@ -48,21 +55,30 @@ sub web(Str $host, Int $port, $runner) is export {
                     my %options = %json<options>>>.Hash;
                     my ($generated-links, @links);
                     if $found.get-option-errors(%options) -> @errors {
-                        send-event({ type => 'STUB_OPTIONS_ERROR_OCCURED',
-                                     errors => @errors });
+                        send-event('stub', { type => 'STUB_OPTIONS_ERROR_OCCURED',
+                                             errors => @errors });
                     }
                     else {
                         my $where = $*CWD.add(%json<id>);
                         mkdir $where;
                         $found.generate($where, %json<id>, %json<id>, %options, $generated-links, @links);
-                        send-event({ type => 'STUB_STUBBED' });
+                        send-event('stub', { type => 'STUB_STUBBED' });
                         CATCH {
                             default {
                                 my @errors = .backtrace.full.split("\n");
-                                send-event({ type => 'STUB_STUB_ERROR_OCCURED',
-                                             :@errors });
+                                send-event('stub', { type => 'STUB_STUB_ERROR_OCCURED',
+                                                     :@errors });
                             }
                         }
+                    }
+                }
+            }
+        }
+        get -> 'logs-road' {
+            web-socket -> $incoming {
+                supply {
+                    whenever $logs-events.Supply {
+                        emit to-json $_;
                     }
                 }
             }
@@ -109,6 +125,8 @@ sub web(Str $host, Int $port, $runner) is export {
 
                     when Cro::Tools::Runner::Started {
                         emit-action($_, 'SERVICE_STARTED');
+                        my %event = type => 'LOGS_NEW_CHANNEL', id => .cro-file.id;
+                        send-event('logs', %event);
                     }
                     when Cro::Tools::Runner::Restarted {
                         emit-action($_, 'SERVICE_RESTARTED')
@@ -120,8 +138,14 @@ sub web(Str $host, Int $port, $runner) is export {
                         emit-action($_, 'SERVICE_UNABLE_TO_START')
                     }
                     when Cro::Tools::Runner::Output {
+                        my %event = type => 'LOGS_UPDATE_CHANNEL',
+                                    id => .service-id, payload => .line;
+                        send-event('logs', %event);
                     }
                     when Cro::Tools::Runner::Trace {
+                        my %event = type => 'LOGS_UPDATE_CHANNEL',
+                                    id => .service-id, payload => .line;
+                        send-event('logs', %event);
                     }
                 }
             }
