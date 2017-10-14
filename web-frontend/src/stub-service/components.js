@@ -13,11 +13,28 @@ var Template = props => (
                     </div>
                 ))}
        <label className="control-label" htmlFor="idTextInput">New service id</label>
-       <input type="text" className="from-control" id="idTextInput" pattern="^[A-Za-z0-9_]+$" value={props.id} onChange={e => props.onChangeIdText(e.target.value)} />
-       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStub(props.idText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
+       <input type="text" className="from-control" id="idTextInput" pattern="^.+$" value={props.id} onChange={e => props.onChangeIdText(e.target.value)} />
+       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStubSent(props.idText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
        </div>}
-    {props.notify}
-    {props.option_errors}
+    <label>{props.notify}</label>
+    {props.option_errors.length != 0 &&
+     <div>Incorrect options:
+     {props.option_errors.map((e, index) => (
+         <div className="option-error" key={index}>
+           <label>{e}</label>
+         </div>
+     ))}
+     </div>
+    }
+    {props.stub_errors.length != 0 &&
+     <div>Stubbing went wrong:
+     {props.stub_errors.map((e, index) => (
+         <div className="stub-error" key={index}>
+           <b>{e}</b>
+         </div>
+     ))}
+     </div>
+    }
     </div>
 );
 
@@ -31,9 +48,11 @@ var App = props => (
         <Template idText={props.stubReducer.idText}
             template={props.stubReducer.current}
             notify={props.stubReducer.notify}
+            option_errors={props.stubReducer.option_errors}
+            stub_errors={props.stubReducer.stub_errors}
             onChangeIdText={props.onChangeIdText}
             onChangeOption={props.onChangeOption}
-            onStub={props.onStub} />
+            onStubSent={props.onStubSent} />
         </div>
 );
 
