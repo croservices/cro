@@ -23,15 +23,15 @@ multi MAIN('web', Str $host-port = '10203',
 
 multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
     my %options = parse-options($options);
-    my $links = %options.grep({ .key eq 'link' }).first.value;
+    my $option-links = %options.grep({ .key eq 'link' }).first.value;
     %options .= grep({ not .key eq 'link' });
 
-    my $generated-links;
-    if $links {
+    my ($generated-links, @links);
+    if $option-links {
         my @services = find(dir => $*CWD, name => / \.cro\.yml$/);
         my @link-templates = get-available-templates(Cro::Tools::LinkTemplate);
 
-        for @$links -> $link {
+        for @$option-links -> $link {
             my ($service, $endp) = $link.split(':');
             unless $service|$endp {
                 conk "`$link` is incorrect link format; Use 'service:endpoint'.";
@@ -55,6 +55,12 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
                                                   (host-env => $endpoint.host-env,
                                                    port-env => $endpoint.port-env));
             $generated-links.push: $generated;
+
+            @links.push: Cro::Tools::CroFile::Link.new(
+                :$service, endpoint => $endpoint.id,
+                host-env => $endpoint.host-env,
+                port-env => $endpoint.port-env
+            );
         }
     }
 
@@ -75,7 +81,7 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
         try {
             my $where = $path.IO;
             mkdir $where;
-            $found.generate($where, $id, $id, %options, $generated-links);
+            $found.generate($where, $id, $id, %options, $generated-links, @links);
             CATCH {
                 default {
                     note "Oops, stub generation failed: {.message}\n";

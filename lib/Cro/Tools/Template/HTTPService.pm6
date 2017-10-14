@@ -56,13 +56,14 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         }
     }
 
-    method generate(IO::Path $where, Str $id, Str $name, %options, $links) {
+    method generate(IO::Path $where, Str $id, Str $name,
+                    %options, $generated-links, @links) {
         my $lib = $where.add('lib');
         mkdir $lib;
         write-fake-tls($where) if %options<secure>;
-        write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, $links);
-        write-entrypoint($where.add('service.p6'), $id, %options, $links);
-        write-cro-file($where.add('.cro.yml'), $id, $name, %options);
+        write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, $generated-links);
+        write-entrypoint($where.add('service.p6'), $id, %options, $generated-links);
+        write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
         write-meta($where.add('META6.json'), $name, %options);
     }
 
@@ -166,7 +167,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         $file.spurt($entrypoint);
     }
 
-    sub write-cro-file($file, $id, $name, %options) {
+    sub write-cro-file($file, $id, $name, %options, @links) {
         my $id-uc = env-name($id);
         my $cro-file = Cro::Tools::CroFile.new(
             :$id, :$name, :entrypoint<service.p6>, :endpoints[
@@ -177,7 +178,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                     host-env => $id-uc ~ '_HOST',
                     port-env => $id-uc ~ '_PORT'
                 )
-            ]
+            ], :@links
         );
         $file.spurt($cro-file.to-yaml());
     }
