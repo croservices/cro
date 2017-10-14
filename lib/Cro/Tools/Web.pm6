@@ -8,6 +8,13 @@ use JSON::Fast;
 
 sub web(Str $host, Int $port, $runner) is export {
     my $stub-events = Supplier.new;
+    sub send-event(%content) {
+        $stub-events.emit: {
+            WS_ACTION => True,
+            action => %content
+        }
+    }
+
     my $application = route {
         get -> {
             content 'text/html', %?RESOURCES<web/index.html>.slurp;
@@ -20,50 +27,44 @@ sub web(Str $host, Int $port, $runner) is export {
                 unless %json<action> ⊆ @commands {
                     bad-request;
                 }
-                $runner.start(%json<id>)        if %json<action> eq 'start';
-                $runner.stop(%json<id>)         if %json<action> eq 'stop';
-                $runner.restart(%json<id>)      if %json<action> eq 'restart';
-                $runner.trace(%json<id>, 'on')  if %json<action> eq 'trace-on';
-                $runner.trace(%json<id>, 'off') if %json<action> eq 'trace-off';
-                $runner.trace-all('on')         if %json<action> eq 'trace-all-on';
-                $runner.trace-all('off')        if %json<action> eq 'trace-all-off';
                 content 'text/html', '';
+                start {
+                    $runner.start(%json<id>)        if %json<action> eq 'start';
+                    $runner.stop(%json<id>)         if %json<action> eq 'stop';
+                    $runner.restart(%json<id>)      if %json<action> eq 'restart';
+                    $runner.trace(%json<id>, 'on')  if %json<action> eq 'trace-on';
+                    $runner.trace(%json<id>, 'off') if %json<action> eq 'trace-off';
+                    $runner.trace-all('on')         if %json<action> eq 'trace-all-on';
+                    $runner.trace-all('off')        if %json<action> eq 'trace-all-off';
+                }
             }
         }
         post -> 'stub' {
             request-body -> %json {
-                my @templates = get-available-templates(Cro::Tools::Template);
-                my $found = @templates.first(*.id eq %json<type>);
-                my %options = %json<options>>>.Hash;
-                my $generated-links;
-                if $found.get-option-errors(%options) -> @errors {
-                    $stub-events.emit: {
-                        WS_ACTION => True,
-                        action => { type => 'STUB_OPTIONS_ERROR_OCCURED',
-                                    errors => @errors }
+                content 'text/html', '';
+                start {
+                    my @templates = get-available-templates(Cro::Tools::Template);
+                    my $found = @templates.first(*.id eq %json<type>);
+                    my %options = %json<options>>>.Hash;
+                    my ($generated-links, @links);
+                    if $found.get-option-errors(%options) -> @errors {
+                        send-event({ type => 'STUB_OPTIONS_ERROR_OCCURED',
+                                     errors => @errors });
                     }
-                }
-                else {
-                    try {
+                    else {
                         my $where = $*CWD.add(%json<id>);
                         mkdir $where;
-                        $found.generate($where, %json<id>, %json<id>, %options, $generated-links);
-                        $stub-events.emit: {
-                            WS_ACTION => True,
-                            action => { type => 'STUB_STUBBED' }
-                        }
-                    }
-                    CATCH {
-                        default {
-                            $stub-events.emit: {
-                                WS_ACTION => True,
-                                action => { type => 'STUB_',
-                                            errors => $_ }
+                        $found.generate($where, %json<id>, %json<id>, %options, $generated-links, @links);
+                        send-event({ type => 'STUB_STUBBED' });
+                        CATCH {
+                            default {
+                                my @errors = .backtrace.full.split("\n");
+                                send-event({ type => 'STUB_STUB_ERROR_OCCURED',
+                                             :@errors });
                             }
                         }
                     }
                 }
-                content 'text/html', '';
             }
         }
         get -> 'stub-road' {
@@ -72,7 +73,6 @@ sub web(Str $host, Int $port, $runner) is export {
                 supply {
                     whenever $stub-events.Supply {
                         emit to-json $_;
-                        CATCH {.note}
                     }
                     my @result = ();
                     for @templates -> $_ {
