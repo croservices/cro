@@ -9,7 +9,7 @@ export default function logsReducer(state = initialState, action) {
     switch (action.type) {
     case ActionTypes.LOGS_NEW_CHANNEL:
         var channels = state.channels;
-        if (state.current != null) {
+        if (state.current == null) {
             state.current = action.id;
         }
         if (channels.get(action.id) == null) {
