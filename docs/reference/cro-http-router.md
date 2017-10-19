@@ -805,3 +805,48 @@ Since a `route { }` block makes an object that does `Cro::Transform`, it is
 possible to use it with `delegate` too. This has slightly different semantics
 from `include`, and due to the need to do two route dispatches will perform a
 bit worse.
+
+## Applying middleware in a route block
+
+**Note:** This describes a future feature that is not yet implemented in the
+current version of Cro.
+
+In Cro, middleware is a component in the reactive processing pipeline. It may
+be installed at the server level (see `Cro::HTTP::Server` for more), but also
+per `route` block using the `before` and `after` functions.
+
+The `before` function is used to install middleware that operates on requests
+before their route handler is called. It may be called with a `Cro::Transform`
+that consumes a `Cro::HTTP::Request` and produces a `Cro::HTTP::Request`.
+
+```
+before My::Request::Middleware;
+```
+
+The `after` function is used to install middleware that operates on responses
+produced by a route handler. It may be called with a `Cro::Transform` that
+consumes a `Cro::HTTP::Response` and produces a `Cro::HTTP::Response`.
+
+```
+after My::Response::Middleware;
+```
+
+As a convenience, the `before` and `after` functions may be passed a `Block`.
+This will be invoked with the `Cro::HTTP::Request` or `Cro::HTTP::Response`
+object as an argument, and it can mutate the request or response (the return
+value of the block is ignored). The various response helper functions that are
+available inside of a route handler are also available, so adding an extra
+header to the response can be achieved by:
+
+```
+after {
+    header 'Strict-transport-security', 'max-age=31536000; includeSubDomains'
+}
+```
+
+Within a `route` block, middleware is applied in the order the `before` and
+`after` calls are made. When `include` is used, the `before` middleware of the
+including `route` block will be applied ahead of any middleware in the target
+of the `include`, and the `after` middleware of the including `route` block
+will be applied after the target of the include. Effectively, the middleware
+of the including route block wraps around those of the included.
