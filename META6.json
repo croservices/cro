@@ -33,6 +33,8 @@
         "web/index.html",
         "web/css/bootstrap.min.css",
         "web/css/cro.css",
+        "web/js/app.js",
+        "web/fonts/glyphicons-halflings-regular.woff2",
         "fake-tls/ca-crt.pem",
         "fake-tls/server-crt.pem",
         "fake-tls/server-key.pem"
