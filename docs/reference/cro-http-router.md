@@ -665,9 +665,6 @@ to instead use:
 
 ## Composing routers
 
-**Note:** This describes a future feature that is not yet implemented in the
-current version of Cro.
-
 For any non-trivial service, defining all of the routes and their handlers in a
 single file will become difficult to manage. With `include`, it is possible to
 move them out to different modules. For example, a module `OurService::Products`
@@ -757,9 +754,6 @@ The `include` operation can only be used to apply routes from another HTTP
 router constructed using `Cro::HTTP::Router`.
 
 ## Delegating routes to another Cro::Transform
-
-**Note:** This describes a future feature that is not yet implemented in the
-current version of Cro.
 
 Using `Cro::HTTP::Router` isn't the only way to write a HTTP request handler.
 The router can `delegate` either a specific path, or all paths below a prefix,
