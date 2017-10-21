@@ -15,7 +15,7 @@ var Service = props => (
                 <button className="btn-primary" onClick={() => props.onServiceRestart(props.service.id)}><span className="glyphicon glyphicon-repeat"></span></button>
                 }
                 {props.service.status == 'Running' &&
-                    <button className="btn btn-primary" onClick={() => props.onServiceStop(props.service.id)}><span className="glyphicon glyphicon-stop"></span></button>
+                    <button className="btn-primary" onClick={() => props.onServiceStop(props.service.id)}><span className="glyphicon glyphicon-stop"></span></button>
                     }
                     <div className="checkbox">
                       <label>
