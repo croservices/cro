@@ -60,9 +60,9 @@ sub web(Str $host, Int $port, $runner) is export {
                                              errors => @errors });
                     }
                     else {
-                        my $where = $*CWD.add(%json<id>);
+                        my $where = $*CWD.add(%json<path>);
                         mkdir $where;
-                        $found.generate($where, %json<id>, %json<id>, %options, $generated-links, @links);
+                        $found.generate($where, %json<id>, %json<name>, %options, $generated-links, @links);
                         send-event('stub', { type => 'STUB_STUBBED' });
                         CATCH {
                             default {
