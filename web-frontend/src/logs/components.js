@@ -8,8 +8,7 @@ var App = props => (
         ))}
     </select>
         {props.logsReducer.channels.get(props.logsReducer.current) &&
-         <div className="log" dangerouslySetInnerHTML={{__html: props.logsReducer.channels.get(props.logsReducer.current)}}>
-         </div>
+         <div className="log">{props.logsReducer.channels.get(props.logsReducer.current)}</div>
         }
     </div>
 );

@@ -19,7 +19,7 @@ export default function logsReducer(state = initialState, action) {
     case ActionTypes.LOGS_UPDATE_CHANNEL:
         var channels = state.channels;
         var log = channels.get(action.id);
-        log = log + action.payload + "<br>";
+        log = log + action.payload + "\n";
         channels.set(action.id, log);
         return {...state, channels };
     case ActionTypes.LOGS_SELECT_CHANNEL:
