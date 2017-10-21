@@ -136,6 +136,13 @@ sub web(Str $host, Int $port, $runner) is export {
                             templates => @result
                         }
                     };
+                    emit to-json {
+                        WS_ACTION => True,
+                        action => {
+                            type => 'STUB_SET_PATH',
+                            path => ~$*CWD
+                        }
+                    }
                 }
             }
         }
