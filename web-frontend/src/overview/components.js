@@ -8,7 +8,7 @@ var App = props => (
       {props.graph == null &&
           <div>
               <h3>No known services...</h3>
-              <button className="btn btn-primary">Create one now</button>
+       <button onClick={e => props.onCreateNew()} className="btn btn-primary">Create one now</button>
           </div>
       }
     </div>

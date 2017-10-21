@@ -7,7 +7,9 @@ function mapProps(state) {
 }
 
 function mapDispatch(dispatch) {
-    return {}
+    return {
+        onCreateNew: () => dispatch(Actions.createNew())
+    }
 }
 
 let OverviewApp = connect(mapProps, mapDispatch)(App);
