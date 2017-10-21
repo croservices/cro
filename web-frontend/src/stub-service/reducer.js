@@ -1,16 +1,23 @@
+import path from 'path';
 import * as ActionTypes from './actions';
 
 const initialState = {
     templates: [],
     current: null,
     idText: '',
+    pathText: '',
     notify: '',
     option_errors: [],
-    stub_errors: []
+    stub_errors: [],
+    cwd: '',
+    fullPath: ''
 };
 
 export default function stubReducer(state = initialState, action) {
     switch (action.type) {
+    case ActionTypes.STUB_SET_PATH:
+        var fullPath = path.join(state.cwd, action.path)
+        return { ...state, fullPath, cwd: action.path }
     case ActionTypes.STUB_TEMPLATES:
         var templates = action.templates;
         templates.sort(function(a, b) {
@@ -30,7 +37,15 @@ export default function stubReducer(state = initialState, action) {
     case ActionTypes.STUB_SELECT:
         return { ...state, current: state.templates[action.index], notify: '' }
     case ActionTypes.STUB_CHANGE_ID_TEXT:
-        return { ...state, idText: action.text }
+        if (state.idText === state.pathText) {
+            var fullPath = path.join(state.cwd, action.text)
+            return { ...state, idText: action.text, pathText: action.text, fullPath }
+        } else {
+            return { ...state, idText: action.text }
+        }
+    case ActionTypes.STUB_CHANGE_PATH_TEXT:
+        var fullPath = path.join(state.cwd, action.text)
+        return { ...state, pathText: action.text, fullPath }
     case ActionTypes.STUB_CHANGE_OPTION:
         var opts = state.current.options;
         for (var i = 0; i < opts.length; i++) {

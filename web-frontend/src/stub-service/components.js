@@ -4,6 +4,9 @@ var Template = props => (
     <div>
       <label className="control-label" htmlFor="idTextInput">New service ID</label>
       <input type="text" className="form-control" id="idTextInput" pattern="^.+$" value={props.idText} onChange={e => props.onChangeIdText(e.target.value)} />
+      <label className="control-label" htmlFor="pathTextInput">New service path</label>
+      <input type="text" className="form-control" id="pathTextInput" pattern="^.+$" value={props.pathText} onChange={e => props.onChangePathText(e.target.value)} />
+        <small>Service will be created in {props.fullPath}</small>
       {props.template !== null &&<div>
             <h3>{props.template.name} <small>{props.template.id}</small></h3>
                 {props.template.options.map((opt, index) => (
@@ -47,12 +50,15 @@ var App = props => (
             <option key={t.id} value={t.id}>{t.name}</option>
         ))}
     </select>
-        <Template idText={props.stubReducer.idText}
+        <Template fullPath={props.stubReducer.fullPath}
+            idText={props.stubReducer.idText}
+            pathText={props.stubReducer.pathText}
             template={props.stubReducer.current}
             notify={props.stubReducer.notify}
             option_errors={props.stubReducer.option_errors}
             stub_errors={props.stubReducer.stub_errors}
             onChangeIdText={props.onChangeIdText}
+            onChangePathText={props.onChangePathText}
             onChangeOption={props.onChangeOption}
             onStubSent={props.onStubSent} />
         </div>
