@@ -176,8 +176,16 @@ sub web(Str $host, Int $port, $runner) is export {
                         send-event('logs', %event);
                     }
                     when Cro::Tools::Runner::Trace {
+                        my $payload;
+                        $payload = do given .event {
+                            when 'EMIT' { "\c[HIGH VOLTAGE SIGN] EMIT " }
+                            when 'DONE' { "\c[BLACK SQUARE FOR STOP] DONE " }
+                            when 'QUIT' { "\c[SKULL AND CROSSBONES] QUIT " }
+                            default { "? {.uc}" }
+                        }
+                        $payload ~= .data.trim;
                         my %event = type => 'LOGS_UPDATE_CHANNEL',
-                                    id => .service-id, payload => .line;
+                                    id => .service-id, :$payload;
                         send-event('logs', %event);
                     }
                 }
