@@ -2,6 +2,8 @@ import React from 'react';
 
 var Template = props => (
     <div>
+      <label className="control-label" htmlFor="nameTextInput">New service name</label>
+      <input type="text" className="form-control" id="nameTextInput" pattern="^.+$" value={props.nameText} onChange={e => props.onChangeNameText(e.target.value)} />
       <label className="control-label" htmlFor="idTextInput">New service ID</label>
       <input type="text" className="form-control" id="idTextInput" pattern="^.+$" value={props.idText} onChange={e => props.onChangeIdText(e.target.value)} />
       <label className="control-label" htmlFor="pathTextInput">New service path</label>
@@ -17,7 +19,7 @@ var Template = props => (
                       </label>
                     </div>
                 ))}
-       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStubSent(props.idText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
+       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
        </div>}
     <label>{props.notify}</label>
     {props.option_errors.length != 0 &&
@@ -52,6 +54,7 @@ var App = props => (
     </select>
         <Template fullPath={props.stubReducer.fullPath}
             idText={props.stubReducer.idText}
+            nameText={props.stubReducer.nameText}
             pathText={props.stubReducer.pathText}
             template={props.stubReducer.current}
             notify={props.stubReducer.notify}
@@ -59,6 +62,7 @@ var App = props => (
             stub_errors={props.stubReducer.stub_errors}
             onChangeIdText={props.onChangeIdText}
             onChangePathText={props.onChangePathText}
+            onChangeNameText={props.onChangeNameText}
             onChangeOption={props.onChangeOption}
             onStubSent={props.onStubSent} />
         </div>

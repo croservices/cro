@@ -6,6 +6,7 @@ const initialState = {
     current: null,
     idText: '',
     pathText: '',
+    nameText: '',
     notify: '',
     option_errors: [],
     stub_errors: [],
@@ -46,6 +47,8 @@ export default function stubReducer(state = initialState, action) {
     case ActionTypes.STUB_CHANGE_PATH_TEXT:
         var fullPath = path.join(state.cwd, action.text)
         return { ...state, pathText: action.text, fullPath }
+    case ActionTypes.STUB_CHANGE_NAME_TEXT:
+        return { ...state, nameText: action.text }
     case ActionTypes.STUB_CHANGE_OPTION:
         var opts = state.current.options;
         for (var i = 0; i < opts.length; i++) {
