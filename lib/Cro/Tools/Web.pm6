@@ -192,6 +192,14 @@ sub web(Str $host, Int $port, $runner) is export {
                 not-found;
             }
         }
+        get -> 'fonts', *@path {
+            with %?RESOURCES{('web', 'fonts', |@path).join('/')} {
+                content 'font/woff2', .slurp :bin;
+            }
+            else {
+                not-found;
+            }
+        }
     }
     given Cro::HTTP::Server.new(:$host, :$port, :$application) {
         .start;
