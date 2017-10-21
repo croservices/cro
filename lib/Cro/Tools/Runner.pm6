@@ -167,8 +167,8 @@ class Cro::Tools::Runner {
                     }
                     when 'start' {
                         $_ = %services{%command<id>};
-                        if .status == StoppedState {
-                            .status = StartedState;
+                        if .state == StoppedState {
+                            .state = StartedState;
                             (.proc, my %env) = service-proc(.cro-file, .endpoint-ports, trace => .tracing);
                             .proc-exit = .proc.start(:ENV(%env), :cwd(.path));
                             emit Started.new(service-id => .cro-file.id, cro-file => .cro-file,
@@ -183,13 +183,13 @@ class Cro::Tools::Runner {
                         my $service = %services{%command<id>};
                         if $service.tracing ^^ (%command<command> eq 'on') {
                             $service.tracing = !$service.tracing;
-                            restart-service($service) if $service.status != StoppedState;
+                            restart-service($service) if $service.state != StoppedState;
                         }
                     }
                     when 'trace-all' {
                         for %services.keys -> $s {
                             $s.tracing = %command<command> eq 'on';
-                            restart-service($s) if $s.status != StoppedState;
+                            restart-service($s) if $s.state != StoppedState;
                         }
                     }
                 }
