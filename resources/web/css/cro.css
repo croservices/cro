@@ -71,6 +71,8 @@
 }
 
 .log {
+    white-space: pre;
+    font-family: monospace;
     margin-top: 20px;
     border: 2px solid #b4b4b4;
     border-radius: 5px;
