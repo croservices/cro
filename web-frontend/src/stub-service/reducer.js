@@ -12,8 +12,11 @@ const initialState = {
 export default function stubReducer(state = initialState, action) {
     switch (action.type) {
     case ActionTypes.STUB_TEMPLATES:
-        return { ...state,
-                 templates: action.templates,
+        var templates = action.templates;
+        templates.sort(function(a, b) {
+            return a.id.localeCompare(b.id)
+        });
+        return { ...state, templates,
                  current: action.templates[0] }
     case ActionTypes.STUB_STUBBED:
         return { ...state, stub_errors: '',

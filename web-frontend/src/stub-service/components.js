@@ -2,6 +2,8 @@ import React from 'react';
 
 var Template = props => (
     <div>
+      <label className="control-label" htmlFor="idTextInput">New service ID</label>
+      <input type="text" className="form-control" id="idTextInput" pattern="^.+$" value={props.idText} onChange={e => props.onChangeIdText(e.target.value)} />
       {props.template !== null &&<div>
             <h3>{props.template.name} <small>{props.template.id}</small></h3>
                 {props.template.options.map((opt, index) => (
@@ -12,8 +14,6 @@ var Template = props => (
                       </label>
                     </div>
                 ))}
-       <label className="control-label" htmlFor="idTextInput">New service id</label>
-       <input type="text" className="form-control" id="idTextInput" pattern="^.+$" value={props.idText} onChange={e => props.onChangeIdText(e.target.value)} />
        <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStubSent(props.idText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
        </div>}
     <label>{props.notify}</label>
@@ -40,7 +40,9 @@ var Template = props => (
 
 var App = props => (
     <div>
-      <select className="form-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
+      <h3>Stub New Service</h3>
+      <label className="control-label" htmlFor="templateSelectInput">Service Template</label>
+      <select id="templateSelectInput" defaultValue={props.stubReducer.current.id} className="form-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
         {props.stubReducer.templates.map(t => (
             <option key={t.id} value={t.id}>{t.name}</option>
         ))}
