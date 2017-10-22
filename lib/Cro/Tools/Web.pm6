@@ -78,23 +78,27 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> 'overview-road' {
             web-socket -> $incoming {
                 supply {
-                    my @elements;
+                    my $color = 1;
+                    my @nodes;
+                    my @links;
+                    my %graph;
                     my %services = links-graph();
                     for %services<outer>.flat -> $cro-file {
-                        @elements.push: { data => { id => $cro-file.id } };
+                        @nodes.push: { id => $cro-file.id, type => $color  };
                         for $cro-file.links {
-                            @elements.push: { data => { id => .endpoint,
-                                                        source => $cro-file.id,
-                                                        target => .service
-                                                      }
-                                            }
+                            my $source = $cro-file.id;
+                            my $target = .service;
+                            @links.push: { :$source, :$target, type => $color }
                         }
+                        $color++;
                     }
+                    %graph<nodes> = @nodes;
+                    %graph<links> = @links;
                     emit to-json {
                         WS_ACTION => True,
                         action => {
                             type => 'OVERVIEW_GRAPH',
-                            graph => @elements
+                            :%graph
                         }
                     };
                 }
