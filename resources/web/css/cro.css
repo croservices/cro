@@ -79,6 +79,17 @@
     overflow: auto;
 }
 
+.links line {
+    stroke-opacity: 0.6;
+    stroke-width: 1px;
+    fill: none;
+}
+
+.nodes circle {
+    stroke: #333;
+    stroke-width: 1.5px;
+}
+
 @font-face {
     font-family: "Glyphicons Halflings";
     src: url("fonts/glyphicons-halflings-regular.woff2") format('woff2');
