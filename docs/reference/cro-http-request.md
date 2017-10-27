@@ -64,6 +64,6 @@ a cookie was actually removed, and `False` otherwise.
 
 ## Stringification
 
-Calling the `Str` method on a `Cro::HTTP::Request` will serialize the requeset
+Calling the `Str` method on a `Cro::HTTP::Request` will serialize the request
 line and headers, giving the `HTTP/1.*` wire representation of the message
 but excluding the body.
