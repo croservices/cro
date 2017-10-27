@@ -187,7 +187,7 @@ sub web(Str $host, Int $port, $runner) is export {
                             when 'QUIT' { "\c[SKULL AND CROSSBONES] QUIT " }
                             default { "? {.uc}" }
                         }
-                        $payload ~= .data.trim;
+                        $payload ~= .data;
                         my %event = type => 'LOGS_UPDATE_CHANNEL',
                                     id => .service-id, :$payload;
                         send-event('logs', %event);
