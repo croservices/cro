@@ -2,9 +2,9 @@ import React from 'react';
 
 var App = props => (
     <div>
-      <select className="form-control" onChange={e => props.onSelectChannel(e.target.options[e.target.selectedIndex].value)}>
+      <select className="form-control" value={props.logsReducer.current} onChange={e => props.onSelectChannel(e.target.options[e.target.selectedIndex].value)}>
         {Array.from(props.logsReducer.channels).map(c => (
-            <option key={c[0]} selected={c[0] == props.logsReducer.current ? 'selected' : ''}>{c[0]}</option>
+            <option key={c[0]}>{c[0]}</option>
         ))}
     </select>
         {props.logsReducer.channels.get(props.logsReducer.current) &&
