@@ -115,7 +115,7 @@ expected that a template will:
 
 1. Write source files, including an entry point script, such that a working,
    barebones service can be successfully started
-2. Optionally write any artefacts that would aid deployment, such as a
+2. Optionally write any artifacts that would aid deployment, such as a
    `Dockerfile`.
 3. Write a `.cro.yml` file. Use `Cro::Tools::CroFile` to generate this, rather
    rather than writing the YAML directly. It is strongly recommended to do
