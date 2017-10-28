@@ -19,21 +19,21 @@ var Template = props => (
                       </label>
                     </div>
                 ))}
-       <input className="btn btn-primary" type="button" value="Stub" onClick={(e) => props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} />
+       <button className="btn btn-primary" id="stubButton" onClick={(e) => props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} disabled>Stub</button>
        </div>}
     <label>{props.notify}</label>
-    {props.option_errors.length != 0 &&
+    {props.optionErrors.length != 0 &&
      <div>Incorrect options:
-     {props.option_errors.map((e, index) => (
+     {props.optionErrors.map((e, index) => (
          <div className="option-error" key={index}>
            <label>{e}</label>
          </div>
      ))}
      </div>
     }
-    {props.stub_errors.length != 0 &&
+    {props.stubErrors.length != 0 &&
      <div>Stubbing went wrong:
-     {props.stub_errors.map((e, index) => (
+     {props.stubErrors.map((e, index) => (
          <div className="stub-error" key={index}>
            <b>{e}</b>
          </div>
@@ -58,8 +58,8 @@ var App = props => (
             pathText={props.stubReducer.pathText}
             template={props.stubReducer.current}
             notify={props.stubReducer.notify}
-            option_errors={props.stubReducer.option_errors}
-            stub_errors={props.stubReducer.stub_errors}
+            optionErrors={props.stubReducer.optionErrors}
+            stubErrors={props.stubReducer.stubErrors}
             onChangeIdText={props.onChangeIdText}
             onChangePathText={props.onChangePathText}
             onChangeNameText={props.onChangeNameText}

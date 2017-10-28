@@ -8,8 +8,8 @@ const initialState = {
     pathText: '',
     nameText: '',
     notify: '',
-    option_errors: [],
-    stub_errors: [],
+    optionErrors: [],
+    stubErrors: [],
     cwd: '',
     fullPath: ''
 };
@@ -27,13 +27,13 @@ export default function stubReducer(state = initialState, action) {
         return { ...state, templates,
                  current: action.templates[0] }
     case ActionTypes.STUB_STUBBED:
-        return { ...state, stub_errors: '',
-                 option_errors: '', idText: '',
+        return { ...state, stubErrors: '', optionErrors: '',
+                 idText: '', pathText: '', nameText: '',
                  notify: 'Successfully stubbed!' }
     case ActionTypes.STUB_OPTIONS_ERROR_OCCURED:
-        return { ...state, notify: 'Error occured with options:', option_errors: action.errors }
+        return { ...state, notify: 'Error occured with options:', optionErrors: action.errors }
     case ActionTypes.STUB_STUB_ERROR_OCCURED:
-        return { ...state, notify: 'Error occured during stubbing:', stub_errors: action.errors }
+        return { ...state, notify: 'Error occured during stubbing:', stubErrors: action.errors }
 
     case ActionTypes.STUB_SELECT:
         return { ...state, current: state.templates[action.index], notify: '' }
@@ -57,7 +57,7 @@ export default function stubReducer(state = initialState, action) {
             }
         }
         state.current.options = opts;
-        return { ...state, notify: '', option_errors: '', stub_errors: '' }
+        return { ...state, notify: '', optionErrors: '', stubErrors: '' }
     case ActionTypes.STUB_STUB_SENT:
         return { ...state, notify: 'Stubbing...' }
     default:
