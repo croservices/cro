@@ -61,7 +61,7 @@ There should now be a page saying 'Hello Cro!' at http://localhost:10000
 
 Congratulations, you have successfully installed Cro!
 
-Now learn more about [building a HTTP service](intro/http-server).
+Now learn more about [building a HTTP service](http-server).
 
 ## Extra credit: use `cro stub` and `cro run`
 
