@@ -46,7 +46,7 @@
 }
 
 .service {
-    height: 110px;
+    overflow: auto;
     background-color: #f0f0f0;
     border: 2px solid #b4b4b4;
     border-radius: 15px;
@@ -63,11 +63,21 @@
     color: gray;
 }
 
-.logLink {
+.logBtn {
     float: left;
     clear: left;
     height: 28px;
     width: 70px;
+    margin-bottom: 5px;
+}
+
+.servicePorts {
+    float: left;
+    clear: left;
+}
+
+.squareBtn {
+    margin: 2px;
 }
 
 .log {

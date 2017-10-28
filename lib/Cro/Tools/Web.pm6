@@ -154,9 +154,17 @@ sub web(Str $host, Int $port, $runner) is export {
             web-socket -> $incoming {
                 supply whenever $runner.run() -> $_ {
                     sub emit-action($_, $type) {
-                        my %action = :$type, id => .cro-file.id,
-                                     name => .cro-file.name,
+                        my $c = .cro-file;
+                        my @endpoints;
+                        if $_ ~~ Cro::Tools::Runner::Started {
+                            @endpoints = .endpoint-ports.map(
+                                -> $e {[$e.key, $e.value,
+                                        $c.endpoints.grep({ .id eq $e.key }).first.protocol] });
+                        }
+                        my %action = :$type, id => $c.id,
+                                     name => $c.name,
                                      tracing => .tracing;
+                        %action<endpoints> = @endpoints if $_ ~~ Cro::Tools::Runner::Started;
                         emit to-json { WS_ACTION => True, :%action }
                     }
 
@@ -175,8 +183,14 @@ sub web(Str $host, Int $port, $runner) is export {
                         emit-action($_, 'SERVICE_UNABLE_TO_START')
                     }
                     when Cro::Tools::Runner::Output {
+                        my $payload = .line;
+                        if .on-stderr {
+                            $payload = "\c[WARNING SIGN] " ~ $payload;
+                        } else {
+                            $payload = "\c[NOTEBOOK] " ~ $payload;
+                        }
                         my %event = type => 'LOGS_UPDATE_CHANNEL',
-                                    id => .service-id, payload => .line;
+                                    id => .service-id, :$payload;
                         send-event('logs', %event);
                     }
                     when Cro::Tools::Runner::Trace {
@@ -187,7 +201,8 @@ sub web(Str $host, Int $port, $runner) is export {
                             when 'QUIT' { "\c[SKULL AND CROSSBONES] QUIT " }
                             default { "? {.uc}" }
                         }
-                        $payload ~= .data;
+                        $payload ~= "[{.id}] {.component}\n";
+                        $payload ~= .data.indent(2);
                         my %event = type => 'LOGS_UPDATE_CHANNEL',
                                     id => .service-id, :$payload;
                         send-event('logs', %event);
