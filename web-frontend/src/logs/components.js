@@ -2,6 +2,7 @@ import React from 'react';
 
 var App = props => (
     <div>
+      <h3>Logs and Traces</h3>
       <select className="form-control" value={props.logsReducer.current} onChange={e => props.onSelectChannel(e.target.options[e.target.selectedIndex].value)}>
         {Array.from(props.logsReducer.channels).map(c => (
             <option key={c[0]}>{c[0]}</option>
