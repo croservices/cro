@@ -11,7 +11,8 @@ const initialState = {
     optionErrors: [],
     stubErrors: [],
     cwd: '',
-    fullPath: ''
+    fullPath: '',
+    disable: true
 };
 
 export default function stubReducer(state = initialState, action) {
@@ -29,20 +30,21 @@ export default function stubReducer(state = initialState, action) {
     case ActionTypes.STUB_STUBBED:
         return { ...state, stubErrors: '', optionErrors: '',
                  idText: '', pathText: '', nameText: '',
-                 notify: 'Successfully stubbed!' }
+                 notify: 'Successfully stubbed!', disabled: true }
     case ActionTypes.STUB_OPTIONS_ERROR_OCCURED:
-        return { ...state, notify: 'Error occured with options:', optionErrors: action.errors }
+        return { ...state, optionErrors: action.errors }
     case ActionTypes.STUB_STUB_ERROR_OCCURED:
         return { ...state, notify: 'Error occured during stubbing:', stubErrors: action.errors }
 
     case ActionTypes.STUB_SELECT:
         return { ...state, current: state.templates[action.index], notify: '' }
     case ActionTypes.STUB_CHANGE_ID_TEXT:
+        var disable = action.text === '';
         if (state.idText === state.pathText) {
             var fullPath = path.join(state.cwd, action.text)
-            return { ...state, idText: action.text, pathText: action.text, fullPath }
+            return { ...state, idText: action.text, pathText: action.text, fullPath, disable }
         } else {
-            return { ...state, idText: action.text }
+            return { ...state, idText: action.text, disable }
         }
     case ActionTypes.STUB_CHANGE_PATH_TEXT:
         var fullPath = path.join(state.cwd, action.text)

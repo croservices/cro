@@ -18,12 +18,6 @@ export function stubSelect(index) {
 }
 
 export function stubChangeIdText(text) {
-    console.log($('#stubButton'));
-    if (text === '') {
-        $('#stubButton').prop('disabled', true);
-    } else {
-        $('#stubButton').prop('disabled', false);
-    }
     return { type: STUB_CHANGE_ID_TEXT, text };
 }
 

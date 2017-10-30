@@ -19,33 +19,23 @@ var Template = props => (
                       </label>
                     </div>
                 ))}
-       <button className="btn btn-primary" id="stubButton" onClick={(e) => props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))} disabled>Stub</button>
+       <button className="btn btn-primary" id="stubButton" disabled={props.disable} onClick={(e) => props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))}>Stub</button>
        </div>}
-    <label>{props.notify}</label>
-    {props.optionErrors.length != 0 &&
-     <div>Incorrect options:
-     {props.optionErrors.map((e, index) => (
-         <div className="option-error" key={index}>
-           <label>{e}</label>
-         </div>
-     ))}
      </div>
-    }
-    {props.stubErrors.length != 0 &&
-     <div>Stubbing went wrong:
-     {props.stubErrors.map((e, index) => (
-         <div className="stub-error" key={index}>
-           <b>{e}</b>
-         </div>
-     ))}
-     </div>
-    }
-    </div>
 );
 
 var App = props => (
     <div>
       <h3>Stub New Service</h3>
+      {props.stubReducer.notify !== '' &&
+       <div className="alert alert-success" role="alert">{props.stubReducer.notify}</div>
+      }
+      {props.stubReducer.optionErrors.length != 0 &&
+       <div className="alert alert-danger" role="alert">{props.stubReducer.optionErrors}</div>
+      }
+      {props.stubReducer.stubErrors.length != 0 &&
+       <div className="alert alert-danger" role="alert">{props.stubReducer.stubErrors}</div>
+      }
       <label className="control-label" htmlFor="templateSelectInput">Service Template</label>
       <select id="templateSelectInput" defaultValue={props.stubReducer.current.id} className="form-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
         {props.stubReducer.templates.map(t => (
@@ -57,9 +47,7 @@ var App = props => (
             nameText={props.stubReducer.nameText}
             pathText={props.stubReducer.pathText}
             template={props.stubReducer.current}
-            notify={props.stubReducer.notify}
-            optionErrors={props.stubReducer.optionErrors}
-            stubErrors={props.stubReducer.stubErrors}
+            disable={props.stubReducer.disable}
             onChangeIdText={props.onChangeIdText}
             onChangePathText={props.onChangePathText}
             onChangeNameText={props.onChangeNameText}
