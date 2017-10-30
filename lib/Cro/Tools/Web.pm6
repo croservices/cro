@@ -83,13 +83,13 @@ sub web(Str $host, Int $port, $runner) is export {
                     my @nodes;
                     my @links;
                     my %graph;
-                    my %services = links-graph();
-                    for %services<outer>.flat -> $cro-file {
-                        @nodes.push: { id => $cro-file.id, type => $color  };
+                    my @services = links-graph()<outer>.flat;
+                    for @services -> $cro-file {
+                        @nodes.push: { id => $cro-file.id, type => $color };
                         for $cro-file.links {
                             my $source = $cro-file.id;
                             my $target = .service;
-                            @links.push: { :$source, :$target, type => $color }
+                            @links.push: { :$source, :$target, type => $color } if @services.grep(*.id eq $target);
                         }
                         $color++;
                     }
@@ -163,8 +163,8 @@ sub web(Str $host, Int $port, $runner) is export {
                                         $c.endpoints.grep({ .id eq $e.key }).first.protocol] });
                         }
                         my %action = :$type, id => $c.id,
-                                     name => $c.name,
-                                     tracing => .tracing;
+                                     name => $c.name;
+                        %action<tracing> = .tracing if $_ !~~ Cro::Tools::Runner::UnableToStart;
                         %action<endpoints> = @endpoints if $_ ~~ Cro::Tools::Runner::Started;
                         emit to-json { WS_ACTION => True, :%action }
                     }
