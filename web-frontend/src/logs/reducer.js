@@ -24,7 +24,7 @@ export default function logsReducer(state = initialState, action) {
         var channels = state.channels;
         var log = channels.get(action.id);
         var all_log = channels.get('All Services');
-        all_log = all_log + action.payload + "\n";
+        all_log = all_log + action.id + ': ' + action.payload + "\n";
         if (log != undefined) {
             log = log + action.payload + "\n";
         } else {
