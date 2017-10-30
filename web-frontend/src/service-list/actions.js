@@ -42,9 +42,9 @@ export function serviceTraceFlip(id, checked) {
             url: '/service',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id, action: checked ? 'trace-on' : 'trace-off' }),
+            data: JSON.stringify({ id, action: (checked ? 'trace-off' : 'trace-on') }),
             success: () => dispatch({
-                type: 'SERVICE_FLIP', switch_state: checked ? 'ON' : 'OFF'
+                id, type: 'SERVICE_TRACE_FLIP', trace: (!checked)
             })
         })
     }

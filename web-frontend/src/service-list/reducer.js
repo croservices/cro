@@ -5,37 +5,37 @@ const initialState = {
 }
 
 export default function serviceListReducer(state = initialState, action) {
+    let services = state.services;
+    let service = services.get(action.id);
     switch (action.type) {
     case ActionTypes.SERVICE_START_SENT:
-        var updated_services = state.services;
-        updated_services.get(action.id).status = 'Starting...';
-        return { ...state, services: updated_services }
+        service.status = 'Starting';
+        services.set(action.id, service);
+        return { ...state, services }
     case ActionTypes.SERVICE_STARTED:
-        var service = { name: action.name, id: action.id, status: 'Running', trace: action.tracing, endpoints: action.endpoints };
-        let new_services = state.services;
-        new_services.set(service.id, service);
-        return { ...state, services: new_services };
+        service = { name: action.name, id: action.id, status: 'Running', trace: action.tracing, endpoints: action.endpoints };
+        services.set(service.id, service);
+        return { ...state, services };
     case ActionTypes.SERVICE_RESTARTED:
-        var updated_services = state.services;
-        updated_services.get(action.id).status = 'Running';
+        service.status = 'Running';
+        services.set(action.id, service);
         return { ...state, services: updated_services };
     case ActionTypes.SERVICE_RESTART_SENT:
-        var updated_services = state.services;
-        updated_services.get(action.id).status = 'Restarting...';
-        return { ...state, services: updated_services };
+        service.status = 'Restarting';
+        services.set(action.id, service);
+        return { ...state, services };
     case ActionTypes.SERVICE_STOPPED:
-        var updated_services = state.services;
-        updated_services.get(action.id).status = 'Stopped';
-        return { ...state, services: updated_services };
+        service.status = 'Stopped';
+        services.set(action.id, service);
+        return { ...state, services };
     case ActionTypes.SERVICE_STOPPED_SENT:
-        var updated_services = state.services;
-        updated_services.get(action.id).status = 'Stopping...';
-        return { ...state, services: updated_services };
-    case ActionTypes.SERVICE_FLIP:
-        var updated_services = state.services;
-        updated_services.get(action.id).trace = action.switch_state;
-        updated_services.get(action.id).status = 'Switching...';
-        return { ...state, services: updated_services };
+        service.status = 'Stopping';
+        services.set(action.id, service);
+        return { ...state, services };
+    case ActionTypes.SERVICE_TRACE_FLIP:
+        service.trace = action.trace;
+        services.set(action.id, service);
+        return { ...state, services };
     default:
         return state;
     }
