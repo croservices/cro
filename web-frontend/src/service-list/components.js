@@ -3,27 +3,33 @@ import React from 'react';
 var Endpoint = props => (
     <div>
       {(props.e[2] == 'http' || props.e[2] == 'https') &&
-      <h5>Endpoint {props.e[0]}: <a href={props.e[2] + '://localhost:' + props.e[1]} target="_blank">{props.e[1]}</a> ({props.e[2]})</h5>
+      <li>
+       <div className="serviceEndPointName">{props.e[0]}</div>
+       <div className="serviceEndPointInfo"><a href={props.e[2] + '://localhost:' + props.e[1]} target="_blank">{props.e[1]}</a> ({props.e[2]})</div>
+      </li>
       }
       {(props.e[2] !== 'http' && props.e[2] !== 'https') &&
-          <h5>Endpoint {props.e[0]}: {props.e[1]} ({props.e[2]})</h5>
+       <li>
+        <div className="serviceEndPointName">{props.e[0]}:</div>
+        <div className="serviceEndPointInfo">{props.e[1]} ({props.e[2]})</div>
+       </li>
       }
     </div>
 );
 
 var Service = props => (
-    <div>
+    <section>
       <div className="serviceCreds">
-        <h5>{props.service.name} <small>{props.service.id}</small></h5>
-        {props.service.endpoints.map(v => (
-            <div key={v[0]}>
-              <Endpoint e={v} />
-            </div>
-        ))}
-        <a href="#" onClick={() => props.onGotoLogs(props.service.id)} className="btn btn-sm btn-primary logBtn">Logs</a>
+        <div>
+          <div className="serviceTitle">{props.service.name}</div>
+          <div className="serviceId">{props.service.id}</div>
+        </div>
+
+        <div className={"serviceStatus " + 'serviceStatus-' + props.service.status.toLowerCase()}>{props.service.status}</div>
       </div>
       <div className="serviceManageBox">
-        <h5>{props.service.status}</h5>
+        <div className="serviceButtons">
+        <a href="#" onClick={() => props.onGotoLogs(props.service.id)} className="btn btn-sm btn-primary logBtn">Logs</a>
         {props.service.status !== 'Running' &&
             <button className="btn btn-sm btn-primary squareBtn" title="Start" onClick={() => props.onServiceStart(props.service.id)}><span className="glyphicon glyphicon-play"></span></button>
             }
@@ -32,14 +38,25 @@ var Service = props => (
                 }
                 {props.service.status == 'Running' &&
                     <button className="btn btn-sm btn-primary squareBtn" title="Stop" onClick={() => props.onServiceStop(props.service.id)}><span className="glyphicon glyphicon-stop"></span></button>
-                    }
-                    <div className="checkbox">
-                      <label>
-                        <input onChange={(e) => props.onServiceTraceFlip(props.service.id, e.target.checked)} name="traceSwitch" type="checkbox" /> Trace
-                      </label>
-                    </div>
-      </div>
+                }
+    {props.service.status == 'Running' &&
+                        <button className={"btn btn-sm traceBtn squareBtn " + (props.service.trace ? "traceBtn-pressed" : "")} title="Toggle trace" onClick={(e) => props.onServiceTraceFlip(props.service.id, props.service.trace)}><span className="glyphicon glyphicon-eye-open"></span></button>
+    }
     </div>
+
+    <div className="serviceSubtitle">Endpoints</div>
+        <div>
+        <ul className="serviceEndPointList">
+        {props.service.endpoints.map(v => (
+              <div className="serviceEndPoint" key={v[0]}>
+                <Endpoint e={v} />
+              </div>
+        ))}
+        </ul>
+        </div>
+
+      </div>
+    </section>
 );
 
 var App = props => (
