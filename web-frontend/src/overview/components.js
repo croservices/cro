@@ -8,13 +8,18 @@ class GraphNetwork extends React.Component {
     }
 
     render () {
-        return <svg width={this.width} height={this.height}></svg>;
+        return (
+                <div>
+                <h3>Overview</h3>
+                <svg ref={node => this.node = node} width={this.width} height={this.height}></svg>
+                </div>
+        )
     }
 
     renderD3(graph) {
         if (graph == null) return;
 
-        const element = ReactDOM.findDOMNode(this);
+        const element = this.node;
         var color = d3.scaleOrdinal(d3.schemeCategory10);
 
         var simulation = d3.forceSimulation()
