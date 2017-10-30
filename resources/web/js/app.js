@@ -22215,7 +22215,7 @@ module.exports = getHostComponentFromComposite;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.SERVICE_TRACE_FLIP = exports.SERVICE_STOP_SENT = exports.SERVICE_RESTART_SENT = exports.SERVICE_START_SENT = exports.SERVICE_TRACE = exports.SERVICE_LOG = exports.SERVICE_STOPPED = exports.SERVICE_RESTARTED = exports.SERVICE_UNABLE_TO_START = exports.SERVICE_STARTED = undefined;
+exports.SERVICE_TRACE_FLIP = exports.SERVICE_STOP_SENT = exports.SERVICE_RESTART_SENT = exports.SERVICE_START_SENT = exports.SERVICE_STOPPED = exports.SERVICE_RESTARTED = exports.SERVICE_UNABLE_TO_START = exports.SERVICE_STARTED = undefined;
 exports.serviceStart = serviceStart;
 exports.serviceRestart = serviceRestart;
 exports.serviceStop = serviceStop;
@@ -22231,8 +22231,6 @@ var SERVICE_STARTED = exports.SERVICE_STARTED = 'SERVICE_STARTED';
 var SERVICE_UNABLE_TO_START = exports.SERVICE_UNABLE_TO_START = 'SERVICE_UNABLE_TO_START';
 var SERVICE_RESTARTED = exports.SERVICE_RESTARTED = 'SERVICE_RESTARTED';
 var SERVICE_STOPPED = exports.SERVICE_STOPPED = 'SERVICE_STOPPED';
-var SERVICE_LOG = exports.SERVICE_LOG = 'SERVICE_LOG';
-var SERVICE_TRACE = exports.SERVICE_TRACE = 'SERVICE_TRACE';
 // User actions
 var SERVICE_START_SENT = exports.SERVICE_START_SENT = 'SERVICE_START_SENT';
 var SERVICE_RESTART_SENT = exports.SERVICE_RESTART_SENT = 'SERVICE_RESTART_SENT';
@@ -56886,10 +56884,15 @@ function serviceListReducer() {
             service = { name: action.name, id: action.id, status: 'Running', trace: action.tracing, endpoints: action.endpoints };
             services.set(service.id, service);
             return _extends({}, state, { services: services });
+        case ActionTypes.SERVICE_UNABLE_TO_START:
+            service = { name: action.name, id: action.id, status: 'Crushed', trace: false, endpoints: [] };
+            console.log(service);
+            services.set(action.id, service);
+            return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_RESTARTED:
             service.status = 'Running';
             services.set(action.id, service);
-            return _extends({}, state, { services: updated_services });
+            return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_RESTART_SENT:
             service.status = 'Restarting';
             services.set(action.id, service);
