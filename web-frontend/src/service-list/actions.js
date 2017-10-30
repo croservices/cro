@@ -4,8 +4,6 @@ export const SERVICE_STARTED         = 'SERVICE_STARTED';
 export const SERVICE_UNABLE_TO_START = 'SERVICE_UNABLE_TO_START';
 export const SERVICE_RESTARTED       = 'SERVICE_RESTARTED';
 export const SERVICE_STOPPED         = 'SERVICE_STOPPED';
-export const SERVICE_LOG             = 'SERVICE_LOG';
-export const SERVICE_TRACE           = 'SERVICE_TRACE';
 // User actions
 export const SERVICE_START_SENT      = 'SERVICE_START_SENT';
 export const SERVICE_RESTART_SENT    = 'SERVICE_RESTART_SENT';
