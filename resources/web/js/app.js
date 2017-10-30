@@ -56885,8 +56885,7 @@ function serviceListReducer() {
             services.set(service.id, service);
             return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_UNABLE_TO_START:
-            service = { name: action.name, id: action.id, status: 'Crushed', trace: false, endpoints: [] };
-            console.log(service);
+            service = { name: action.name, id: action.id, status: 'Crashed', trace: false, endpoints: [] };
             services.set(action.id, service);
             return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_RESTARTED:
