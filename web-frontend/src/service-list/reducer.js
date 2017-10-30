@@ -16,10 +16,14 @@ export default function serviceListReducer(state = initialState, action) {
         service = { name: action.name, id: action.id, status: 'Running', trace: action.tracing, endpoints: action.endpoints };
         services.set(service.id, service);
         return { ...state, services };
+    case ActionTypes.SERVICE_UNABLE_TO_START:
+        service = { name: action.name, id: action.id, status: 'Crushed', trace: false, endpoints: [] };
+        services.set(action.id, service);
+        return { ...state, services };
     case ActionTypes.SERVICE_RESTARTED:
         service.status = 'Running';
         services.set(action.id, service);
-        return { ...state, services: updated_services };
+        return { ...state, services };
     case ActionTypes.SERVICE_RESTART_SENT:
         service.status = 'Restarting';
         services.set(action.id, service);
