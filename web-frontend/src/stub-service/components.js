@@ -27,14 +27,14 @@ var Template = props => (
 var App = props => (
     <div>
       <h3>Stub New Service</h3>
-      {props.stubReducer.notify !== '' &&
+      {props.stubReducer.notify !== '' && props.stubReducer.optionErrors.length == 0 && props.stubReducer.optionErrors.length == 0 &&
        <div className="alert alert-success" role="alert">{props.stubReducer.notify}</div>
       }
       {props.stubReducer.optionErrors.length != 0 &&
-       <div className="alert alert-danger" role="alert">{props.stubReducer.optionErrors}</div>
+       <div className="alert alert-danger" role="alert">{props.stubReducer.notify} {props.stubReducer.optionErrors}</div>
       }
       {props.stubReducer.stubErrors.length != 0 &&
-       <div className="alert alert-danger" role="alert">{props.stubReducer.stubErrors}</div>
+       <div className="alert alert-danger" role="alert">{props.stubReducer.notify} {props.stubReducer.stubErrors}</div>
       }
       <label className="control-label" htmlFor="templateSelectInput">Service Template</label>
       <select id="templateSelectInput" defaultValue={props.stubReducer.current.id} className="form-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>

@@ -56,8 +56,9 @@ sub web(Str $host, Int $port, $runner) is export {
                     my %options = %json<options>>>.Hash;
                     my ($generated-links, @links);
                     if $found.get-option-errors(%options) -> @errors {
+                        my $errors = @errors.map({ "$_\n" }).join;
                         send-event('stub', { type => 'STUB_OPTIONS_ERROR_OCCURED',
-                                             errors => @errors });
+                                             :$errors });
                     }
                     else {
                         my $where = $*CWD.add(%json<path>);
@@ -66,9 +67,9 @@ sub web(Str $host, Int $port, $runner) is export {
                         send-event('stub', { type => 'STUB_STUBBED' });
                         CATCH {
                             default {
-                                my @errors = .backtrace.full.split("\n");
+                                my $errors = .backtrace.full;
                                 send-event('stub', { type => 'STUB_STUB_ERROR_OCCURED',
-                                                     :@errors });
+                                                     :$errors });
                             }
                         }
                     }

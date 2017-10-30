@@ -32,7 +32,7 @@ export default function stubReducer(state = initialState, action) {
                  idText: '', pathText: '', nameText: '',
                  notify: 'Successfully stubbed!', disabled: true }
     case ActionTypes.STUB_OPTIONS_ERROR_OCCURED:
-        return { ...state, optionErrors: action.errors }
+        return { ...state, notify: 'Options error occured:', optionErrors: action.errors }
     case ActionTypes.STUB_STUB_ERROR_OCCURED:
         return { ...state, notify: 'Error occured during stubbing:', stubErrors: action.errors }
 
