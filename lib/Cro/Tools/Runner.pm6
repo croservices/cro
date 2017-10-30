@@ -124,16 +124,18 @@ class Cro::Tools::Runner {
                 }
             }
 
-            whenever $!services.services -> $service {
-                FIRST {
-                    whenever Promise.in(2) {
-                        for %services.grep(*.value.state == WaitingState) {
-                            emit UnableToStart.new(service-id => .cro-file.id,
-                                                   cro-file => .cro-file);
-                        }
+            my $first-service = Promise.new;
+            whenever $first-service {
+                whenever Promise.in(2) {
+                    for %services.grep(*.value.state == WaitingState) {
+                        emit UnableToStart.new(service-id => .value.cro-file.id,
+                                               cro-file => .value.cro-file);
                     }
                 }
+            }
 
+            whenever $!services.services -> $service {
+                $first-service.keep unless $first-service.status ~~ Kept;
                 my $cro-file = $service.cro-file;
                 my $service-id = $cro-file.id;
                 if $service-id ~~ $!service-id-filter {
