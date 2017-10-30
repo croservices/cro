@@ -22271,10 +22271,10 @@ function serviceTraceFlip(id, checked) {
             url: '/service',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id: id, action: checked ? 'trace-on' : 'trace-off' }),
+            data: JSON.stringify({ id: id, action: checked ? 'trace-off' : 'trace-on' }),
             success: function success() {
                 return dispatch({
-                    type: 'SERVICE_FLIP', switch_state: checked ? 'ON' : 'OFF'
+                    id: id, type: 'SERVICE_TRACE_FLIP', trace: !checked
                 });
             }
         });
@@ -54451,71 +54451,139 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var Endpoint = function Endpoint(props) {
+  return _react2.default.createElement(
+    'div',
+    null,
+    (props.e[2] == 'http' || props.e[2] == 'https') && _react2.default.createElement(
+      'li',
+      null,
+      _react2.default.createElement(
+        'div',
+        { className: 'serviceEndPointName' },
+        props.e[0]
+      ),
+      _react2.default.createElement(
+        'div',
+        { className: 'serviceEndPointInfo' },
+        _react2.default.createElement(
+          'a',
+          { href: props.e[2] + '://localhost:' + props.e[1], target: '_blank' },
+          props.e[1]
+        ),
+        ' (',
+        props.e[2],
+        ')'
+      )
+    ),
+    props.e[2] !== 'http' && props.e[2] !== 'https' && _react2.default.createElement(
+      'li',
+      null,
+      _react2.default.createElement(
+        'div',
+        { className: 'serviceEndPointName' },
+        props.e[0],
+        ':'
+      ),
+      _react2.default.createElement(
+        'div',
+        { className: 'serviceEndPointInfo' },
+        props.e[1],
+        ' (',
+        props.e[2],
+        ')'
+      )
+    )
+  );
+};
+
 var Service = function Service(props) {
   return _react2.default.createElement(
-    "div",
+    'section',
     null,
     _react2.default.createElement(
-      "div",
-      { className: "serviceCreds" },
+      'div',
+      { className: 'serviceCreds' },
       _react2.default.createElement(
-        "h5",
+        'div',
         null,
-        props.service.name,
-        " ",
         _react2.default.createElement(
-          "small",
-          null,
+          'div',
+          { className: 'serviceTitle' },
+          props.service.name
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'serviceId' },
           props.service.id
         )
       ),
       _react2.default.createElement(
-        "button",
-        { className: "logLink btn btn-primary", onClick: function onClick() {
-            return props.onGotoLogs(props.service.id);
-          } },
-        "Logs"
+        'div',
+        { className: "serviceStatus " + 'serviceStatus-' + props.service.status.toLowerCase() },
+        props.service.status
       )
     ),
     _react2.default.createElement(
-      "div",
-      { className: "serviceManageBox" },
+      'div',
+      { className: 'serviceManageBox' },
       _react2.default.createElement(
-        "h5",
-        null,
-        props.service.status
-      ),
-      props.service.status !== 'Running' && _react2.default.createElement(
-        "button",
-        { className: "btn-primary", onClick: function onClick() {
-            return props.onServiceStart(props.service.id);
-          } },
-        _react2.default.createElement("span", { className: "glyphicon glyphicon-play" })
-      ),
-      props.service.status == 'Running' && _react2.default.createElement(
-        "button",
-        { className: "btn-primary", onClick: function onClick() {
-            return props.onServiceRestart(props.service.id);
-          } },
-        _react2.default.createElement("span", { className: "glyphicon glyphicon-repeat" })
-      ),
-      props.service.status == 'Running' && _react2.default.createElement(
-        "button",
-        { className: "btn-primary", onClick: function onClick() {
-            return props.onServiceStop(props.service.id);
-          } },
-        _react2.default.createElement("span", { className: "glyphicon glyphicon-stop" })
-      ),
-      _react2.default.createElement(
-        "div",
-        { className: "checkbox" },
+        'div',
+        { className: 'serviceButtons' },
         _react2.default.createElement(
-          "label",
-          null,
-          _react2.default.createElement("input", { onChange: function onChange(e) {
-              return props.onServiceTraceFlip(props.service.id, e.target.checked);
-            }, name: "traceSwitch", type: "checkbox" }),
-          " Trace"
+          'a',
+          { href: '#', onClick: function onClick() {
+              return props.onGotoLogs(props.service.id);
+            }, className: 'btn btn-sm btn-primary logBtn' },
+          'Logs'
+        ),
+        props.service.status !== 'Running' && _react2.default.createElement(
+          'button',
+          { className: 'btn btn-sm btn-primary squareBtn', title: 'Start', onClick: function onClick() {
+              return props.onServiceStart(props.service.id);
+            } },
+          _react2.default.createElement('span', { className: 'glyphicon glyphicon-play' })
+        ),
+        props.service.status == 'Running' && _react2.default.createElement(
+          'button',
+          { className: 'btn btn-sm  btn-primary squareBtn', title: 'Restart', onClick: function onClick() {
+              return props.onServiceRestart(props.service.id);
+            } },
+          _react2.default.createElement('span', { className: 'glyphicon glyphicon-repeat' })
+        ),
+        props.service.status == 'Running' && _react2.default.createElement(
+          'button',
+          { className: 'btn btn-sm btn-primary squareBtn', title: 'Stop', onClick: function onClick() {
+              return props.onServiceStop(props.service.id);
+            } },
+          _react2.default.createElement('span', { className: 'glyphicon glyphicon-stop' })
+        ),
+        props.service.status == 'Running' && _react2.default.createElement(
+          'button',
+          { className: "btn btn-sm traceBtn squareBtn " + (props.service.trace ? "traceBtn-pressed" : ""), title: 'Toggle trace', onClick: function onClick(e) {
+              return props.onServiceTraceFlip(props.service.id, props.service.trace);
+            } },
+          _react2.default.createElement('span', { className: 'glyphicon glyphicon-eye-open' })
+        )
+      ),
+      _react2.default.createElement(
+        'div',
+        { className: 'serviceSubtitle' },
+        'Endpoints'
+      ),
+      _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'ul',
+          { className: 'serviceEndPointList' },
+          props.service.endpoints.map(function (v) {
+            return _react2.default.createElement(
+              'div',
+              { className: 'serviceEndPoint', key: v[0] },
+              _react2.default.createElement(Endpoint, { e: v })
+            );
+          })
         )
       )
     )
@@ -54524,12 +54592,12 @@ var Service = function Service(props) {
 
 var App = function App(props) {
   return _react2.default.createElement(
-    "div",
+    'div',
     null,
     Array.from(props.serviceListReducer.services).map(function (v) {
       return _react2.default.createElement(
-        "div",
-        { className: "service", key: v[0] },
+        'div',
+        { className: 'service', key: v[0] },
         _react2.default.createElement(Service, { service: v[1],
           onServiceStart: props.onServiceStart,
           onServiceStop: props.onServiceStop,
@@ -56807,37 +56875,37 @@ function serviceListReducer() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
     var action = arguments[1];
 
+    var services = state.services;
+    var service = services.get(action.id);
     switch (action.type) {
         case ActionTypes.SERVICE_START_SENT:
-            var updated_services = state.services;
-            updated_services.get(action.id).status = 'Starting...';
-            return _extends({}, state, { services: updated_services });
+            service.status = 'Starting';
+            services.set(action.id, service);
+            return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_STARTED:
-            var service = { name: action.name, id: action.id, status: 'Running', trace: action.tracing };
-            var new_services = state.services;
-            new_services.set(service.id, service);
-            return _extends({}, state, { services: new_services });
+            service = { name: action.name, id: action.id, status: 'Running', trace: action.tracing, endpoints: action.endpoints };
+            services.set(service.id, service);
+            return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_RESTARTED:
-            var updated_services = state.services;
-            updated_services.get(action.id).status = 'Running';
+            service.status = 'Running';
+            services.set(action.id, service);
             return _extends({}, state, { services: updated_services });
         case ActionTypes.SERVICE_RESTART_SENT:
-            var updated_services = state.services;
-            updated_services.get(action.id).status = 'Restarting...';
-            return _extends({}, state, { services: updated_services });
+            service.status = 'Restarting';
+            services.set(action.id, service);
+            return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_STOPPED:
-            var updated_services = state.services;
-            updated_services.get(action.id).status = 'Stopped';
-            return _extends({}, state, { services: updated_services });
+            service.status = 'Stopped';
+            services.set(action.id, service);
+            return _extends({}, state, { services: services });
         case ActionTypes.SERVICE_STOPPED_SENT:
-            var updated_services = state.services;
-            updated_services.get(action.id).status = 'Stopping...';
-            return _extends({}, state, { services: updated_services });
-        case ActionTypes.SERVICE_FLIP:
-            var updated_services = state.services;
-            updated_services.get(action.id).trace = action.switch_state;
-            updated_services.get(action.id).status = 'Switching...';
-            return _extends({}, state, { services: updated_services });
+            service.status = 'Stopping';
+            services.set(action.id, service);
+            return _extends({}, state, { services: services });
+        case ActionTypes.SERVICE_TRACE_FLIP:
+            service.trace = action.trace;
+            services.set(action.id, service);
+            return _extends({}, state, { services: services });
         default:
             return state;
     }
@@ -56977,48 +57045,15 @@ var Template = function Template(props) {
                     )
                 );
             }),
-            _react2.default.createElement("input", { className: "btn btn-primary", type: "button", value: "Stub", onClick: function onClick(e) {
-                    return props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(function (e) {
-                        return [e[0], e[3]];
-                    }));
-                } })
-        ),
-        _react2.default.createElement(
-            "label",
-            null,
-            props.notify
-        ),
-        props.option_errors.length != 0 && _react2.default.createElement(
-            "div",
-            null,
-            "Incorrect options:",
-            props.option_errors.map(function (e, index) {
-                return _react2.default.createElement(
-                    "div",
-                    { className: "option-error", key: index },
-                    _react2.default.createElement(
-                        "label",
-                        null,
-                        e
-                    )
-                );
-            })
-        ),
-        props.stub_errors.length != 0 && _react2.default.createElement(
-            "div",
-            null,
-            "Stubbing went wrong:",
-            props.stub_errors.map(function (e, index) {
-                return _react2.default.createElement(
-                    "div",
-                    { className: "stub-error", key: index },
-                    _react2.default.createElement(
-                        "b",
-                        null,
-                        e
-                    )
-                );
-            })
+            _react2.default.createElement(
+                "button",
+                { className: "btn btn-primary", id: "stubButton", disabled: props.disable, onClick: function onClick(e) {
+                        return props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(function (e) {
+                            return [e[0], e[3]];
+                        }));
+                    } },
+                "Stub"
+            )
         )
     );
 };
@@ -57031,6 +57066,25 @@ var App = function App(props) {
             "h3",
             null,
             "Stub New Service"
+        ),
+        props.stubReducer.notify !== '' && props.stubReducer.optionErrors.length == 0 && props.stubReducer.optionErrors.length == 0 && _react2.default.createElement(
+            "div",
+            { className: "alert alert-success", role: "alert" },
+            props.stubReducer.notify
+        ),
+        props.stubReducer.optionErrors.length != 0 && _react2.default.createElement(
+            "div",
+            { className: "alert alert-danger", role: "alert" },
+            props.stubReducer.notify,
+            " ",
+            props.stubReducer.optionErrors
+        ),
+        props.stubReducer.stubErrors.length != 0 && _react2.default.createElement(
+            "div",
+            { className: "alert alert-danger", role: "alert" },
+            props.stubReducer.notify,
+            " ",
+            props.stubReducer.stubErrors
         ),
         _react2.default.createElement(
             "label",
@@ -57055,9 +57109,7 @@ var App = function App(props) {
             nameText: props.stubReducer.nameText,
             pathText: props.stubReducer.pathText,
             template: props.stubReducer.current,
-            notify: props.stubReducer.notify,
-            option_errors: props.stubReducer.option_errors,
-            stub_errors: props.stubReducer.stub_errors,
+            disable: props.stubReducer.disable,
             onChangeIdText: props.onChangeIdText,
             onChangePathText: props.onChangePathText,
             onChangeNameText: props.onChangeNameText,
@@ -57102,10 +57154,11 @@ var initialState = {
     pathText: '',
     nameText: '',
     notify: '',
-    option_errors: [],
-    stub_errors: [],
+    optionErrors: [],
+    stubErrors: [],
     cwd: '',
-    fullPath: ''
+    fullPath: '',
+    disable: true
 };
 
 function stubReducer() {
@@ -57124,22 +57177,23 @@ function stubReducer() {
             return _extends({}, state, { templates: templates,
                 current: action.templates[0] });
         case ActionTypes.STUB_STUBBED:
-            return _extends({}, state, { stub_errors: '',
-                option_errors: '', idText: '',
-                notify: 'Successfully stubbed!' });
+            return _extends({}, state, { stubErrors: '', optionErrors: '',
+                idText: '', pathText: '', nameText: '',
+                notify: 'Successfully stubbed!', disabled: true });
         case ActionTypes.STUB_OPTIONS_ERROR_OCCURED:
-            return _extends({}, state, { notify: 'Error occured with options:', option_errors: action.errors });
+            return _extends({}, state, { notify: 'Options error occured:', optionErrors: action.errors });
         case ActionTypes.STUB_STUB_ERROR_OCCURED:
-            return _extends({}, state, { notify: 'Error occured during stubbing:', stub_errors: action.errors });
+            return _extends({}, state, { notify: 'Error occured during stubbing:', stubErrors: action.errors });
 
         case ActionTypes.STUB_SELECT:
             return _extends({}, state, { current: state.templates[action.index], notify: '' });
         case ActionTypes.STUB_CHANGE_ID_TEXT:
+            var disable = action.text === '';
             if (state.idText === state.pathText) {
                 var fullPath = _path2.default.join(state.cwd, action.text);
-                return _extends({}, state, { idText: action.text, pathText: action.text, fullPath: fullPath });
+                return _extends({}, state, { idText: action.text, pathText: action.text, fullPath: fullPath, disable: disable });
             } else {
-                return _extends({}, state, { idText: action.text });
+                return _extends({}, state, { idText: action.text, disable: disable });
             }
         case ActionTypes.STUB_CHANGE_PATH_TEXT:
             var fullPath = _path2.default.join(state.cwd, action.text);
@@ -57154,7 +57208,7 @@ function stubReducer() {
                 }
             }
             state.current.options = opts;
-            return _extends({}, state, { notify: '', option_errors: '', stub_errors: '' });
+            return _extends({}, state, { notify: '', optionErrors: '', stubErrors: '' });
         case ActionTypes.STUB_STUB_SENT:
             return _extends({}, state, { notify: 'Stubbing...' });
         default:
@@ -57455,6 +57509,11 @@ var App = function App(props) {
         "div",
         null,
         _react2.default.createElement(
+            "h3",
+            null,
+            "Logs and Traces"
+        ),
+        _react2.default.createElement(
             "select",
             { className: "form-control", value: props.logsReducer.current, onChange: function onChange(e) {
                     return props.onSelectChannel(e.target.options[e.target.selectedIndex].value);
@@ -57499,8 +57558,8 @@ var ActionTypes = _interopRequireWildcard(_actions);
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 var initialState = {
-    channels: new Map(),
-    current: null
+    channels: new Map([['All Services', 'Logging is started.\n']]),
+    current: 'All Services'
 };
 
 function logsReducer() {
@@ -57510,22 +57569,29 @@ function logsReducer() {
     switch (action.type) {
         case ActionTypes.LOGS_NEW_CHANNEL:
             var channels = state.channels;
-            if (state.current == null) {
-                state.current = action.id;
+            var msg = 'Service ' + action.id + ' is started.\n';
+            var log = channels.get(action.id);
+            var all_log = channels.get('All Services');
+            all_log = all_log + msg;
+            if (log != undefined) {
+                channels.set(action.id, log + msg);
+            } else {
+                channels.set(action.id, msg);
             }
-            if (channels.get(action.id) == null) {
-                channels.set(action.id, '');
-            }
+            channels.set('All Services', all_log);
             return _extends({}, state, { channels: channels });
         case ActionTypes.LOGS_UPDATE_CHANNEL:
             var channels = state.channels;
             var log = channels.get(action.id);
+            var all_log = channels.get('All Services');
+            all_log = all_log + action.id + ': ' + action.payload + "\n";
             if (log != undefined) {
                 log = log + action.payload + "\n";
             } else {
                 log = action.payload + "\n";
             }
             channels.set(action.id, log);
+            channels.set('All Services', all_log);
             return _extends({}, state, { channels: channels });
         case ActionTypes.LOGS_SELECT_CHANNEL:
             return _extends({}, state, { current: action.id });
@@ -57624,14 +57690,27 @@ var GraphNetwork = function (_React$Component) {
     _createClass(GraphNetwork, [{
         key: 'render',
         value: function render() {
-            return _react2.default.createElement('svg', { width: this.width, height: this.height });
+            var _this2 = this;
+
+            return _react2.default.createElement(
+                'div',
+                null,
+                _react2.default.createElement(
+                    'h3',
+                    null,
+                    'Overview'
+                ),
+                _react2.default.createElement('svg', { ref: function ref(node) {
+                        return _this2.node = node;
+                    }, width: this.width, height: this.height })
+            );
         }
     }, {
         key: 'renderD3',
         value: function renderD3(graph) {
             if (graph == null) return;
 
-            var element = _reactDom2.default.findDOMNode(this);
+            var element = this.node;
             var color = d3.scaleOrdinal(d3.schemeCategory10);
 
             var simulation = d3.forceSimulation().force("link", d3.forceLink().id(function (d) {
