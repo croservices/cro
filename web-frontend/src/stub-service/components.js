@@ -24,36 +24,44 @@ var Template = props => (
      </div>
 );
 
-var App = props => (
-    <div>
-      <h3>Stub New Service</h3>
-      {props.stubReducer.notify !== '' && props.stubReducer.optionErrors.length == 0 && props.stubReducer.optionErrors.length == 0 &&
-       <div className="alert alert-success" role="alert">{props.stubReducer.notify}</div>
-      }
-      {props.stubReducer.optionErrors.length != 0 &&
-       <div className="alert alert-danger" role="alert">{props.stubReducer.notify} {props.stubReducer.optionErrors}</div>
-      }
-      {props.stubReducer.stubErrors.length != 0 &&
-       <div className="alert alert-danger" role="alert">{props.stubReducer.notify} {props.stubReducer.stubErrors}</div>
-      }
-      <label className="control-label" htmlFor="templateSelectInput">Service Template</label>
-      <select id="templateSelectInput" defaultValue={props.stubReducer.current.id} className="form-control" onChange={(e) => props.onStubSelect(e.target.selectedIndex)}>
-        {props.stubReducer.templates.map(t => (
-            <option key={t.id} value={t.id}>{t.name}</option>
-        ))}
-    </select>
-        <Template fullPath={props.stubReducer.fullPath}
-            idText={props.stubReducer.idText}
-            nameText={props.stubReducer.nameText}
-            pathText={props.stubReducer.pathText}
-            template={props.stubReducer.current}
-            disable={props.stubReducer.disable}
-            onChangeIdText={props.onChangeIdText}
-            onChangePathText={props.onChangePathText}
-            onChangeNameText={props.onChangeNameText}
-            onChangeOption={props.onChangeOption}
-            onStubSent={props.onStubSent} />
-        </div>
-);
+class App extends React.Component {
+    render() {
+        return (
+          <div>
+            <h3>Stub New Service</h3>
+            {this.props.stubReducer.notify !== '' && this.props.stubReducer.optionErrors.length == 0 && this.props.stubReducer.optionErrors.length == 0 &&
+              <div className="alert alert-success" role="alert">{this.props.stubReducer.notify}</div>
+            }
+            {this.props.stubReducer.optionErrors.length != 0 &&
+              <div className="alert alert-danger" role="alert">{this.props.stubReducer.notify} {this.props.stubReducer.optionErrors}</div>
+            }
+            {this.props.stubReducer.stubErrors.length != 0 &&
+              <div className="alert alert-danger" role="alert">{this.props.stubReducer.notify} {this.props.stubReducer.stubErrors}</div>
+            }
+            <label className="control-label" htmlFor="templateSelectInput">Service Template</label>
+            <select id="templateSelectInput" defaultValue={this.props.stubReducer.current.id} className="form-control" onChange={(e) => this.props.onStubSelect(e.target.selectedIndex)}>
+              {this.props.stubReducer.templates.map(t => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+            <Template fullPath={this.props.stubReducer.fullPath}
+                      idText={this.props.stubReducer.idText}
+                      nameText={this.props.stubReducer.nameText}
+                      pathText={this.props.stubReducer.pathText}
+                      template={this.props.stubReducer.current}
+                      disable={this.props.stubReducer.disable}
+                      onChangeIdText={this.props.onChangeIdText}
+                      onChangePathText={this.props.onChangePathText}
+                      onChangeNameText={this.props.onChangeNameText}
+                      onChangeOption={this.props.onChangeOption}
+                      onStubSent={this.props.onStubSent} />
+          </div>
+        );
+    }
+
+    componentWillUnmount() {
+        this.props.stubUnmount();
+    }
+}
 
 export default App;

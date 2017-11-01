@@ -12,6 +12,7 @@ export const STUB_CHANGE_PATH_TEXT      = 'STUB_CHANGE_PATH_TEXT';
 export const STUB_CHANGE_NAME_TEXT      = 'STUB_CHANGE_NAME_TEXT';
 export const STUB_CHANGE_OPTION         = 'STUB_CHANGE_OPTION';
 export const STUB_STUB_SENT             = 'STUB_STUB_SENT';
+export const STUB_UNMOUNT               = 'STUB_UNMOUNT';
 
 export function stubSelect(index) {
     return { type: STUB_SELECT, index };
@@ -34,6 +35,7 @@ export function stubChangeOption(id, value) {
 }
 
 export function stubStub(id, name, path, type, options) {
+    var name = name == '' ? id : name;
     return dispatch => {
         $.ajax({
             url: '/stub',
@@ -43,4 +45,8 @@ export function stubStub(id, name, path, type, options) {
             success: () => dispatch({ type: STUB_STUB_SENT })
         });
     };
+}
+
+export function stubUnmount() {
+    return { type: STUB_UNMOUNT };
 }

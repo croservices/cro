@@ -62,6 +62,8 @@ export default function stubReducer(state = initialState, action) {
         return { ...state, notify: '', optionErrors: '', stubErrors: '' }
     case ActionTypes.STUB_STUB_SENT:
         return { ...state, notify: 'Stubbing...' }
+    case ActionTypes.STUB_UNMOUNT:
+        return { ...state, notify: '' }
     default:
         return state;
     }
