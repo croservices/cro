@@ -8,17 +8,31 @@ class GraphNetwork extends React.Component {
     }
 
     render () {
+        const graph = this.props.overviewReducer.graph;
+
+        let content = null;
+        if (graph == null) {
+            content = <div>Loading...</div>;
+        } else if (graph.nodes.length == 0) {
+            content = <div>
+                <h3>No known services...</h3>
+                <button onClick={e => this.props.onCreateNew()} className="btn btn-primary">Create one now</button>
+                </div>;
+        } else if (graph.nodes.length > 0) {
+            content = <svg ref={node => this.node = node} width={this.width} height={this.height}></svg>;
+        }
+
         return (
                 <div>
                 <h3>Overview</h3>
-                <svg ref={node => this.node = node} width={this.width} height={this.height}></svg>
+                {content}
                 </div>
-        )
+        );
     }
 
     renderD3(graph) {
         if (graph == null) return;
-
+        if (graph.nodes === []) return;
         const element = this.node;
         var color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -81,7 +95,7 @@ class GraphNetwork extends React.Component {
 
     shouldComponentUpdate (props) {
         this.renderD3(props.overviewReducer.graph);
-        return false;
+        return true;
     }
 };
 
