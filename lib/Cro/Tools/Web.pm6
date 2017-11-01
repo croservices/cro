@@ -10,6 +10,7 @@ use JSON::Fast;
 sub web(Str $host, Int $port, $runner) is export {
     my $stub-events = Supplier.new;
     my $logs-events = Supplier.new;
+    my $overview-events = Supplier.new;
     sub send-event($channel, %content) {
         my $msg = { WS_ACTION => True,
                     action => %content };
@@ -19,6 +20,9 @@ sub web(Str $host, Int $port, $runner) is export {
             }
             when 'logs' {
                 $logs-events.emit: $msg;
+            }
+            when 'overview' {
+                $overview-events.emit: $msg;
             }
         }
     }
@@ -65,6 +69,11 @@ sub web(Str $host, Int $port, $runner) is export {
                         mkdir $where;
                         $found.generate($where, %json<id>, %json<name>, %options, $generated-links, @links);
                         send-event('stub', { type => 'STUB_STUBBED' });
+                        # Update graph
+                        my %graph-event = type => 'OVERVIEW_ADD_NODE',
+                                          node => { id => %json<id>,
+                                                    type => 10.rand.Int };
+                        send-event('overview', %graph-event);
                         CATCH {
                             default {
                                 my $errors = .backtrace.full;
@@ -79,29 +88,24 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> 'overview-road' {
             web-socket -> $incoming {
                 supply {
-                    my $color = 1;
-                    my @nodes;
-                    my @links;
-                    my %graph;
+                    whenever $overview-events.Supply {
+                        emit to-json $_;
+                    }
+
+                    my (@nodes, @links);
                     my @services = links-graph()<outer>.flat;
-                    for @services -> $cro-file {
+                    for @services.kv -> $color, $cro-file {
                         @nodes.push: { id => $cro-file.id, type => $color };
                         for $cro-file.links {
                             my $source = $cro-file.id;
                             my $target = .service;
-                            @links.push: { :$source, :$target, type => $color } if @services.grep(*.id eq $target);
+                            if @services.grep(*.id eq $target) {
+                                @links.push: { :$source, :$target, type => $color };
+                            }
                         }
-                        $color++;
                     }
-                    %graph<nodes> = @nodes;
-                    %graph<links> = @links;
-                    emit to-json {
-                        WS_ACTION => True,
-                        action => {
-                            type => 'OVERVIEW_GRAPH',
-                            :%graph
-                        }
-                    };
+                    my %graph = :@nodes, :@links;
+                    send-event('overview', { type => 'OVERVIEW_GRAPH', :%graph });
                 }
             }
         }
