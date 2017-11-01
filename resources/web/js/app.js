@@ -37896,12 +37896,13 @@ function transform(node) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.OVERVIEW_CREATE_NEW = exports.OVERVIEW_GRAPH = undefined;
+exports.OVERVIEW_CREATE_NEW = exports.OVERVIEW_ADD_NODE = exports.OVERVIEW_GRAPH = undefined;
 exports.createNew = createNew;
 
 var _reactRouter = __webpack_require__(161);
 
 var OVERVIEW_GRAPH = exports.OVERVIEW_GRAPH = 'OVERVIEW_GRAPH';
+var OVERVIEW_ADD_NODE = exports.OVERVIEW_ADD_NODE = 'OVERVIEW_ADD_NODE';
 var OVERVIEW_CREATE_NEW = exports.OVERVIEW_CREATE_NEW = 'OVERVIEW_CREATE_NEW';
 
 function createNew() {
@@ -57694,6 +57695,38 @@ var GraphNetwork = function (_React$Component) {
         value: function render() {
             var _this2 = this;
 
+            var graph = this.props.overviewReducer.graph;
+
+            var content = null;
+            if (graph == null) {
+                content = _react2.default.createElement(
+                    'div',
+                    null,
+                    'Loading...'
+                );
+            } else if (graph.nodes.length == 0) {
+                content = _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(
+                        'h3',
+                        null,
+                        'No known services...'
+                    ),
+                    _react2.default.createElement(
+                        'button',
+                        { onClick: function onClick(e) {
+                                return _this2.props.onCreateNew();
+                            }, className: 'btn btn-primary' },
+                        'Create one now'
+                    )
+                );
+            } else if (graph.nodes.length > 0) {
+                content = _react2.default.createElement('svg', { ref: function ref(node) {
+                        return _this2.node = node;
+                    }, width: this.width, height: this.height });
+            }
+
             return _react2.default.createElement(
                 'div',
                 null,
@@ -57702,16 +57735,14 @@ var GraphNetwork = function (_React$Component) {
                     null,
                     'Overview'
                 ),
-                _react2.default.createElement('svg', { ref: function ref(node) {
-                        return _this2.node = node;
-                    }, width: this.width, height: this.height })
+                content
             );
         }
     }, {
         key: 'renderD3',
         value: function renderD3(graph) {
             if (graph == null) return;
-
+            if (graph.nodes === []) return;
             var element = this.node;
             var color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -57774,7 +57805,7 @@ var GraphNetwork = function (_React$Component) {
         key: 'shouldComponentUpdate',
         value: function shouldComponentUpdate(props) {
             this.renderD3(props.overviewReducer.graph);
-            return false;
+            return true;
         }
     }]);
 
@@ -71348,6 +71379,10 @@ function overviewReducer() {
     switch (action.type) {
         case ActionTypes.OVERVIEW_GRAPH:
             return _extends({}, state, { graph: action.graph });
+        case ActionTypes.OVERVIEW_ADD_NODE:
+            var graph = state.graph;
+            graph.nodes.push(action.node);
+            return _extends({}, state, { graph: graph });
         case ActionTypes.OVERVIEW_CREATE_NEW:
             return state;
         default:
