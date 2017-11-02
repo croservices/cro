@@ -12,9 +12,21 @@
     border-right: 1px solid #eee;
 }
 
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+.content {
+    margin-top: 85px;
+}
+
 .main {
     padding: 20px;
 }
+
 @media (min-width: 768px) {
     .main {
         padding-right: 40px;
@@ -27,4 +39,190 @@
 .sub-header {
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
+}
+
+.service {
+    position: relative;
+    overflow: auto;
+    border-radius: 1px;
+    margin-top: 3px;
+    margin-bottom: 7px;
+
+    color: #fafafa;
+    background: linear-gradient(to top,#343a40 0,#3f474e 90%);
+    border: 1px solid #3f474e;
+    border-top: 2px solid #4b545c;
+    background-color: #343a40;
+    box-shadow: 0 2px 3px rgba(0,0,0,.2);
+}
+
+.serviceCreds {
+    width: 100%;
+    padding: 5px 7px 3px 7px;
+}
+
+.serviceStatus {
+    width: 100%;
+    padding-top: 1px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+
+    border-bottom: 1px solid #4b545c;
+}
+
+.serviceStatus-running {
+    color: #709688;
+ }
+
+.serviceStatus-starting, .serviceStatus-restarting {
+    color: #cd9575;
+ }
+
+.serviceStatus-crashed {
+    color: #cd5c5c;
+ }
+
+.serviceStatus-stopped {
+    color: #817f96;
+ }
+
+.serviceTitle {
+    max-width: 180px;
+    margin-right: 5px;
+    font-size: 16px;
+    font-weight: bold;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: #80b6bc;
+}
+
+.serviceId {
+    font-size: 14px;
+
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: #777777;
+}
+
+.serviceManageBox {
+    padding: 3px;
+}
+
+.logBtn {
+    height: 30px;
+    width: 70px;
+
+    font-weight: bold;
+}
+
+
+.serviceButtons {
+    max-width: 210px;
+    height: 30px;
+    padding: 7px 7px 7px 10px;
+
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+.serviceButtons .logBtn, .serviceButtons button, .serviceButtons .traceBtn {
+    display: inline-block;
+    margin: 0 3px 0 1px;
+
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    color: #fafafa;
+}
+
+.serviceButtons .traceBtn-pressed {
+    background-color: #709688;
+    border-color: #597a6e;
+}
+
+.serviceButtons .traceBtn-pressed:hover {
+    background-color: #597a6e;
+    border-color: #597a6e;
+}
+
+
+.serviceButtons .logBtn:hover, .serviceButtons button:hover {
+    background-color: #286090;
+    border-color: #204d74;
+    color: #ffffff;
+}
+
+.serviceSubtitle {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    padding: 2px 0 3px 0;
+
+    color: #fafafa;
+    border-bottom: 1px solid #4b545c;
+
+}
+
+.serviceTitle, .serviceId {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.serviceEndPoint {
+    padding: 1px;
+}
+
+.serviceEndPointList {
+    margin: 0;
+    padding: 5px 7px 3px 20px;
+}
+
+.serviceEndPointName {
+    font-weight: bold;
+    margin-right: 7px;
+
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.serviceEndPointInfo a:hover {
+    color: #275E8F;
+}
+
+.serviceEndPointName, .serviceEndPointInfo {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.log {
+    white-space: pre;
+    font-family: monospace;
+    margin-top: 20px;
+    border: 2px solid #b4b4b4;
+    border-radius: 5px;
+    overflow: auto;
+}
+
+.links line {
+    stroke-opacity: 0.6;
+    stroke-width: 1px;
+    fill: none;
+}
+
+.nodes circle {
+    stroke: #333;
+    stroke-width: 1.5px;
+}
+
+@font-face {
+    font-family: "Glyphicons Halflings";
+    src: url("fonts/glyphicons-halflings-regular.woff2") format('woff2');
 }

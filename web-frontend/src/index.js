@@ -1,29 +1,52 @@
+import { connect } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, combineReducers } from 'redux';
+import WSAction from 'redux-websocket-action';
+import ServiceListApp from './service-list/index';
+import serviceListReducer from './service-list/reducer';
+import StubApp from './stub-service/index';
+import stubReducer from './stub-service/reducer';
+import LogsApp from './logs/index';
+import logsReducer from './logs/reducer';
+import OverviewApp from './overview/index';
+import overviewReducer from './overview/reducer';
+import thunkMiddleware from 'redux-thunk';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import { Router, Route, browserHistory } from 'react-router';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 // Build up reducers from the various components.
 const store = createStore(combineReducers({
-   routing: routerReducer
-}));
+    routing: routerReducer,
+    serviceListReducer,
+    stubReducer,
+    logsReducer,
+    overviewReducer
+}), applyMiddleware(thunkMiddleware));
 
 // Set up history.
 const history = syncHistoryWithStore(browserHistory, store);
 
+['overview-road', 'services-road', 'stub-road', 'logs-road'].forEach(endpoint => {
+    let host = window.location.host;
+    let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
+        retryCount: 3,
+        reconnectInterval: 3
+    });
+    wsAction.start();
+});
+
 // Temporary components, to move out later
-var Dashboard = props => (
-    <div className="container">
-      Dashboard goes here
-    </div>
+var Overview = props => (
+      <OverviewApp />
 );
 var Stub = props => (
-    <div className="container">
-      Stub service UI goes here
-    </div>
+      <StubApp />
+);
+var Logs = props => (
+      <LogsApp />
 );
 
 var Navigation = props => (
@@ -32,23 +55,33 @@ var Navigation = props => (
         <Navbar.Brand>
           <a href="#" onClick={() => browserHistory.push("/")}>Cro Development Tool</a>
         </Navbar.Brand>
-        </Navbar.Header>
+      </Navbar.Header>
       <Nav>
-        <NavItem onClick={() => browserHistory.push("/")}>Dashboard</NavItem>
+        <NavItem onClick={() => browserHistory.push("/")}>Overview</NavItem>
         <NavItem onClick={() => browserHistory.push("/stub")}>Stub Service</NavItem>
-        <NavItem href="http://cro.services/docs">Documentation</NavItem>
+        <NavItem onClick={() => browserHistory.push("/logs")}>Logs and Traces</NavItem>
       </Nav>
     </Navbar>
 );
 
 ReactDOM.render(
     <Provider store={store}>
-	  <div>
-      <Navigation />
-	  <Router history={history}>
-        <Route path="/" component={Dashboard} />
-        <Route path="/stub" component={Stub} />
-      </Router>
+      <div>
+        <Navigation />
+        <div className="container content">
+          <div className="row">
+            <div className="col-sm-4">
+              <ServiceListApp />
+            </div>
+            <div className="col-sm-8">
+              <Router history={history}>
+                <Route path="/" component={Overview} />
+                <Route path="/stub" component={Stub} />
+                <Route path="/logs" component={Logs} />
+              </Router>
+            </div>
+          </div>
+        </div>
       </div>
     </Provider>,
     document.getElementById('app')

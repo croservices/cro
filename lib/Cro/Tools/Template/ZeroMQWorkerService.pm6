@@ -11,9 +11,10 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
 
     method get-option-errors($options --> List) { () }
 
-    method generate(IO::Path $where, Str $id, Str $name, %options) {
+    method generate(IO::Path $where, Str $id, Str $name, %options, $generated-links, @links) {
+        die "Horrible death";
         write-entrypoint($where.add('service.p6'), $id, %options);
-        write-cro-file($where.add('.cro.yml'), $id, $name, %options);
+        write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
         write-meta($where.add('META6.json'), $name);
     }
 
@@ -56,7 +57,7 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
         $file.spurt($entrypoint);
     }
 
-    sub write-cro-file($file, $id, $name, %options) {
+    sub write-cro-file($file, $id, $name, %options, @links) {
         my $id-uc = env-name($id);
         my $cro-file = Cro::Tools::CroFile.new(
             :$id, :$name, :entrypoint<service.p6>, :entrypoints[
@@ -67,7 +68,7 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
                     host-env => $id-uc ~ '_HOST',
                     port-env => $id-uc ~ '_PORT'
                 )
-            ]
+            ], :@links
         );
         $file.spurt($cro-file.to-yaml());
     }
