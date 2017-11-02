@@ -802,8 +802,9 @@ bit worse.
 
 ## Applying middleware in a route block
 
-**Note:** This describes a future feature that is not yet implemented in the
-current version of Cro.
+**Note:** This describes a feature that is only partially implemented in the
+current version of Cro. The block convenience forms will be included in an
+upcoming release.
 
 In Cro, middleware is a component in the reactive processing pipeline. It may
 be installed at the server level (see `Cro::HTTP::Server` for more), but also
