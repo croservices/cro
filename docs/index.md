@@ -81,4 +81,7 @@ parts have stable APIs for the sake of extending the tools.
 * [Cro::Tools::LinkTemplate](docs/reference/cro-tools-linktemplate)
 * [Cro::Tools::Template](docs/reference/cro-tools-template)
 
+## Meta
+
+* [Release notes](docs/releases.md)
 ---
