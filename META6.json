@@ -1,7 +1,7 @@
 {
     "perl"          : "6.*",
     "name"          : "cro",
-    "version"       : "0.7",
+    "version"       : "0.7.1",
     "description"   : "Libraries for building reactive services in Perl 6.",
     "authors"       : [ "Jonathan Worthington <jnthn@jnthn.net>" ],
     "license"       : "Artistic-2.0",
