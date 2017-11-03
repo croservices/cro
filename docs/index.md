@@ -83,5 +83,5 @@ parts have stable APIs for the sake of extending the tools.
 
 ## Meta
 
-* [Release notes](docs/releases.md)
+* [Release notes](docs/releases)
 ---
