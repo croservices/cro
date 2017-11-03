@@ -90,7 +90,7 @@ The following changes were made to the `cro` distribution:
 * Other
     * Harden tests against potential hangs
 
-This release was contributed to by Altai-man and Jonathan Worthington from
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington from
 [Edument](http://cro.services/training-support), together with the following
 community members: Alexander Hartmaier, Alex Chen, Curt Tilmes, Kai Carver,
 Karl Rune Nilsen, MasterDuke17, Nick Logan, Salve J. Nilsen, Simon Proctor,
