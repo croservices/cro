@@ -880,7 +880,7 @@ post -> 'tips' {
         response.status = 204;
     }
 }
-``` 
+```
 
 Next up, the JavaScript part. The question is where to put the network bit?
 Our reducer should be pure. The answer is the `redux-thunk` module that we
