@@ -22,7 +22,7 @@ HTTP/1.1, and a HTTP request will always use HTTP/1.1.
 
 ## Making basic requests
 
-The `get`, `post`, `put`, `delete`, and `head` methods may be called on either
+The `get`, `post`, `put`, `delete`, `patch` and `head` methods may be called on either
 the type object or an instance of `Cro::HTTP::Client`. They will all return a
 `Promise`, which will be kept if the request is successful or broken if an
 error occurs.
