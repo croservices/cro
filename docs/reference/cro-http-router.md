@@ -101,6 +101,11 @@ my $app = route {
     delete -> 'catalogue', 'products', uint32 $id {
         ...
     }
+    
+    # PATCH /catalogue/products/42
+    patch -> 'catalogue', 'products', uint32 $id {
+        ...
+    }
 }
 ```
 
