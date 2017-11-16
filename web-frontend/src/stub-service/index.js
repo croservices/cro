@@ -13,7 +13,8 @@ function mapDispatch(dispatch) {
         onChangePathText: text => dispatch(Actions.stubChangePathText(text)),
         onChangeNameText: text => dispatch(Actions.stubChangeNameText(text)),
         onChangeOption: (id, value) => dispatch(Actions.stubChangeOption(id, value)),
-        onStubSent: (id, name, path, type, opts) => dispatch(Actions.stubStub(id, name, path, type, opts)),
+        onChangeLink: (id, end, value) => dispatch(Actions.stubChangeLink(id, end, value)),
+        onStubSent: (id, name, path, type, opts, links) => dispatch(Actions.stubStub(id, name, path, type, opts, links)),
         stubUnmount: () => dispatch(Actions.stubUnmount())
     }
 }

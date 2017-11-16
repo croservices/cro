@@ -9,6 +9,23 @@ var Template = props => (
       <label className="control-label" htmlFor="pathTextInput">New service path</label>
       <input type="text" className="form-control" id="pathTextInput" pattern="^.+$" value={props.pathText} onChange={e => props.onChangePathText(e.target.value)} />
         <small>Service will be created in {props.fullPath}</small>
+        {Array.from(props.links).length !== 0 &&
+            <div>
+              <label className="control-label">Services links</label>
+              {Array.from(props.links).map((link, index) => (
+                <div key={index}>
+                  {link[1].map((endpoint, index) => (
+                      <div className="checkbox" key={index}>
+                        <label>
+                          <input type="checkbox" onChange={(e) => props.onChangeLink(link[0], endpoint.endpointId, e.target.checked)} />
+                          {link[0]} - {endpoint.endpointId}
+                        </label>
+                      </div>
+                  ))}
+                </div>
+              ))}
+         </div>
+        }
       {props.template !== null &&<div>
             <h3>{props.template.name} <small>{props.template.id}</small></h3>
                 {props.template.options.map((opt, index) => (
@@ -19,7 +36,14 @@ var Template = props => (
                       </label>
                     </div>
                 ))}
-       <button className="btn btn-primary" id="stubButton" disabled={props.disable} onClick={(e) => props.onStubSent(props.idText, props.nameText, props.pathText, props.template.id, props.template.options.map(e => ( [e[0], e[3]] )))}>Stub</button>
+       <button className="btn btn-primary" id="stubButton" disabled={props.disable} onClick={(e) =>
+                                                                                             props.onStubSent(
+                                                                                                 props.idText,
+                                                                                                 props.nameText,
+                                                                                                 props.pathText,
+                                                                                                 props.template.id,
+                                                                                                 props.template.options.map(e => ( [e[0], e[3]] )),
+                                                                                                 props.links)}>Stub</button>
        </div>}
      </div>
 );
@@ -49,11 +73,13 @@ class App extends React.Component {
                       nameText={this.props.stubReducer.nameText}
                       pathText={this.props.stubReducer.pathText}
                       template={this.props.stubReducer.current}
+                      links={this.props.stubReducer.links}
                       disable={this.props.stubReducer.disable}
                       onChangeIdText={this.props.onChangeIdText}
                       onChangePathText={this.props.onChangePathText}
                       onChangeNameText={this.props.onChangeNameText}
                       onChangeOption={this.props.onChangeOption}
+                      onChangeLink={this.props.onChangeLink}
                       onStubSent={this.props.onStubSent} />
           </div>
         );

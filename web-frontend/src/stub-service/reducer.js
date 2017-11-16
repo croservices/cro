@@ -12,11 +12,32 @@ const initialState = {
     stubErrors: [],
     cwd: '',
     fullPath: '',
-    disable: true
+    disable: true,
+    links: new Map()
 };
 
 export default function stubReducer(state = initialState, action) {
     switch (action.type) {
+    case ActionTypes.STUB_NEW_LINK:
+        var links = state.links;
+        var link = links.get(action.id);
+        if (link == undefined) {
+            var endpoints = action.endpoints;
+            for (var i = 0; i < endpoints.length; i++) {
+                endpoints[i] = {endpointId: endpoints[i], link: false};
+            }
+            links.set(action.id, endpoints);
+        }
+        return { ...state, links };
+    case ActionTypes.STUB_CHANGE_LINK:
+        var links = state.links;
+        var endpoints = links.get(action.id);
+        for (var i = 0; i < endpoints.length; i++) {
+            if (endpoints[i].endpointId == action.end)
+                endpoints[i].link = true;
+        }
+        links.set(action.id, endpoints);
+        return { ...state, links };
     case ActionTypes.STUB_SET_PATH:
         var fullPath = path.join(state.cwd, action.path)
         return { ...state, fullPath, cwd: action.path }
