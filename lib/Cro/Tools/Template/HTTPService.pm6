@@ -135,7 +135,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
             $entrypoint ~= Q:to/CODE/;
                             %?RESOURCES<fake-tls/server-key.pem>,
                 CODE
-            $entrypoint ~= q:to/CODE/;
+            $entrypoint ~= q:c:to/CODE/;
                         certificate-file => %*ENV<{$env-name}_TLS_CERT> ||
                 CODE
             $entrypoint ~= Q:to/CODE/;
