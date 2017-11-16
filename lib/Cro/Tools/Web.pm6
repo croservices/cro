@@ -2,15 +2,16 @@ use Cro::HTTP::Router::WebSocket;
 use Cro::HTTP::Router;
 use Cro::HTTP::Server;
 use Cro::Tools::Link::Editor;
+use Cro::Tools::LinkTemplate;
 use Cro::Tools::Runner;
 use Cro::Tools::Template;
 use Cro::Tools::TemplateLocator;
 use JSON::Fast;
 
 sub web(Str $host, Int $port, $runner) is export {
-    my $stub-events = Supplier.new;
-    my $logs-events = Supplier.new;
-    my $overview-events = Supplier.new;
+    my $stub-events = Supplier::Preserving.new;
+    my $logs-events = Supplier::Preserving.new;
+    my $overview-events = Supplier::Preserving.new;
     sub send-event($channel, %content) {
         my $msg = { WS_ACTION => True,
                     action => %content };
@@ -58,7 +59,15 @@ sub web(Str $host, Int $port, $runner) is export {
                     my @templates = get-available-templates(Cro::Tools::Template);
                     my $found = @templates.first(*.id eq %json<type>);
                     my %options = %json<options>>>.Hash;
-                    my ($generated-links, @links);
+                    my (@generated-links, @links);
+                    populate-links(
+                        %json<links>.map(
+                            {
+                                "{$_<service>}:{$_<endpoint>}";
+                            }
+                        ),
+                        @generated-links, @links
+                    );
                     if $found.get-option-errors(%options) -> @errors {
                         my $errors = @errors.map({ "$_\n" }).join;
                         send-event('stub', { type => 'STUB_OPTIONS_ERROR_OCCURED',
@@ -67,7 +76,7 @@ sub web(Str $host, Int $port, $runner) is export {
                     else {
                         my $where = $*CWD.add(%json<path>);
                         mkdir $where;
-                        $found.generate($where, %json<id>, %json<name>, %options, $generated-links, @links);
+                        $found.generate($where, %json<id>, %json<name>, %options, @generated-links, @links);
                         send-event('stub', { type => 'STUB_STUBBED' });
                         # Update graph
                         my %graph-event = type => 'OVERVIEW_ADD_NODE',
@@ -174,9 +183,12 @@ sub web(Str $host, Int $port, $runner) is export {
                     }
 
                     when Cro::Tools::Runner::Started {
+                        my %event;
                         emit-action($_, 'SERVICE_STARTED');
-                        my %event = type => 'LOGS_NEW_CHANNEL', id => .cro-file.id;
+                        %event = type => 'LOGS_NEW_CHANNEL', id => .cro-file.id;
                         send-event('logs', %event);
+                        %event = type => 'STUB_NEW_LINK', id => .cro-file.id, endpoints => .cro-file.endpoints.map(*.id);
+                        send-event('stub', %event);
                     }
                     when Cro::Tools::Runner::Restarted {
                         emit-action($_, 'SERVICE_RESTARTED')
