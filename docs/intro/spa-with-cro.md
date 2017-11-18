@@ -687,7 +687,7 @@ And adding it to our `.babelrc`:
 With that done, here's our reducer, placed in `frontend/reducer.js`:
 
 ```
-import ActionTypes from './actions';
+import * as ActionTypes from './actions';
 
 const initialState = {
     tipText: ''
@@ -1022,7 +1022,7 @@ export const LATEST_TIP = 'LATEST_TIP';
 ```
 
 Then we'll update our reducer, to prepend each incoming tip to a list of
-latest tips, so `frontend/reducers.js` ends up as:
+latest tips, so `frontend/reducer.js` ends up as:
 
 ```
 import * as ActionTypes from './actions';
