@@ -222,17 +222,87 @@ instead does the `Cro::HTTP::Middleware::Pair` role, described below.
 
 The `Cro::HTTP::Middleware::RequestResponse` role is for middleware that needs
 to take action for both the request and the response. This is both the most
-flexible kind of middleware but also the trickest to write, since requests and
-responses on a single connection may be processed concurrently (particularly
-under HTTP/2.0), and so any state shared between the two must be protected.
+flexible kind of middleware but also the trickest to write, since it will most
+often involve some state that exists between requests and responses either on
+the same or over many connections. Note that even on a single connection,
+requests may be processed concurrently (particularly under HTTP/2.0). It is
+therefore important to protect any state, perhaps by keeping it in a `monitor`
+(use `OO::Monitors` for this).
 
 A typical use for `Cro::HTTP::Middleware::RequestResponse` is implementing a
 response cache. Here, incoming requets should first do a lookup in the cache
 to see if the request can be satisfied from the cache; if so, the response is
 sent from the cache. Otherwise, processing proceeds as normal, and in the
-response middleware a cache entry is made.
+response middleware a cache entry is made. Note that this is a very minimal
+response cache, that caches everything, forever, without regard to language,
+encoding, and so forth. The cache is held per instance of the middleware, and
+so lives between requests.
 
-    XXX Response cache example
+    use Cro::HTTP::Request;
+    use Cro::HTTP::Response;
+    use OO::Monitors;
+
+    monitor CachedData {
+        my class Entry {
+            has $.status;
+            has @.headers;
+            has $.body-blob;
+        }
+        has Entry %!cache;
+
+        method lookup(Cro::HTTP::Request $request) {
+            with %!cache{$req.target} {
+                my $resp = Cro::HTTP::Response.new: :$request, :status(.status);
+                $resp.append-header($_) for .headers;
+                $resp.set-body-byte-stream(supply emit .body-blob);
+                return $resp;
+            }
+            return Nil;
+        }
+
+        method add($key, $status, @headers, $body-blob --> Nil) {
+            %!cache{$key} = Entry.new: :$status, :@headers, :$body-blob;
+        }
+    }
+
+    class ResponseCache does Cro::HTTP::Middleware::RequestResponse {
+        has CachedData $!cache .= new;
+
+        method process-requests(Supply $requests) {
+            supply whenever $requests -> $req {
+                with $!cache.lookup($req) {
+                    self.respond($_);
+                }
+                else {
+                    emit $req;
+                }
+            }
+        }
+
+        method process-responses(Supply $responses) {
+            supply whenever $responses -> $res {
+                my $key = $res.request.target;
+                my $status = $res.status;
+                my @headers = $res.header-list;
+                whenever $res.body-blob -> $body-blob {
+                    # Produce the response, and cache the bytes, rather than
+                    # going through body serialization every time in the
+                    # future.
+                    $!cache.add($key, $status, @headers, $body-blob);
+                    $resp.set-body-byte-stream(supply emit $body-blob);
+                    emit $res;
+                }
+            }
+        }
+    }
+
+The `Cro::HTTP::Middleware::RequestResponse` role requires implementing the
+`process-requests` and `process-responses` methods, which are passed `Supply`
+instances containing a stream of requests and responses to process. They
+should, respectively, return a stream of processed requests and responses.
+The `respond` method provided by the role allows for an early response to the
+request. In this case, the response will skip past the `process-responses`
+method's handler and be emitted after it.
 
 This role does not implement `Cro::Transform`, since it actually is a way of
 declaring a pair of transforms that work together with connection state. It
