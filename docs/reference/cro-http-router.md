@@ -811,9 +811,12 @@ bit worse.
 current version of Cro. The block convenience forms will be included in an
 upcoming release.
 
-In Cro, middleware is a component in the reactive processing pipeline. It may
+In Cro, middleware is a component in the request processing pipeline. It may
 be installed at the server level (see `Cro::HTTP::Server` for more), but also
-per `route` block using the `before` and `after` functions.
+per `route` block using the `before` and `after` functions. For readers new to
+middleware in Cro, the [HTTP middleware guide](docs/cro-http-middleware) gives
+an overview of what middleware is, and the trade-offs between the different
+ways of writing and using HTTP middleware in Cro.
 
 The `before` function is used to install middleware that operates on requests
 before their route handler is called. It may be called with a `Cro::Transform`
@@ -831,6 +834,10 @@ consumes a `Cro::HTTP::Response` and produces a `Cro::HTTP::Response`.
 after My::Response::Middleware;
 ```
 
+It is allowed to use `before` and `after` many times in a single route block,
+and the middleware will be placed into the pipeline in the order that the
+`before` and `after` calls are made.
+
 As a convenience, the `before` and `after` functions may be passed a `Block`.
 This will be invoked with the `Cro::HTTP::Request` or `Cro::HTTP::Response`
 object as an argument, and it can mutate the request or response (the return
@@ -844,9 +851,57 @@ after {
 }
 ```
 
-Within a `route` block, middleware is applied in the order the `before` and
-`after` calls are made. When `include` is used, the `before` middleware of the
-including `route` block will be applied ahead of any middleware in the target
-of the `include`, and the `after` middleware of the including `route` block
-will be applied after the target of the include. Effectively, the middleware
-of the including route block wraps around those of the included.
+In some cases, it is desirable for `before` middleware to itself produce the
+response. When using the block form, the `response` symbol and all functions
+that aid in producing responses are available. The `before` will be considered
+to have produced a response if, after it has run, the `status` of the response
+has been set. For example, producing a 403 Forbidden response to all requests
+not coming from the loopback interface could be achieved using:
+
+```
+before {
+    forbidden unless .connection.peer-host eq '127.0.0.1' | '::1';
+}
+```
+
+A `before` actually inserts two pipeline components: one that runs the block,
+and one that outputs any "early" responses produced by the middleware. The
+latter component is inserted as if it were introducd by an `after` immediately
+after the `before`. This means that any `after` middleware specified prior to
+the `before` block making the early response will be skipped over.
+
+```
+# WRONG - the first `after` will be skipped over and so never see the 403
+# Forbidden
+after {
+    if .status == 403 && !.has-body {
+        content 'text/html', '<h1>Forbidden</h1>';
+    }
+}
+before {
+    forbidden unless .request.connection.peer-host eq '127.0.0.1' | '::1';
+}
+
+# CORRECT - the `after` is placed after any early response from the `before`
+# is inserted into the output pipeline, and so will add the content to the
+# response, as desired.
+before {
+    forbidden unless .request.connection.peer-host eq '127.0.0.1' | '::1';
+}
+after {
+    if .status == 403 && !.has-body {
+        content 'text/html', '<h1>Forbidden</h1>';
+    }
+}
+```
+
+When `include` is used, the `before` middleware of the including `route` block
+will be applied ahead of any middleware in the target of the `include`, and
+the `after` middleware of the including `route` block will be applied after
+the target of the include. Effectively, the middleware of the including route
+block wraps around those of the included.
+
+With `delegate`, `before` and `after` middleware is applied before delegation
+takes place, and `after` middleware on any response that it produces. A
+`before` middleware that produces a response will, as with any other route,
+result in the delegation never being performed.
