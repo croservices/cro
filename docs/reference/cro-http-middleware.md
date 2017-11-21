@@ -143,7 +143,7 @@ class UserAgentLog does Cro::HTTP::Middleware::Request {
 The `Cro::HTTP::Middleware::Response` role provides a convenient way to
 implement response processing middleware. It does the `Cro::Transform` role
 and implements all of its methods, and requires only that the `process`
-message be implemented.
+method be implemented.
 
 The `process` method is passed a `Supply` of responses, and should return a
 `Supply` that the responses will be emitted into after processing. One could
@@ -172,7 +172,7 @@ class HSTS does Cro::HTTP::Middleware::Response {
     has Int $.max-age = 31536000;
 
     method process(Supply $responses) {
-        $responses.do: $rep {
+        $responses.do: -> $rep {
             $rep.append-header: 'Strict-transport-security',
                 "max-age=$!max-age"
         }
