@@ -57175,7 +57175,7 @@ var App = function (_React$Component) {
         ),
         _react2.default.createElement(
           "select",
-          { id: "templateSelectInput", defaultValue: this.props.stubReducer.current.id, className: "form-control", onChange: function onChange(e) {
+          { id: "templateSelectInput", defaultValue: this.props.stubReducer.current && this.props.stubReducer.current.id || '', className: "form-control", onChange: function onChange(e) {
               return _this2.props.onStubSelect(e.target.selectedIndex);
             } },
           this.props.stubReducer.templates.map(function (t) {
@@ -57186,7 +57186,7 @@ var App = function (_React$Component) {
             );
           })
         ),
-        _react2.default.createElement(Template, { fullPath: this.props.stubReducer.fullPath,
+        this.props.stubReducer.current && _react2.default.createElement(Template, { fullPath: this.props.stubReducer.fullPath,
           idText: this.props.stubReducer.idText,
           nameText: this.props.stubReducer.nameText,
           pathText: this.props.stubReducer.pathText,
