@@ -183,18 +183,26 @@ class HSTS does Cro::HTTP::Middleware::Response {
 ### Request middleware that may produce a response
 
 Often, it is desirable to write middleware that looks at an incoming request
-and conditionally emits it for "normal" processing, or alternatively sends an
-early response. This requires two insertions into the pipeline: one to process
-the request, and another to inject the early response, skipping over other
-pieces of the pipeline. Implementing the `Cro::HTTP::Middleware::Conditional`
-role requires writing a single method, `process`, which is passed a `Supply`
-of incoming requests. It should return a `Supply` of requests which are to
-continue onwards through the processing pipeline.
+and conditionally emits it for "normal" processing, or alternatively emits an
+early response.
 
-The role provides a `respond` method, which should be passed an instance of
-`Cro::HTTP::Response` in order to respond early to the request. For example,
-to respond to incoming requests that are not from the loopback interface with
-a 403 Forbidden response, one could write this:
+This requires two insertions into the pipeline: one to process the request,
+and another to inject the early response, skipping over other pieces of the
+pipeline. Implementing the `Cro::HTTP::Middleware::Conditional` role requires
+writing a single method, `process`; the request and response parts of the
+middleware are then constructed automatically.
+
+The `process` method is passed a `Supply` of incoming requests. It should
+return a `Supply` that, for each request received, will `emit` either:
+
+* That request object, perhaps after some tweaks. The request object will
+  continue onwards through the pipeline "as normal".
+* A `Cro::HTTP::Response` object, which represents an early response. This
+  will be forwraded to a later point in the pipeline, skipping over the usual
+  request processing.
+
+For example, to respond to incoming requests that are not from the loopback
+interface with a 403 Forbidden response, one could write this:
 
 ```
 class LocalOnly does Cro::HTTP::Middleware::Conditional {
@@ -205,9 +213,8 @@ class LocalOnly does Cro::HTTP::Middleware::Conditional {
                 emit $req;
             }
             else {
-                # It's not, so make a 403 forbidden response and pass it to
-                # the respond method provided by the role.
-                self.respond: Cro::HTTP::Response.new(:$request, :403status);
+                # It's not, so emit a 403 forbidden response.
+                emit Cro::HTTP::Response.new(:$request, :403status);
             }
         }
     }
@@ -270,8 +277,8 @@ so lives between requests.
 
         method process-requests(Supply $requests) {
             supply whenever $requests -> $req {
-                with $!cache.lookup($req) {
-                    self.respond($_);
+                with $!cache.lookup($req) -> $res {
+                    emit $res;
                 }
                 else {
                     emit $req;
@@ -298,11 +305,18 @@ so lives between requests.
 
 The `Cro::HTTP::Middleware::RequestResponse` role requires implementing the
 `process-requests` and `process-responses` methods, which are passed `Supply`
-instances containing a stream of requests and responses to process. They
-should, respectively, return a stream of processed requests and responses.
-The `respond` method provided by the role allows for an early response to the
-request. In this case, the response will skip past the `process-responses`
-method's handler and be emitted after it.
+instances containing a stream of requests and responses to process. The
+`process-requests` method should return a `Supply` that, for each request
+received, will `emit` either:
+
+* That request object, perhaps after some tweaks. The request object will
+  continue onwards through the pipeline "as normal".
+* A `Cro::HTTP::Response` object, which represents an early response. This
+  will be emitted as if it came after the response part of the middleware
+  (and so will not be seen by `process-response`).
+
+The `process-responses` method receives a `Supply` that will emit responses
+to be processed. It must emit those responses after processing them.
 
 This role does not implement `Cro::Transform`, since it actually is a way of
 declaring a pair of transforms that work together with connection state. It
