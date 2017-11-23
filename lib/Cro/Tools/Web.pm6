@@ -32,7 +32,7 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> {
             content 'text/html', %?RESOURCES<web/index.html>.slurp;
         }
-        get -> Str $app-route where "stub" | "logs" {
+        get -> $app-route {
             content 'text/html', %?RESOURCES<web/index.html>.slurp;
         }
         post -> 'service' {
