@@ -63,24 +63,25 @@ class App extends React.Component {
               <div className="alert alert-danger" role="alert">{this.props.stubReducer.notify} {this.props.stubReducer.stubErrors}</div>
             }
             <label className="control-label" htmlFor="templateSelectInput">Service Template</label>
-            <select id="templateSelectInput" defaultValue={this.props.stubReducer.current.id} className="form-control" onChange={(e) => this.props.onStubSelect(e.target.selectedIndex)}>
+            <select id="templateSelectInput" defaultValue={this.props.stubReducer.current && this.props.stubReducer.current.id || ''} className="form-control" onChange={(e) => this.props.onStubSelect(e.target.selectedIndex)}>
               {this.props.stubReducer.templates.map(t => (
                 <option key={t.id} value={t.id}>{t.name}</option>
               ))}
             </select>
-            <Template fullPath={this.props.stubReducer.fullPath}
-                      idText={this.props.stubReducer.idText}
-                      nameText={this.props.stubReducer.nameText}
-                      pathText={this.props.stubReducer.pathText}
-                      template={this.props.stubReducer.current}
-                      links={this.props.stubReducer.links}
-                      disable={this.props.stubReducer.disable}
-                      onChangeIdText={this.props.onChangeIdText}
-                      onChangePathText={this.props.onChangePathText}
-                      onChangeNameText={this.props.onChangeNameText}
-                      onChangeOption={this.props.onChangeOption}
-                      onChangeLink={this.props.onChangeLink}
-                      onStubSent={this.props.onStubSent} />
+            {this.props.stubReducer.current &&
+                <Template fullPath={this.props.stubReducer.fullPath}
+                          idText={this.props.stubReducer.idText}
+                          nameText={this.props.stubReducer.nameText}
+                          pathText={this.props.stubReducer.pathText}
+                          template={this.props.stubReducer.current}
+                          links={this.props.stubReducer.links}
+                          disable={this.props.stubReducer.disable}
+                          onChangeIdText={this.props.onChangeIdText}
+                          onChangePathText={this.props.onChangePathText}
+                          onChangeNameText={this.props.onChangeNameText}
+                          onChangeOption={this.props.onChangeOption}
+                          onChangeLink={this.props.onChangeLink}
+                          onStubSent={this.props.onStubSent} />}
           </div>
         );
     }

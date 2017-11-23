@@ -32,6 +32,9 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> {
             content 'text/html', %?RESOURCES<web/index.html>.slurp;
         }
+        get -> $app-route {
+            content 'text/html', %?RESOURCES<web/index.html>.slurp;
+        }
         post -> 'service' {
             request-body -> %json {
                 my @commands = <start restart stop
