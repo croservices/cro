@@ -9,9 +9,19 @@ var Template = props => (
       <label className="control-label" htmlFor="pathTextInput">New service path</label>
       <input type="text" className="form-control" id="pathTextInput" pattern="^.+$" value={props.pathText} onChange={e => props.onChangePathText(e.target.value)} />
         <small>Service will be created in {props.fullPath}</small>
+      {props.template !== null &&<div>
+            <h3>{props.template.name} <small>{props.template.id}</small></h3>
+                {props.template.options.map((opt, index) => (
+                    <div className="checkbox" key={index}>
+                      <label className="control-label">
+                        <input type="checkbox" checked={opt[3]} onChange={(e) => props.onChangeOption(opt[0], e.target.checked)} />
+                          {opt[1]}
+                      </label>
+                    </div>
+                ))}
         {Array.from(props.links).length !== 0 &&
             <div>
-              <label className="control-label">Services links</label>
+              <h3>Links To Other Service Endpoints</h3>
               {Array.from(props.links).map((link, index) => (
                 <div key={index}>
                   {link[1].map((endpoint, index) => (
@@ -26,16 +36,6 @@ var Template = props => (
               ))}
          </div>
         }
-      {props.template !== null &&<div>
-            <h3>{props.template.name} <small>{props.template.id}</small></h3>
-                {props.template.options.map((opt, index) => (
-                    <div className="checkbox" key={index}>
-                      <label className="control-label">
-                        <input type="checkbox" checked={opt[3]} onChange={(e) => props.onChangeOption(opt[0], e.target.checked)} />
-                          {opt[1]}
-                      </label>
-                    </div>
-                ))}
        <button className="btn btn-primary" id="stubButton" disabled={props.disable} onClick={(e) =>
                                                                                              props.onStubSent(
                                                                                                  props.idText,
