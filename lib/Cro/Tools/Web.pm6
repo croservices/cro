@@ -82,12 +82,23 @@ sub web(Str $host, Int $port, $runner) is export {
                         $found.generate($where, %json<id>, %json<name>, %options, @generated-links, @links);
                         send-event('stub', { type => 'STUB_STUBBED' });
                         # Update graph
+                        my $color = 10.rand.Int;
                         my %graph-event = type => 'OVERVIEW_ADD_NODE',
                                           node => { id => %json<id>,
-                                                    type => 10.rand.Int };
+                                                    type => $color
+                                                  },
+                                          links => @links.map(
+                                              { my %link;
+                                                %link<source> = %json<name>;
+                                                %link<target> = .service;
+                                                %link<type> = $color;
+                                                %link }
+                                          );
                         send-event('overview', %graph-event);
                         CATCH {
                             default {
+                                # Print error to terminal too to easify bug reporting
+                                .note;
                                 my $errors = .backtrace.full;
                                 send-event('stub', { type => 'STUB_STUB_ERROR_OCCURED',
                                                      :$errors });

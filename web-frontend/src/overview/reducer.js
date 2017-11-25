@@ -11,6 +11,9 @@ export default function overviewReducer(state = initialState, action) {
     case ActionTypes.OVERVIEW_ADD_NODE:
         const graph = state.graph;
         graph.nodes.push(action.node);
+        for (var i = 0; i < action.links.length; i++) {
+            graph.links.push(action.links[i]);
+        }
         return { ...state, graph }
     case ActionTypes.OVERVIEW_CREATE_NEW:
         return state;
