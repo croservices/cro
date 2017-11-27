@@ -9,7 +9,7 @@ The simplest `GET` request can be written as:
 # Import the client class.
 use Cro::HTTP::Client;
 
-# Doing the request
+# Make the request
 my $resp = await Cro::HTTP::Client.get('https://www.perl6.org/');
 ```
 

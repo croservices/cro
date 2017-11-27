@@ -30,7 +30,7 @@ So, we'll make a SPA that supports:
 
 * Submitting new tips (a POST to the backend)
 * Having the latest tips appear live (delivered over a web socket)
-* Being able to agree to disagree with a tip (also a POST)
+* Being able to agree or disagree with a tip (also a POST)
 * Being able to see a list of the tips sorted most agreeable to most
   disagreeable (obtained by a `GET`)
 
@@ -244,7 +244,7 @@ bundle.js  2.5 kB       0  [emitted]  main
 
 ## Serving and using the bundle
 
-Next up, edit `static/index.html`, and just before the closing </body> tag
+Next up, edit `static/index.html`, and just before the closing `</body>` tag
 add:
 
 ```
@@ -285,7 +285,7 @@ ways we could factor it, but the key thing to keep in mind is that a web
 application is a concurrent system, and in Cro requests are processed on a
 thread pool. This means two requests may be processed at the same time!
 
-To handle this, we'll use the OO::Monitors module. A monitor is like a class,
+To handle this, we'll use the `OO::Monitors` module. A monitor is like a class,
 but it enforces mutual exclusion on its methods - that is, only one thread
 may be inside the methods on a particular instance at a time. Thus, provided
 we don't leak out our internal state (making defensive copies if we do have
@@ -343,8 +343,8 @@ that, we'll come back to them one at a time.
 
 Next up is to make this available to our routes. We could make the instance in
 `Routes.pm6`, but that will make it hard to test our routes in isolation of
-the business logic. Instead, we'll make the sub in Routes.pm6 take an instance
-of the business logic object as parameter:
+the business logic. Instead, we'll make the sub in `Routes.pm6` take an instance
+of the business logic object as a parameter:
 
 ```
 use Cro::HTTP::Router;
@@ -432,7 +432,7 @@ done-testing;
 
 The first part tests that we can add two tips, and that if we tap the `Supply`
 of latest tips then we are given those two straight away. The second part is a
-bit more involved: it checks that if we tap the latest tips Supply, and then a
+bit more involved: it checks that if we tap the latest tips `Supply`, and then a
 new tip is added, then we will also be told about this new tip.
 
 Now to make them pass! Here's the implementation in the `monitor`:
@@ -477,7 +477,7 @@ a `start` to dispatch the notifications asynchronously.
 The `latest-tips` method also needs a little care. Remember that anything we
 return from a `monitor` is not protected by the mutual exclusion. Thus, we
 should make a copy of the latest existing tips outside of the `supply` block,
-while the monitor is protected `%!tips-by-id`. Then, when the returned
+while the monitor is protecting `%!tips-by-id`. Then, when the returned
 `supply` block is tapped, we subscribe to the latest tips, and then emit each
 of the latest existing ones.
 
@@ -506,7 +506,7 @@ $ npm install --save-dev babel-loader babel-core babel-preset-es2015 babel-prese
 ```
 
 Next, we need to create a `.babelrc` file, saying to use this react preset
-(babel is the thing used to turn modern JavaScript into browser-compatible
+(Babel is the thing used to turn modern JavaScript into browser-compatible
 JavaScript). It should simply contain:
 
 ```
@@ -515,7 +515,7 @@ JavaScript). It should simply contain:
 }
 ```
 
-Finally, the `webpack.config.js` needs updating to say to use this. After the
+Finally, the `webpack.config.js` needs updates to use this. After the
 changes, it should look as follows:
 
 ```
@@ -891,7 +891,7 @@ asynchronous operation starts, which we can use to indicate that on the UI,
 and a further one once it has completed, so we can again indicate that the
 operation completed in the UI.
 
-First, let's setup `react-thunk`, which is a piece of middleware. Back in
+First, let's setup `redux-thunk`, which is a piece of middleware. Back in
 `frontend/index.js`, add:
 
 ```
@@ -916,7 +916,7 @@ Finally, change:
 let store = createStore(tipsyReducer);
 ```
 
-To apply the middlware also:
+To apply the middleware also:
 
 ```
 let store = createStore(tipsyReducer, applyMiddleware(thunkMiddleware));
@@ -937,7 +937,7 @@ Note that this doesn't yet change anything; build it and the behavior should
 be just the same. Now that we've done this, however, we can see that it will
 be possible to do this dispatch in a callback after the network operation.
 
-There's, of course, dozens of good ways to deal with asynchronous operations
+There's of course dozens of good ways to deal with asynchronous operations
 in JavaScript, and if you are seriously building single page applications I
 strongly recommend looking into using a promise library. There's also Redux
 middleware that will integrate with that. For now, we'll do the simplest
@@ -971,7 +971,7 @@ export function addTip() {
 ```
 
 Reload it, maybe open your browser's development tools (F12 usually), flip to
-the Network tap, and click Add Tip. All being well, you'll observe the request
+the Network tab, and click Add Tip. All being well, you'll observe the request
 was made and it produced a 204 response. Alternatively, you may like to stop
 the `cro run` and instead do `cro trace`; type a message, click Add Tip again,
 and you should see the request body dumped in the trace output.
@@ -1435,7 +1435,7 @@ refactor away in `frontend/index.js`:
 });
 ```
 
-Next, we'll update the dispatch to props map, to incldue our new agree and
+Next, we'll update the dispatch to props map, to include our new agree and
 disagree actions:
 
 ```
@@ -1491,7 +1491,7 @@ var App = props => (
 ```
 
 And there we have it. `npm run build`, refresh, and give it a spin. Clicking
-agree of disagree in either list ends up with the sort order in the Top Tips
+agree or disagree in either list ends up with the sort order in the Top Tips
 list changing to reflect the votes.
 
 At last, we're done.
