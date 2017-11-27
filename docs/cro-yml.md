@@ -73,7 +73,7 @@ from another service. Protocols include:
 * `http` - HTTP/1.1 insecure
 * `http2` - HTTP/2.0 insecure (starts HTTP/2 by prior knowledge)
 * `wss` - web socket secure
-* `ws` - insecure
+* `ws` - web socket insecure
 * `zeromq/rep` - ZeroMQ `REP` (generated client would be a `REQ`)
 * `zeromq/pub` - ZeroMQ `PUB` (generated client would be a `SUB`)
 
@@ -109,7 +109,7 @@ links:
 Where `service` is the ID of the service (defined by `id` in its `.cro.yml`),
 `endpoint` is the ID of the endpoint (from the target service's `.cro.yml`'s
 `endpoints` section), and `env` is the environment variable specifying the
-host and port in the form `host:port`
+host and port in the form `host:port`.
 
 ## Environment
 

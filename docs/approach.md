@@ -8,23 +8,23 @@ over the network.
 
 Messages are represented by `Cro::Message`. Concrete implementations include:
 
-* Cro::TCP::Message
-* Cro::HTTP::Request
-* Cro::HTTP::Response
+* `Cro::TCP::Message`
+* `Cro::HTTP::Request`
+* `Cro::HTTP::Response`
 
 Incoming connections are represented by `Cro::Connection`; implementations
 include:
 
-* Cro::TCP::ServerConnection
-* Cro::TLS::ServerConnection
+* `Cro::TCP::ServerConnection`
+* `Cro::TLS::ServerConnection`
 
 A `Cro::Source` is a source of either messages or connections. For example,
 `Cro::TCP::Listener` produces `Cro::TCP::ServerConnection` objects.
 
 A `Cro::Transform` transforms one connection or message into another. For
 example, `Cro::HTTP::RequestParser` will transform `Cro::TCP::Message`s into
-`Cro::HTTP::Request`s, while a `Cro::HTTP::ResponseSerializer` transforms a
-`Cro::HTTP::Response`s into `Cro::TCP::Messages`s. This means that in Cro,
+`Cro::HTTP::Request`s, while a `Cro::HTTP::ResponseSerializer` transforms
+`Cro::HTTP::Response`s into `Cro::TCP::Message`s. This means that in Cro,
 HTTP applications are simply transforms from `Cro::HTTP::Request` into
 `Cro::HTTP::Response`.
 
@@ -153,7 +153,7 @@ A minimal TCP client that connects, sends a message, and disconnects as soon
 as it has received something, could be expressed as:
 
     my Cro::Connector $conn = Cro.compose(Cro::TCP::Connector);
-    my Supply $responses = $tcp-client.establish(
+    my Supply $responses = $conn.establish(
         host => 'localhost',
         port => 4242,
         supply {

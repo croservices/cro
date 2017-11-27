@@ -2,7 +2,7 @@
 
 ## Introductory Material
 
-The essentials you need to know to get building with Cro.
+The essentials you need to know to get building with Cro:
 
 * [Getting Started](docs/intro/getstarted)
 * [Creating HTTP Services](docs/intro/http-server)
@@ -12,7 +12,7 @@ The essentials you need to know to get building with Cro.
 ## Beyond The Basics
 
 Ready to dig a deeper? These articles explain the Cro design and structure,
-as well as covering some more advanced topics.
+as well as covering some more advanced topics:
 
 * [The Cro Approach](docs/approach)
 * [Module Structure](docs/module-structure)
@@ -21,7 +21,7 @@ as well as covering some more advanced topics.
 
 ## Reference
 
-The full details, organized by module.
+The full details, organized by module:
 
 ### Cro::Core
 
@@ -76,7 +76,7 @@ Pipeline components:
 
 The development tools are mostly without API docs, as they are mostly not
 expected to be extended from the outside at this point. However, the following
-parts have stable APIs for the sake of extending the tools.
+parts have stable APIs for the sake of extending the tools:
 
 * [Cro::Tools::LinkTemplate](docs/reference/cro-tools-linktemplate)
 * [Cro::Tools::Template](docs/reference/cro-tools-template)

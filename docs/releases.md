@@ -14,14 +14,14 @@ The following changes were made to the `Cro::Core` distribution:
   binary data
 * Provide a mode for machine-readable trace output
 * Always flush handle after producing trace output
-* Add a workaround for `CLOSE` phaser bug
+* Add a workaround for a `CLOSE` phaser bug
 
-The `Cro::SSL` distribution is decprecated in favor of `Cro::TLS`. In
+The `Cro::SSL` distribution is deprecated in favor of `Cro::TLS`. In
 `Cro::TLS`, the following changes were made:
 
 * Eliminate a workaround for an older `IO::Socket::Async::SSL` bug
 * The tests no longer assume the availability of an OpenSSL version with ALPN
-* Add a workaround for `CLOSE` phaser bug
+* Add a workaround for a `CLOSE` phaser bug
 
 Furthermore, the Cro team contributed bug fixes to `IO::Socket::Async::SSL`.
 
@@ -36,7 +36,7 @@ The following changes were made to the `Cro::HTTP` distribution:
     * Partial implementation of per-`route`-block middleware (`before` and
       `after`)
 * `Cro::HTTP::Client`
-    * Fix a HTTP/1.1 vs HTTP/2.0 detection bug
+    * Fix an HTTP/1.1 vs HTTP/2.0 detection bug
     * Remove unused attributes in HTTP client internals
     * Fix client to pass on the query string in the target URI
     * Implement `base-uri` constructor argument, which will be prepended to
@@ -51,9 +51,9 @@ The following changes were made to the `Cro::HTTP` distribution:
     * Fix a couple of occasional hangs in the HTTP/2.0 client
     * Implement window size handling in HTTP/2.0
 * General
-    * Correct mispelled body serializer class names
+    * Correct misspelled body serializer class names
     * Implement new `trace-output` API for better trace output
-    * Fix missing JSON::Fast dependency
+    * Fix missing `JSON::Fast` dependency
     * Use `Cro::TLS` instead of `Cro::SSL`
     * Make urlencoded and multipart bodies associative, so they can be
       hash-indexed

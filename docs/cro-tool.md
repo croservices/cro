@@ -11,14 +11,14 @@ project.
 A new service can be stubbed using the `cro stub` command. The general usage
 is:
 
-    cro stub <service-type> <service-id> <path> ['link-and-options']
+    cro stub <service-type> <service-id> <path> ['links-and-options']
 
 Where
 
 * `service-type` is the type of service to create
 * `service-id` is the ID of the service (to be used with other `cro`
   commands; this will also be used as the service's default descriptive
-  `name` in `.cro.yml`),
+  `name` in `.cro.yml`)
 * `path` is the location to create the service
 * `links-and-options` specifies links to other services that should be added
   to the stub, together with options specific to the service type
@@ -47,14 +47,14 @@ of an entry in the `endpoints` list of that `.cro.yml` file.
 ### HTTP Services
 
 The `http` service type stubs in a HTTP service, using `Cro::HTTP::Router` and
-served by `Cro::HTTP::Server`. By default, it stubs a HTTPS service that will
+served by `Cro::HTTP::Server`. By default, it stubs an HTTPS service that will
 accept HTTP/1.0, HTTP/1.1 and HTTP/2.0 requests.
 
     cro stub http flashcard-backend backend/flashcards
 
 The following options may be supplied:
 
-* `:secure`: generates a HTTPS service instead of a HTTP one (`:!secure` is
+* `:secure`: generates an HTTPS service instead of an HTTP one (`:!secure` is
   the default); implies `:http1 :http2` by default, using ALPN to negotiate
   whether to use HTTP/2
 * `:!http2`: generates a service without HTTP 2 support
@@ -139,7 +139,7 @@ An IP address to bind to may also be provided before the port number:
 ## Working with service links
 
 The `cro link` subcommand is used to manage the `links` section of `.cro.yml`
-files. These describes how one Cro service uses another, resulting in the
+files. These describe how one Cro service uses another, resulting in the
 injection of environment variables specifying the host and port where the
 service can be found. In production, these would be set by a container engine
 such as Kubernetes, by some kind of configuration management system, or even
@@ -161,7 +161,7 @@ If `to-endpoint-id` is not specified, and the `to-service-id` service has only
 one endpoint, then that one will be used by default. Otherwise, the ambiguity
 will be whined about.
 
-To re-generate the code for an existing link, do:
+To regenerate the code for an existing link, do:
 
     cro link code <from-service-id> <to-service-id> [<to-endpoint-id>]
 
