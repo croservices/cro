@@ -66,6 +66,6 @@ react whenever signal(SIGINT) {
 }
 ```
 
-And the application is up and running, so it's time to improve it: add
+With this the application is up and running, so it's time to improve it: add
 more logic and use other features. See `Cro::HTTP::Router` and
 `Cro::HTTP::Server` to learn more.
