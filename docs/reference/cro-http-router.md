@@ -807,10 +807,6 @@ bit worse.
 
 ## Applying middleware in a route block
 
-**Note:** This describes a feature that is only partially implemented in the
-current version of Cro. The block convenience forms will be included in an
-upcoming release.
-
 In Cro, middleware is a component in the request processing pipeline. It may
 be installed at the server level (see `Cro::HTTP::Server` for more), but also
 per `route` block using the `before` and `after` functions. For readers new to
