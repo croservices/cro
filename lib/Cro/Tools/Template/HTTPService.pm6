@@ -45,7 +45,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         return @errors;
     }
 
-    sub write-fake-tls($where) {
+    method write-fake-tls($where) {
         my $res = $where.add('RESOURCES/');
         mkdir $res;
         mkdir $res.add('fake-tls');
@@ -60,14 +60,14 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                     %options, $generated-links, @links) {
         my $lib = $where.add('lib');
         mkdir $lib;
-        write-fake-tls($where) if %options<secure>;
-        write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, $generated-links);
-        write-entrypoint($where.add('service.p6'), $id, %options, $generated-links);
-        write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
-        write-meta($where.add('META6.json'), $name, %options);
+        self.write-fake-tls($where) if %options<secure>;
+        self.write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, $generated-links);
+        self.write-entrypoint($where.add('service.p6'), $id, %options, $generated-links);
+        self.write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
+        self.write-meta($where.add('META6.json'), $name, %options);
     }
 
-    sub write-app-module($file, $name, $include-websocket, $links) {
+    method app-module-contents($name, $include-websocket, $links) {
         my $module = "use Cro::HTTP::Router;\n";
         $module ~= "use Cro::HTTP::Router::WebSocket;\n" if $include-websocket;
         $module ~= "\nsub routes(";
@@ -99,10 +99,15 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                 }
             }
             CODE
-        $file.spurt($module);
+
+        $module
     }
 
-    sub write-entrypoint($file, $id, %options, $links) {
+    method write-app-module($file, $name, $include-websocket, $links) {
+        $file.spurt(self.app-module-contents($name, $include-websocket, $links));
+    }
+
+    method entrypoint-contents($id, %options, $links) {
         my $env-name = env-name($id);
         my $http = %options<http1> && %options<http2>
             ?? <1.1 2>
@@ -164,10 +169,15 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                 }
             }
             CODE
-        $file.spurt($entrypoint);
+
+        $entrypoint
     }
 
-    sub write-cro-file($file, $id, $name, %options, @links) {
+    method write-entrypoint($file, $id, %options, $links) {
+        $file.spurt(self.entrypoint-contents($id, %options, $links));
+    }
+
+    method cro-file-object($id, $name, %options, @links) {
         my $id-uc = env-name($id);
         my $cro-file = Cro::Tools::CroFile.new(
             :$id, :$name, :entrypoint<service.p6>, :endpoints[
@@ -180,10 +190,13 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                 )
             ], :@links
         );
-        $file.spurt($cro-file.to-yaml());
     }
 
-    sub write-meta($file, $name, %options) {
+    method write-cro-file($file, $id, $name, %options, @links) {
+        $file.spurt(self.cro-file-object($id, $name, %options, @links).to-yaml);
+    }
+
+    method meta6-object($name, %options) {
         my @deps = <Cro::HTTP>;
         @deps.push: <Cro::WebSocket> if %options<websocket>;
         my $m = META6.new(
@@ -207,7 +220,10 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                                               fake-tls/server-key.pem> !! (),
             license => 'Write me!'
         );
-        spurt($file, $m.to-json);
+    }
+
+    method write-meta($file, $name, %options) {
+        $file.spurt(self.meta6-object($name, %options).to-json);
     }
 
     sub env-name($id) {
