@@ -45,17 +45,6 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         return @errors;
     }
 
-    method write-fake-tls($where) {
-        my $res = $where.add('RESOURCES/');
-        mkdir $res;
-        mkdir $res.add('fake-tls');
-        for <fake-tls/ca-crt.pem fake-tls/server-crt.pem fake-tls/server-key.pem> -> $fn {
-            with %?RESOURCES{$fn} {
-                copy($_, $res.add($fn));
-            }
-        }
-    }
-
     method generate(IO::Path $where, Str $id, Str $name,
                     %options, $generated-links, @links) {
         my $lib = $where.add('lib');
@@ -65,6 +54,17 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         self.write-entrypoint($where.add('service.p6'), $id, %options, $generated-links);
         self.write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
         self.write-meta($where.add('META6.json'), $name, %options);
+    }
+
+    method write-fake-tls($where) {
+        my $res = $where.add('RESOURCES/');
+        mkdir $res;
+        mkdir $res.add('fake-tls');
+        for <fake-tls/ca-crt.pem fake-tls/server-crt.pem fake-tls/server-key.pem> -> $fn {
+            with %?RESOURCES{$fn} {
+                copy($_, $res.add($fn));
+            }
+        }
     }
 
     method app-module-contents($name, $include-websocket, $links) {
