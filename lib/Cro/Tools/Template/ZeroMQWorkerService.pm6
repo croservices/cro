@@ -13,7 +13,6 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template does C
     method get-option-errors($options --> List) { () }
 
     method generate(IO::Path $where, Str $id, Str $name, %options, $generated-links, @links) {
-        die "Horrible death";
         self.generate-common($where, $id, $name, %options, $generated-links, @links);
     }
 
