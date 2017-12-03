@@ -1,8 +1,8 @@
 use Cro::Tools::CroFile;
 use Cro::Tools::Template;
-use META6;
+use Cro::Tools::Template::Common;
 
-class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
+class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template does Cro::Tools::Template::Common {
     method id(--> Str) { 'zeromq-worker' }
 
     method name(--> Str) { 'ZeroMQ Worker Service' }
@@ -12,14 +12,13 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
     method get-option-errors($options --> List) { () }
 
     method generate(IO::Path $where, Str $id, Str $name, %options, $generated-links, @links) {
-        die "Horrible death";
-        write-entrypoint($where.add('service.p6'), $id, %options);
-        write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
-        write-meta($where.add('META6.json'), $name);
+        self.generate-common($where, $id, $name, %options, $generated-links, @links);
     }
 
-    sub write-entrypoint($file, $id, %options) {
-        my $env-name = env-name($id);
+    method entrypoint-contents($id, %options, $links) {
+        my $env-name = self.env-name($id);
+        my $pull-service = 'MY_TEST_ZMQ_SERVICE';
+        my $push-service = 'MY_TEST_ZMQ_SERVICE';
         my $entrypoint = q:to/CODE/;
         use Cro;
         use Cro::ZeroMQ::Service;
@@ -38,13 +37,19 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
             }
         }
 
-        my Cro::Service $service = Cro::ZeroMQ::Service.pull-push(
-            pull-connect => "tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>",
-            push-connect => "tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>",
-            Worker);
+        CODE
+
+        $entrypoint ~= q:c:to/CODE/;
+        my $pull-connect = "tcp://%*ENV<{$pull-service}_HOST>:%*ENV<{$pull-service}_PORT>";
+        my $push-connect = "tcp://%*ENV<{$push-service}_HOST>:%*ENV<{$push-service}_PORT>";
+        my Cro::Service $service = Cro::ZeroMQ::Service.pull-push(:$pull-connect, :$push-connect, Worker);
         $service.start;
 
-        say "Listening at tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>";
+        say "Pulling at $pull-connect";
+        say "Pushing at $push-connect";
+        CODE
+
+        $entrypoint ~= q:to/CODE/;
         react {
             whenever signal(SIGINT) {
                 say "Shutting down...";
@@ -53,47 +58,17 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template {
             }
         }
         CODE
-
-        $file.spurt($entrypoint);
     }
 
-    sub write-cro-file($file, $id, $name, %options, @links) {
-        my $id-uc = env-name($id);
-        my $cro-file = Cro::Tools::CroFile.new(
-            :$id, :$name, :entrypoint<service.p6>, :entrypoints[
-                Cro::Tools::CroFile::Endpoint.new(
-                    id => 'zmq',
-                    name => 'ZeroMQ',
-                    protocol => 'tcp',
-                    host-env => $id-uc ~ '_HOST',
-                    port-env => $id-uc ~ '_PORT'
-                )
-            ], :@links
-        );
-        $file.spurt($cro-file.to-yaml());
+    method cro-file-endpoints($id-uc, %options) {
+        Cro::Tools::CroFile::Endpoint.new(
+            id => 'zmq',
+            name => 'ZeroMQ',
+            protocol => 'tcp',
+            host-env => $id-uc ~ '_HOST',
+            port-env => $id-uc ~ '_PORT'
+        ),
     }
 
-    sub write-meta($file, $name) {
-        my $m = META6.new(
-            name => $name,
-            description => 'Write me!',
-            version => Version.new('0.0.1'),
-            perl-version => Version.new('6.*'),
-            depends => <Cro::ZMQ>,
-            tags => (''),
-            authors => (''),
-            auth => 'Write me!',
-            source-url => 'Write me!',
-            support => META6::Support.new(
-                source => 'Write me!'
-            ),
-            provides => {},
-            license => 'Write me!'
-        );
-        spurt($file, $m.to-json);
-    }
-
-    sub env-name($id) {
-        $id.uc.subst(/<-[A..Za..z_]>/, '_', :g)
-    }
+    method meta6-depends(%options) { <Cro::ZMQ> }
 }
