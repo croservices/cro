@@ -26,6 +26,7 @@
                 "Cro::Tools::TemplateLocator": "lib/Cro/Tools/TemplateLocator.pm6",
                 "Cro::Tools::Template::Common": "lib/Cro/Tools/Template/Common.pm6",
                 "Cro::Tools::Template::HTTPService": "lib/Cro/Tools/Template/HTTPService.pm6",
+                "Cro::Tools::Template::ReactReduxSPA": "lib/Cro/Tools/Template/ReactReduxSPA.pm6",
                 "Cro::Tools::Template::ZeroMQWorkSinkService": "lib/Cro/Tools/Template/ZeroMQWorkSinkService.pm6",
                 "Cro::Tools::Template::ZeroMQWorkerService": "lib/Cro/Tools/Template/ZeroMQWorkerService.pm6",
                 "Cro::Tools::Web": "lib/Cro/Tools/Web.pm6"
