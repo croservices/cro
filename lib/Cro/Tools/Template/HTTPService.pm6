@@ -182,29 +182,18 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
         ),
     }
 
-    method meta6-object($name, %options) {
-        my @deps = <Cro::HTTP>;
-        @deps.push: <Cro::WebSocket> if %options<websocket>;
-        my $m = META6.new(
-            name => $name,
-            description => 'Write me!',
-            version => Version.new('0.0.1'),
-            perl-version => Version.new('6.*'),
-            depends => @deps,
-            tags => (''),
-            authors => (''),
-            auth => 'Write me!',
-            source-url => 'Write me!',
-            support => META6::Support.new(
-                source => 'Write me!'
-            ),
-            provides => {
-                'Routes.pm6' => 'lib/Routes.pm6'
-            },
-            resources => %options<secure> ?? <fake-tls/ca-crt.pem
-                                              fake-tls/server-crt.pem
-                                              fake-tls/server-key.pem> !! (),
-            license => 'Write me!'
-        );
+    method meta6-depends(%options) {
+         <Cro::HTTP>,
+        (<Cro::WebSocket> if %options<websocket>)
+    }
+
+    method meta6-resources(%options) {
+        %options<secure> ?? <fake-tls/ca-crt.pem
+                             fake-tls/server-crt.pem
+                             fake-tls/server-key.pem> !! ()
+    }
+
+    method meta6-provides(%options) {
+        'Routes.pm6' => 'lib/Routes.pm6',
     }
 }

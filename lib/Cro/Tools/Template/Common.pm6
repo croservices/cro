@@ -4,7 +4,11 @@ use META6;
 role Cro::Tools::Template::Common {
     method entrypoint-contents($id, %options, $links --> Str) { ... }
 
-    method meta6-object($name, %options --> META6) { ... }
+    method meta6-depends(%options) { ... }
+
+    method meta6-provides(%options) { ... }
+
+    method meta6-resources(%options) { ... }
 
     method cro-file-endpoints($id-uc, %options) { ... }
 
@@ -21,6 +25,26 @@ role Cro::Tools::Template::Common {
 
     method write-meta($file, $name, %options) {
         $file.spurt(self.meta6-object($name, %options).to-json);
+    }
+
+    method meta6-object($name, %options) {
+        my @depends = self.meta6-depends(%options);
+        my %provides = self.meta6-provides(%options);
+        my @resources = self.meta6-resources(%options);
+        my $m = META6.new(
+            :$name, :@depends, :%provides, :@resources,
+            description => 'Write me!',
+            version => Version.new('0.0.1'),
+            perl-version => Version.new('6.*'),
+            tags => (''),
+            authors => (''),
+            auth => 'Write me!',
+            source-url => 'Write me!',
+            support => META6::Support.new(
+                source => 'Write me!'
+            ),
+            license => 'Write me!'
+        );
     }
 
     method write-cro-file($file, $id, $name, %options, @links) {
