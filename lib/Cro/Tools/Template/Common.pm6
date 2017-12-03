@@ -26,4 +26,8 @@ role Cro::Tools::Template::Common {
     method write-meta($file, $name, %options) {
         $file.spurt(self.meta6-object($name, %options).to-json);
     }
+
+    method env-name($id) {
+        $id.uc.subst(/<-[A..Za..z_]>/, '_', :g)
+    }
 }

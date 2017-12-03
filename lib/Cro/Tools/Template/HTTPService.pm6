@@ -107,7 +107,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
     }
 
     method entrypoint-contents($id, %options, $links) {
-        my $env-name = env-name($id);
+        my $env-name = self.env-name($id);
         my $http = %options<http1> && %options<http2>
             ?? <1.1 2>
             !! %options<http1> ?? <1.1> !! <2>;
@@ -173,7 +173,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
     }
 
     method cro-file-object($id, $name, %options, @links) {
-        my $id-uc = env-name($id);
+        my $id-uc = self.env-name($id);
         my $cro-file = Cro::Tools::CroFile.new(
             :$id, :$name, :entrypoint<service.p6>, :endpoints[
                 Cro::Tools::CroFile::Endpoint.new(
@@ -211,9 +211,5 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
                                               fake-tls/server-key.pem> !! (),
             license => 'Write me!'
         );
-    }
-
-    sub env-name($id) {
-        $id.uc.subst(/<-[A..Za..z_]>/, '_', :g)
     }
 }
