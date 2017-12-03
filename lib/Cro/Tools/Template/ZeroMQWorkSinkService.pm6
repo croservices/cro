@@ -56,8 +56,4 @@ class Cro::Tools::Template::ZeroMQWorkSinkService does Cro::Tools::Template does
     }
 
     method meta6-depends(%options) { <Cro::ZMQ> }
-
-    method meta6-provides(%options) { () }
-
-    method meta6-resources(%options) { () }
 }

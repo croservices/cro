@@ -6,9 +6,9 @@ role Cro::Tools::Template::Common {
 
     method meta6-depends(%options) { ... }
 
-    method meta6-provides(%options) { ... }
+    method meta6-provides(%options) { () }
 
-    method meta6-resources(%options) { ... }
+    method meta6-resources(%options) { () }
 
     method cro-file-endpoints($id-uc, %options) { ... }
 
