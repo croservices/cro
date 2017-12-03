@@ -172,19 +172,14 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
         $entrypoint
     }
 
-    method cro-file-object($id, $name, %options, @links) {
-        my $id-uc = self.env-name($id);
-        my $cro-file = Cro::Tools::CroFile.new(
-            :$id, :$name, :entrypoint<service.p6>, :endpoints[
-                Cro::Tools::CroFile::Endpoint.new(
-                    id => %options<secure> ?? 'https' !! <http>,
-                    name => %options<secure> ?? 'HTTPS' !! 'HTTP',
-                    protocol => %options<secure> ?? 'https' !! 'http',
-                    host-env => $id-uc ~ '_HOST',
-                    port-env => $id-uc ~ '_PORT'
-                )
-            ], :@links
-        );
+    method cro-file-endpoints($id-uc, %options) {
+        Cro::Tools::CroFile::Endpoint.new(
+            id => %options<secure> ?? 'https' !! <http>,
+            name => %options<secure> ?? 'HTTPS' !! 'HTTP',
+            protocol => %options<secure> ?? 'https' !! 'http',
+            host-env => $id-uc ~ '_HOST',
+            port-env => $id-uc ~ '_PORT'
+        ),
     }
 
     method meta6-object($name, %options) {

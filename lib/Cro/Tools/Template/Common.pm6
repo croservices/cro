@@ -6,7 +6,7 @@ role Cro::Tools::Template::Common {
 
     method meta6-object($name, %options --> META6) { ... }
 
-    method cro-file-object($id, $name, %options, @links --> Cro::Tools::CroFile) { ... }
+    method cro-file-endpoints($id-uc, %options) { ... }
 
 
     method generate-common($where, $id, $name, %options, $generated-links, @links) {
@@ -25,6 +25,13 @@ role Cro::Tools::Template::Common {
 
     method write-cro-file($file, $id, $name, %options, @links) {
         $file.spurt(self.cro-file-object($id, $name, %options, @links).to-yaml);
+    }
+
+    method cro-file-object($id, $name, %options, @links) {
+        my $id-uc = self.env-name($id);
+        my @endpoints = self.cro-file-endpoints($id-uc, %options);
+        my $entrypoint = 'service.p6';
+        Cro::Tools::CroFile.new(:$id, :$name, :$entrypoint, :@endpoints, :@links)
     }
 
     method env-name($id) {
