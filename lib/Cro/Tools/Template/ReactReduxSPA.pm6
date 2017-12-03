@@ -19,11 +19,16 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
     }
 
     method make-directories($where) {
+        my @dirs = self.new-directories($where);
+        .value.mkdir for @dirs;
+        @dirs
+    }
+
+    method new-directories($where) {
         my $static = $where.add('static');
-        my $static-js = $static.add('js');
-        my $frontend = $where.add('frontend');
-        .mkdir for $static, $static-js, $frontend;
-        :$static, :$static-js, :$frontend;
+        static    => $static,
+        static-js => $static.add('js'),
+        frontend  => $where.add('frontend')
     }
 
     method write-static-index($file) {
