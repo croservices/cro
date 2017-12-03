@@ -19,15 +19,18 @@ class Cro::Tools::Template::ZeroMQWorkSinkService does Cro::Tools::Template does
 
     method entrypoint-contents($id, %options, $links) {
         my $env-name = self.env-name($id);
-        my $entrypoint = q:to/CODE/;
+        my $service = 'MY_TEST_ZMQ_SERVICE';
+        my $entrypoint = q:c:to/CODE/;
         use Cro::ZeroMQ::Collector;
 
-        my $worker = Cro::ZeroMQ::Collector.pull(
-            connect => "tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>");
-
+        my $connect = "tcp://%*ENV<{$service}_HOST>:%*ENV<{$service}_PORT>";
+        my $worker = Cro::ZeroMQ::Collector.pull(:$connect);
         my $work = $worker.Supply.share;
 
-        say "Listening at tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>";
+        say "Pulling from $connect";
+        CODE
+
+        $entrypoint ~= q:to/CODE/;
         react {
             whenever $work {
                 say $work.perl;
