@@ -1,7 +1,6 @@
 use Cro::Tools::CroFile;
 use Cro::Tools::Template;
 use Cro::Tools::Template::Common;
-use META6;
 
 class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tools::Template::Common {
     method id(--> Str) { 'http' }
