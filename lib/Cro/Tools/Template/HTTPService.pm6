@@ -1,8 +1,9 @@
 use Cro::Tools::CroFile;
 use Cro::Tools::Template;
+use Cro::Tools::Template::Common;
 use META6;
 
-class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
+class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tools::Template::Common {
     method id(--> Str) { 'http' }
 
     method name(--> Str) { 'HTTP Service' }
@@ -51,9 +52,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         mkdir $lib;
         self.write-fake-tls($where) if %options<secure>;
         self.write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, $generated-links);
-        self.write-entrypoint($where.add('service.p6'), $id, %options, $generated-links);
-        self.write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
-        self.write-meta($where.add('META6.json'), $name, %options);
+        self.generate-common($where, $id, $name, %options, $generated-links, @links);
     }
 
     method write-fake-tls($where) {
@@ -173,10 +172,6 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
         $entrypoint
     }
 
-    method write-entrypoint($file, $id, %options, $links) {
-        $file.spurt(self.entrypoint-contents($id, %options, $links));
-    }
-
     method cro-file-object($id, $name, %options, @links) {
         my $id-uc = env-name($id);
         my $cro-file = Cro::Tools::CroFile.new(
@@ -190,10 +185,6 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                 )
             ], :@links
         );
-    }
-
-    method write-cro-file($file, $id, $name, %options, @links) {
-        $file.spurt(self.cro-file-object($id, $name, %options, @links).to-yaml);
     }
 
     method meta6-object($name, %options) {
@@ -220,10 +211,6 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template {
                                               fake-tls/server-key.pem> !! (),
             license => 'Write me!'
         );
-    }
-
-    method write-meta($file, $name, %options) {
-        $file.spurt(self.meta6-object($name, %options).to-json);
     }
 
     sub env-name($id) {
