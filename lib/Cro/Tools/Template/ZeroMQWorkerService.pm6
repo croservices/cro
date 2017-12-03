@@ -19,6 +19,8 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template does C
 
     method entrypoint-contents($id, %options, $links) {
         my $env-name = self.env-name($id);
+        my $pull-service = 'MY_TEST_ZMQ_SERVICE';
+        my $push-service = 'MY_TEST_ZMQ_SERVICE';
         my $entrypoint = q:to/CODE/;
         use Cro;
         use Cro::ZeroMQ::Service;
@@ -37,13 +39,19 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template does C
             }
         }
 
-        my Cro::Service $service = Cro::ZeroMQ::Service.pull-push(
-            pull-connect => "tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>",
-            push-connect => "tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>",
-            Worker);
+        CODE
+
+        $entrypoint ~= q:c:to/CODE/;
+        my $pull-connect = "tcp://%*ENV<{$pull-service}_HOST>:%*ENV<{$pull-service}_PORT>";
+        my $push-connect = "tcp://%*ENV<{$push-service}_HOST>:%*ENV<{$push-service}_PORT>";
+        my Cro::Service $service = Cro::ZeroMQ::Service.pull-push(:$pull-connect, :$push-connect, Worker);
         $service.start;
 
-        say "Listening at tcp://%*ENV<MY_TEST_ZMQ_SERVICE_HOST>:%*ENV<MY_TEST_ZMQ_SERVICE_PORT>";
+        say "Pulling at $pull-connect";
+        say "Pushing at $push-connect";
+        CODE
+
+        $entrypoint ~= q:to/CODE/;
         react {
             whenever signal(SIGINT) {
                 say "Shutting down...";
