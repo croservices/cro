@@ -18,12 +18,6 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         nextsame;
     }
 
-    method make-directories($where) {
-        my @dirs = self.new-directories($where);
-        .value.mkdir for @dirs;
-        @dirs
-    }
-
     method new-directories($where) {
         my $static = $where.add('static');
         static    => $static,

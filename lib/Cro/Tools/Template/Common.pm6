@@ -2,6 +2,8 @@ use Cro::Tools::CroFile;
 use META6;
 
 role Cro::Tools::Template::Common {
+    method new-directories($where) { () }
+
     method entrypoint-contents($id, %options, $links --> Str) { ... }
 
     method meta6-depends(%options) { ... }
@@ -12,6 +14,12 @@ role Cro::Tools::Template::Common {
 
     method cro-file-endpoints($id-uc, %options) { ... }
 
+
+    method make-directories($where) {
+        my @dirs = self.new-directories($where);
+        .value.mkdir for @dirs;
+        @dirs
+    }
 
     method generate-common($where, $id, $name, %options, $generated-links, @links) {
         self.write-entrypoint($where.add('service.p6'), $id, %options, $generated-links);
