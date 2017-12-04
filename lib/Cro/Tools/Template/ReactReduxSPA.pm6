@@ -8,7 +8,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
     method generate(IO::Path $where, Str $id, Str $name,
                     %options, $generated-links, @links) {
         my %dir = self.make-directories($where);
-        self.write-static-index(%dir<static>.add('index.html'));
+        self.write-static-index(%dir<static>.add('index.html'), $name);
         self.write-frontend-index(%dir<frontend>.add('index.js'));
         self.write-frontend-actions(%dir<frontend>.add('actions.js'));
         self.write-frontend-reducer(%dir<frontend>.add('reducer.js'));
@@ -26,12 +26,23 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         frontend  => $where.add('frontend')
     }
 
-    method write-static-index($file) {
-        $file.spurt(self.static-index-contents);
+    method write-static-index($file, $name) {
+        $file.spurt(self.static-index-contents($name));
     }
 
-    method static-index-contents() {
-        'TODO'
+    method static-index-contents($name) {
+        q:c:to/HTML/;
+            <html>
+              <head>
+                <title>{$name}</title>
+              </head>
+              <body>
+                <h1>{$name}</h1>
+                <div id="app"></div>
+                <script src="js/bundle.js"></script>
+              </body>
+            </html>
+            HTML
     }
 
     method write-frontend-index($file) {
