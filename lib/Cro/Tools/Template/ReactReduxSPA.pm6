@@ -90,6 +90,11 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
     }
 
     method babelrc-contents() {
-        'TODO'
+        q:to/JSON/;
+            {
+                "presets" : ["es2015","react"],
+                "plugins" : ["transform-object-rest-spread"]
+            }
+            JSON
     }
 }
