@@ -20,6 +20,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
 
     method new-directories($where) {
         my $static = $where.add('static');
+        |callsame,
         static    => $static,
         static-js => $static.add('js'),
         frontend  => $where.add('frontend')

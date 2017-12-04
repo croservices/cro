@@ -47,11 +47,14 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
 
     method generate(IO::Path $where, Str $id, Str $name,
                     %options, $generated-links, @links) {
-        my $lib = $where.add('lib');
-        mkdir $lib;
+        my %dir = self.make-directories($where);
         self.write-fake-tls($where) if %options<secure>;
-        self.write-app-module($lib.add('Routes.pm6'), $name, %options<websocket>, $generated-links);
+        self.write-app-module(%dir<lib>.add('Routes.pm6'), $name, %options<websocket>, $generated-links);
         self.generate-common($where, $id, $name, %options, $generated-links, @links);
+    }
+
+    method new-directories($where) {
+        lib => $where.add('lib'),
     }
 
     method write-fake-tls($where) {
