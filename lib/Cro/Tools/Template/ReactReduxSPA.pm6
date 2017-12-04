@@ -82,7 +82,26 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
     }
 
     method webpack-config-contents() {
-        'TODO'
+        q:to/CODE/;
+            const path = require('path');
+
+            module.exports = {
+                entry: './frontend/index.js',
+                output: {
+                    filename: 'bundle.js',
+                    path: path.resolve(__dirname, 'static/js')
+                },
+                module: {
+                    loaders: [
+                        {
+                            test: /\.js/,
+                            include: path.resolve(__dirname, 'frontend'),
+                            loader: 'babel-loader'
+                        }
+                    ]
+                }
+            };
+            CODE
     }
 
     method write-babelrc($file) {
