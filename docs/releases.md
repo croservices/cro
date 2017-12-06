@@ -1,5 +1,52 @@
 # Cro Release History
 
+## 0.7.2
+
+This release brings a number of new features making it easier to create and
+consume HTTP middleware, as well as support for middleware at a `route` block
+level. In tooling, the `cro web` tool now supports adding inter-service links
+when stubbing, and there there are improvements for those writing templates
+for use with `cro stub`. Read on for details of the full set of improvements.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Factor out trace output repeated code
+* Avoid trace output throwing execptions on Windows
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Add `Cro::HTTP::Middleware` module, with a range of roles to simplify the
+  implementation of middleware. These include `Conditional` (for request
+  middleware that may wish to send an early response) and `RequestResponse`
+  (for middleware interested in both requests and responses).
+* Support `before` and `after` in `route` blocks taking a block argument for
+  writing simple inline middleware, together with support for `before`
+  middleware to itself produce a response
+* Pass named arguments to the `/` route in `Cro::HTTP::Router`
+* Fix `Cro::HTTP::Client` handling of the `http-only` flag on cookies
+* Add the `PATCH` HTTP method to the default set of those accepted by the
+  request parser, add a `patch` method to `Cro::HTTP::Client`, and a `patch`
+  function to `Cro::HTTP::Router`
+
+The following changes were made to the `cro` distribution:
+
+* Support creation of inter-service links when stubbing a service in the Cro
+  web tool
+* Allow F5 to work in the Cro web tool even after navigating to other pages
+* Introduce the `Cro::Tools::Template::Common` role to factor out many common
+  tasks between stub templates, and use it
+* Make existing templates more possible to subclass, to ease adding further
+  stubbing templates
+* Fix HTTPS service stub generation
+* Document new `Cro::HTTP` middleware features
+* Document client and rotuer support for the HTTP `PATCH` method
+* A range of typo and layout fixes across the documentation
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support), together with the
+following community members: dakkar, Geoffrey Broadwell, James Raspass, Michal
+Jurosz, Timo Paulssen, vendethiel.
+
 ## 0.7.1
 
 This is the second public BETA release of Cro, and the first to be distributed
