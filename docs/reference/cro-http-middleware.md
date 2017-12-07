@@ -245,63 +245,65 @@ response cache, that caches everything, forever, without regard to language,
 encoding, and so forth. The cache is held per instance of the middleware, and
 so lives between requests.
 
-    use Cro::HTTP::Request;
-    use Cro::HTTP::Response;
-    use OO::Monitors;
+```
+use Cro::HTTP::Request;
+use Cro::HTTP::Response;
+use OO::Monitors;
 
-    monitor CachedData {
-        my class Entry {
-            has $.status;
-            has @.headers;
-            has $.body-blob;
+monitor CachedData {
+    my class Entry {
+        has $.status;
+        has @.headers;
+        has $.body-blob;
+    }
+    has Entry %!cache;
+
+    method lookup(Cro::HTTP::Request $request) {
+        with %!cache{$req.target} {
+            my $resp = Cro::HTTP::Response.new: :$request, :status(.status);
+            $resp.append-header($_) for .headers;
+            $resp.set-body-byte-stream(supply emit .body-blob);
+            return $resp;
         }
-        has Entry %!cache;
+        return Nil;
+    }
 
-        method lookup(Cro::HTTP::Request $request) {
-            with %!cache{$req.target} {
-                my $resp = Cro::HTTP::Response.new: :$request, :status(.status);
-                $resp.append-header($_) for .headers;
-                $resp.set-body-byte-stream(supply emit .body-blob);
-                return $resp;
+    method add($key, $status, @headers, $body-blob --> Nil) {
+        %!cache{$key} = Entry.new: :$status, :@headers, :$body-blob;
+    }
+}
+
+class ResponseCache does Cro::HTTP::Middleware::RequestResponse {
+    has CachedData $!cache .= new;
+
+    method process-requests(Supply $requests) {
+        supply whenever $requests -> $req {
+            with $!cache.lookup($req) -> $res {
+                emit $res;
             }
-            return Nil;
-        }
-
-        method add($key, $status, @headers, $body-blob --> Nil) {
-            %!cache{$key} = Entry.new: :$status, :@headers, :$body-blob;
+            else {
+                emit $req;
+            }
         }
     }
 
-    class ResponseCache does Cro::HTTP::Middleware::RequestResponse {
-        has CachedData $!cache .= new;
-
-        method process-requests(Supply $requests) {
-            supply whenever $requests -> $req {
-                with $!cache.lookup($req) -> $res {
-                    emit $res;
-                }
-                else {
-                    emit $req;
-                }
-            }
-        }
-
-        method process-responses(Supply $responses) {
-            supply whenever $responses -> $res {
-                my $key = $res.request.target;
-                my $status = $res.status;
-                my @headers = $res.header-list;
-                whenever $res.body-blob -> $body-blob {
-                    # Produce the response, and cache the bytes, rather than
-                    # going through body serialization every time in the
-                    # future.
-                    $!cache.add($key, $status, @headers, $body-blob);
-                    $resp.set-body-byte-stream(supply emit $body-blob);
-                    emit $res;
-                }
+    method process-responses(Supply $responses) {
+        supply whenever $responses -> $res {
+            my $key = $res.request.target;
+            my $status = $res.status;
+            my @headers = $res.header-list;
+            whenever $res.body-blob -> $body-blob {
+                # Produce the response, and cache the bytes, rather than
+                # going through body serialization every time in the
+                # future.
+                $!cache.add($key, $status, @headers, $body-blob);
+                $resp.set-body-byte-stream(supply emit $body-blob);
+                emit $res;
             }
         }
     }
+}
+```
 
 The `Cro::HTTP::Middleware::RequestResponse` role requires implementing the
 `process-requests` and `process-responses` methods, which are passed `Supply`
