@@ -5,7 +5,7 @@
 This release brings a number of new features making it easier to create and
 consume HTTP middleware, as well as support for middleware at a `route` block
 level. In tooling, the `cro web` tool now supports adding inter-service links
-when stubbing, and there there are improvements for those writing templates
+when stubbing, and there are improvements for those writing templates
 for use with `cro stub`. Read on for details of the full set of improvements.
 
 The following changes were made to the `Cro::Core` distribution:
@@ -39,7 +39,7 @@ The following changes were made to the `cro` distribution:
   stubbing templates
 * Fix HTTPS service stub generation
 * Document new `Cro::HTTP` middleware features
-* Document client and rotuer support for the HTTP `PATCH` method
+* Document client and router support for the HTTP `PATCH` method
 * A range of typo and layout fixes across the documentation
 
 This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
