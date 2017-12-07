@@ -810,8 +810,8 @@ bit worse.
 In Cro, middleware is a component in the request processing pipeline. It may
 be installed at the server level (see `Cro::HTTP::Server` for more), but also
 per `route` block using the `before` and `after` functions. For readers new to
-middleware in Cro, the [HTTP middleware guide](docs/cro-http-middleware) gives
-an overview of what middleware is, and the trade-offs between the different
+middleware in Cro, the [HTTP middleware guide](docs/reference/cro-http-middleware)
+gives an overview of what middleware is, and the trade-offs between the different
 ways of writing and using HTTP middleware in Cro.
 
 The `before` function is used to install middleware that operates on requests
