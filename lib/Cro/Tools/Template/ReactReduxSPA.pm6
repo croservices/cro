@@ -12,7 +12,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         self.write-frontend-index(%dir<frontend>.add('index.js'));
         self.write-frontend-actions(%dir<frontend>.add('actions.js'));
         self.write-frontend-reducer(%dir<frontend>.add('reducer.js'));
-        self.write-npm-package-config($where.add('package.json'));
+        self.write-npm-package-config($where.add('package.json'), $id);
         self.write-webpack-config($where.add('webpack.config.js'));
         self.write-babelrc($where.add('.babelrc'));
         nextsame;
@@ -69,12 +69,44 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         'TODO'
     }
 
-    method write-npm-package-config($file) {
-        $file.spurt(self.npm-package-config-contents);
+    method write-npm-package-config($file, $id) {
+        $file.spurt(self.npm-package-config-contents($id));
     }
 
-    method npm-package-config-contents() {
-        'TODO'
+    method npm-package-config-contents($id) {
+        q:s:to/CODE/;
+            {
+              "name": "$id",
+              "version": "1.0.0",
+              "description": "Write me!",
+              "main": "index.js",
+              "scripts": {
+                "build": "webpack",
+                "test": "echo \"Error: no test specified\" && exit 1"
+              },
+              "author": "",
+              "license": "UNLICENSED",
+              "private": true,
+              "devDependencies": {
+                "babel-core": "^6.26.0",
+                "babel-loader": "^7.1.2",
+                "babel-plugin-transform-object-rest-spread": "^6.26.0",
+                "babel-preset-env": "^1.6.0",
+                "babel-preset-es2015": "^6.24.1",
+                "babel-preset-react": "^6.24.1",
+                "webpack": "^3.6.0"
+              },
+              "dependencies": {
+                "jquery": "^3.2.1",
+                "react": "^16.0.0",
+                "react-dom": "^16.0.0",
+                "react-redux": "^5.0.6",
+                "redux": "^3.7.2",
+                "redux-thunk": "^2.2.0",
+                "redux-websocket-action": "^1.0.5"
+              }
+            }
+            CODE
     }
 
     method write-webpack-config($file) {
