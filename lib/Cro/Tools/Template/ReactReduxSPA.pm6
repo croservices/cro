@@ -11,7 +11,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         self.write-static-index(%dir<static>.add('index.html'), $name);
         self.write-frontend-index(%dir<frontend>.add('index.js'));
         self.write-frontend-actions(%dir<frontend>.add('actions.js'));
-        self.write-frontend-reducer(%dir<frontend>.add('reducer.js'));
+        self.write-frontend-reducer(%dir<frontend>.add('reducer.js'), $id);
         self.write-npm-package-config($where.add('package.json'), $id);
         self.write-webpack-config($where.add('webpack.config.js'));
         self.write-babelrc($where.add('.babelrc'));
@@ -61,12 +61,30 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         'TODO'
     }
 
-    method write-frontend-reducer($file) {
-        $file.spurt(self.frontend-reducer-contents);
+    method write-frontend-reducer($file, $id) {
+        $file.spurt(self.frontend-reducer-contents($id));
     }
 
-    method frontend-reducer-contents() {
-        'TODO'
+    method frontend-reducer-contents($id) {
+        my $state   = $id ~ 'Text';
+        my $reducer = $id ~ 'Reducer';
+        my $action  = 'CHANGE_' ~ $id.uc ~ '_TEXT';
+        q:s:to/CODE/;
+            import * as ActionTypes from './actions';
+
+            const initialState = {
+                $state: '',
+            };
+
+            export function \qq[$reducer](state = initialState, action) {
+                switch (action.type) {
+                    case ActionTypes.$action:
+                        return { ...state, $state: action.text };
+                    default:
+                        return state;
+                }
+            }
+            CODE
     }
 
     method write-npm-package-config($file, $id) {
