@@ -9,7 +9,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
                     %options, $generated-links, @links) {
         my %dir = self.make-directories($where);
         self.write-static-index(%dir<static>.add('index.html'), $name);
-        self.write-frontend-index(%dir<frontend>.add('index.js'));
+        self.write-frontend-index(%dir<frontend>.add('index.js'), $id);
         self.write-frontend-actions(%dir<frontend>.add('actions.js'), $id);
         self.write-frontend-reducer(%dir<frontend>.add('reducer.js'), $id);
         self.write-npm-package-config($where.add('package.json'), $id);
@@ -45,12 +45,71 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
             HTML
     }
 
-    method write-frontend-index($file) {
-        $file.spurt(self.frontend-index-contents);
+    method write-frontend-index($file, $id) {
+        $file.spurt(self.frontend-index-contents($id));
     }
 
-    method frontend-index-contents() {
-        'TODO'
+    method frontend-index-contents($id) {
+        my $property = $id ~ 'Text';
+        my $chunk    = $id.tclc ~ 'Text';
+        my $event    = 'onChange' ~ $chunk;
+        my $function = 'change'  ~ $id    ~ 'Text';
+        my $reducer  = $id ~ 'Reducer';
+        q:s:to/CODE/;
+            import React from 'react';
+            import { render } from 'react-dom';
+            import { createStore, applyMiddleware } from 'redux';
+            import { Provider, connect } from 'react-redux';
+            import thunkMiddleware from 'redux-thunk';
+            import WSAction from 'redux-websocket-action';
+            import * as Actions from './actions';
+            import { $reducer } from './reducer';
+
+            var $chunk = props => (
+                <div>
+                    <h2>Text Editing</h2>
+                    <div>
+                        <textarea rows="2" cols="100" maxLength="200"
+                            value={props.$property}
+                            onChange={e => props.\qq[$event](e.target.value)} />
+                    </div>
+                </div>
+            );
+
+            var App = props => (
+                <div>
+                    <$chunk $property={props.$property}
+                        $event={props.$event} />
+                </div>
+            );
+
+            function mapProps(state) {
+                return state;
+            }
+            function mapDispatch(dispatch) {
+                return {
+                    $event: text => dispatch(Actions.\qq[$function](text)),
+                };
+            }
+
+            let store = createStore($reducer, applyMiddleware(thunkMiddleware));
+
+            [].forEach(endpoint => {
+                let host = window.location.host;
+                let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
+                    retryCount:3,
+                    reconnectInterval: 3
+                });
+                wsAction.start();
+            });
+
+            let ConnectedApp = connect(mapProps, mapDispatch)(App);
+            render(
+                <Provider store={store}>
+                    <ConnectedApp />
+                </Provider>,
+                document.getElementById('app'));
+            CODE
     }
 
     method write-frontend-actions($file, $id) {
