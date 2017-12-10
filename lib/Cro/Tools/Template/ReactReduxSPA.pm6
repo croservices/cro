@@ -10,7 +10,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         my %dir = self.make-directories($where);
         self.write-static-index(%dir<static>.add('index.html'), $name);
         self.write-frontend-index(%dir<frontend>.add('index.js'));
-        self.write-frontend-actions(%dir<frontend>.add('actions.js'));
+        self.write-frontend-actions(%dir<frontend>.add('actions.js'), $id);
         self.write-frontend-reducer(%dir<frontend>.add('reducer.js'), $id);
         self.write-npm-package-config($where.add('package.json'), $id);
         self.write-webpack-config($where.add('webpack.config.js'));
@@ -53,12 +53,22 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
         'TODO'
     }
 
-    method write-frontend-actions($file) {
-        $file.spurt(self.frontend-actions-contents);
+    method write-frontend-actions($file, $id) {
+        $file.spurt(self.frontend-actions-contents($id));
     }
 
-    method frontend-actions-contents() {
-        'TODO'
+    method frontend-actions-contents($id) {
+        my $function = 'change'  ~ $id    ~ 'Text';
+        my $action   = 'CHANGE_' ~ $id.uc ~ '_TEXT';
+        q:s:to/CODE/;
+            import \q[$] from 'jquery';
+
+            export const $action = '$action';
+
+            export function \qq[$function](text) {
+                return { type: $action, text };
+            }
+            CODE
     }
 
     method write-frontend-reducer($file, $id) {
