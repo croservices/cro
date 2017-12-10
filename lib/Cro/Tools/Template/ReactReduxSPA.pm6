@@ -161,7 +161,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
     }
 
     method npm-package-config-contents($id) {
-        q:s:to/CODE/;
+        q:s:to/JSON/;
             {
               "name": "$id",
               "version": "1.0.0",
@@ -193,7 +193,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
                 "redux-websocket-action": "^1.0.5"
               }
             }
-            CODE
+            JSON
     }
 
     method write-webpack-config($file) {
