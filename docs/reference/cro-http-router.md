@@ -719,6 +719,9 @@ get -> {
 }
 ```
 
+In the case that the reuqest currently being processed was not a HTTP/2.0
+request, the `push-promise` function does nothing.
+
 ## Composing routers
 
 For any non-trivial service, defining all of the routes and their handlers in a
