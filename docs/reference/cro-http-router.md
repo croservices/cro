@@ -668,6 +668,57 @@ to instead use:
 
     cache-control :no-store, :no-cache;
 
+## Push Promises
+
+**Upcoming Feature::** *This section describes a feature that will be included
+in an upcoming Cro release.*
+
+HTTP/2.0 allows the response to include push promises. A push promise is used
+to push content associated with the response to the client. For example, CSS,
+JavaScript, or images needed for a page might be pushed, so as to save the
+client from needing to request them as it parses the page.
+
+The `push-promise` function provided by the router is the most convenient way
+to include a push promise with the current response. The simplest approach is
+to call it with the route of the resource to respond with:
+
+```
+get -> {
+    push-promise '/css/main.css';
+    content 'text/html', $some-content;
+}
+get 'css', *@path {
+    cache-control :public, :maxage(300);
+    static 'assets/css', @path;
+}
+```
+
+In the case that the route is reached via an `include` or `delegate` with a
+prefix, the leading `/` will be interpreted as relative the enclosing `route`
+block (put another way, any prefixes will be prepended to form the URL that
+is being promised).
+
+Push promises are processed like requests; they are emitted by the HTTP/2.0
+message parser, and thus will go through all middleware that a normal request
+would.
+
+By default, no headers are included in the push promise request. To include
+them, pass the `headers` named parameter, with either a `Hash` or a `List` of
+`Pair` (the latter form exists in case header ordering or multiple headers of
+the same name are desired). To simply pass on any headers as they appear in
+the request currently being processed, use `*` as the value; if the current
+request doesn't have such a header, it will not be included into the push
+promise.
+
+```
+get -> {
+    push-promise '/js/strings.js', headers => {
+        Accept-language => *
+    };
+    content 'text/html', $some-content;
+}
+```
+
 ## Composing routers
 
 For any non-trivial service, defining all of the routes and their handlers in a
