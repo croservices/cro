@@ -349,3 +349,41 @@ and `2`.
 The default is `:http<1.1>` for a HTTP request, and `:http<1.1 2>` for a HTTPS
 request. It is not legal to use `:http<1.1 2>` with a HTTP connection, as ALPN
 is the only supported mechanism for deciding which protocol to use.
+
+## Push promises
+
+**Upcoming Feature::** *This section describes a feature that will be included
+in an upcoming Cro release.*
+
+HTTP/2.0 proides push promises, which allow the server to push extra resources
+to the client as part of the response. By default, `Cro::HTTP::Client` will
+instruct the remote server to **not** send push promises. To opt in to this
+feature, either:
+
+* If making an instance of `Cro::HTTP::Client`, pass `:push-promises` to the
+  constructor to enable them for all requests made with the client instance
+* Otherwise, pass `:push-promises` when making a request (for example, to
+  the `get` method). However, when using HTTP/2.0, it's usually wise to make
+  an instance and re-use the connection for many requests.
+
+Push promises are obtained by calling the `push-promises` method of the
+`Cro::HTTP::Response` object that the request produces. This returns a `Supply`
+that emits an instance of `Cro::HTTP::PushPromise` for each push promise the
+server sends. Each of those in turn has a `response` property that returns a
+`Promise` that will be kept with a `Cro::HTTP::Response` object when the push
+promise is fulfilled.
+
+Making a request and obtaining all push promises can therefore be achieved as
+follows:
+
+```
+react {
+    my $client = Cro::HTTP::Client.new(:push-promises);
+    my $response = await $client.get($url);
+    whenever $response.push-promises -> $prom {
+        whenever $prom.response -> $resp {
+            say "Push promise for $prom.target() had status $resp.status()";
+        }
+    }
+}
+```
