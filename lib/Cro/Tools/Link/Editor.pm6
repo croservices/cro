@@ -62,7 +62,7 @@ our sub add-link($from-service, $to-service, $to-endpoint?) {
     }
     $from.links.push($link);
     spurt $path, $from.to-yaml;
-    print-endpoint($to-service, $endpoint);
+    endpoint-code($to-service, $endpoint);
 }
 
 our sub rm-link($from-service, $to-service, $to-endpoint?) {
@@ -81,27 +81,29 @@ our sub rm-link($from-service, $to-service, $to-endpoint?) {
     }
 }
 
-my sub print-endpoint($to-service, $ep) {
+my sub endpoint-code($to-service, $ep) {
     use Cro::Tools::TemplateLocator;
     use Cro::Tools::LinkTemplate;
     my @templates = get-available-templates(Cro::Tools::LinkTemplate);
+    my @output;
     for @templates {
         if $ep.protocol eq $_.protocol {
             my $g-link = $_.generate($to-service, $ep.id,
                                     (host-env => $ep.host-env,
                                      port-env => $ep.port-env));
-            say "use $_;" for $g-link.use;
-            say "\n" ~ $g-link.setup-code;
+            @output.push: "use $_;" for $g-link.use;
+            @output.push: "\n" ~ $g-link.setup-code;
             last;
         }
     }
+    @output.join("\n");
 }
 
 our sub code-link($from-service, $to-service, $to-endpoint?) {
     my ($path, $from, $to, $ep) = check-services($from-service,
                                                        $to-service,
                                                        $to-endpoint);
-    print-endpoint($to-service, $ep);
+    endpoint-code($to-service, $ep);
 }
 
 our sub links-graph($service?) {
