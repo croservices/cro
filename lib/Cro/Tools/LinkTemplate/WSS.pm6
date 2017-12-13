@@ -1,7 +1,7 @@
 use Cro::Tools::LinkTemplate;
 
-class Cro::Tools::LinkTemplate::WS does Cro::Tools::LinkTemplate {
-    method protocol() { 'ws' }
+class Cro::Tools::LinkTemplate::WSS does Cro::Tools::LinkTemplate {
+    method protocol() { 'wss' }
     method generate(Str $service, Str $endpoint, (:$host-env!, :$port-env!)) {
         my $setup-variable = "\$$service-$endpoint";
         my $setup-code = q:c:to/CODE/;
