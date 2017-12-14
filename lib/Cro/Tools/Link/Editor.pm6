@@ -1,4 +1,5 @@
 use Cro::Tools::CroFile;
+use Cro::Tools::LinkTemplate;
 use File::Find;
 
 my sub check-services($from-service, $to-service, $to-endpoint?) {
@@ -83,14 +84,13 @@ our sub rm-link($from-service, $to-service, $to-endpoint?) {
 
 my sub endpoint-code($to-service, $ep) {
     use Cro::Tools::TemplateLocator;
-    use Cro::Tools::LinkTemplate;
     my @templates = get-available-templates(Cro::Tools::LinkTemplate);
     my @output;
     for @templates {
-        if $ep.protocol eq $_.protocol {
-            my $g-link = $_.generate($to-service, $ep.id,
-                                    (host-env => $ep.host-env,
-                                     port-env => $ep.port-env));
+        if $ep.protocol eq .protocol {
+            my $g-link = .generate($to-service, $ep.id,
+                                   (host-env => $ep.host-env,
+                                    port-env => $ep.port-env));
             @output.push: "use $_;" for $g-link.use;
             @output.push: "\n" ~ $g-link.setup-code;
             last;
@@ -101,8 +101,8 @@ my sub endpoint-code($to-service, $ep) {
 
 our sub code-link($from-service, $to-service, $to-endpoint?) {
     my ($path, $from, $to, $ep) = check-services($from-service,
-                                                       $to-service,
-                                                       $to-endpoint);
+                                                 $to-service,
+                                                 $to-endpoint);
     endpoint-code($to-service, $ep);
 }
 
