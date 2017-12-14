@@ -217,6 +217,42 @@
     fill: none;
 }
 
+.linksURL {
+    cursor: pointer;
+}
+
+.linkControlPanel {
+    display: inline-block;
+}
+
+.linkName {
+    display: inline-block;
+    width: 70%;
+}
+
+@media only screen and (max-width: 1200px) {
+    .linkName {
+        width: 50%;
+    }
+}
+
+.linkSection {
+    margin-bottom: 8px;
+}
+
+.linkRemoveButton {
+    margin-left: 8px;
+}
+
+#linkEndpointInput, #linkServiceInput {
+    display: inline-block;
+    width: 36%;
+}
+
+#newLinkButton {
+    margin: 10px;
+}
+
 .nodes circle {
     stroke: #333;
     stroke-width: 1.5px;
