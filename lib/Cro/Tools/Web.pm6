@@ -12,6 +12,8 @@ sub web(Str $host, Int $port, $runner) is export {
     my $stub-events = Supplier::Preserving.new;
     my $logs-events = Supplier::Preserving.new;
     my $overview-events = Supplier::Preserving.new;
+    my $link-events = Supplier::Preserving.new;
+
     sub send-event($channel, %content) {
         my $msg = { WS_ACTION => True,
                     action => %content };
@@ -25,7 +27,17 @@ sub web(Str $host, Int $port, $runner) is export {
             when 'overview' {
                 $overview-events.emit: $msg;
             }
+            when 'link' {
+                $link-events.emit: $msg;
+            }
         }
+    }
+
+    sub handle-error($path, $type, $e) {
+        # Print error to terminal too to easify bug reporting
+        $e.note;
+        my $errorMsg = "$e {$e.backtrace.full}";
+        send-event($path, { :$type , :$errorMsg })
     }
 
     my $application = route {
@@ -35,14 +47,15 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> $app-route {
             content 'text/html', %?RESOURCES<web/index.html>.slurp;
         }
+        get -> 'links', $service-id {
+            content 'text/html', %?RESOURCES<web/index.html>.slurp;
+        }
         post -> 'service' {
             request-body -> %json {
                 my @commands = <start restart stop
                               trace-on trace-off
                               trace-all-on trace-all-off>;
-                unless %json<action> ⊆ @commands {
-                    bad-request;
-                }
+                bad-request unless %json<action> ⊆ @commands;
                 content 'text/html', '';
                 start {
                     $runner.start(%json<id>)        if %json<action> eq 'start';
@@ -97,17 +110,39 @@ sub web(Str $host, Int $port, $runner) is export {
                         send-event('overview', %graph-event);
                         CATCH {
                             default {
-                                # Print error to terminal too to easify bug reporting
-                                .note;
-                                my $errors = .backtrace.full;
-                                send-event('stub', { type => 'STUB_STUB_ERROR_OCCURED',
-                                                     :$errors });
+                                handle-error('stub', 'STUB_STUB_ERROR_OCCURED', $_);
                             }
                         }
                     }
                 }
             }
         }
+        post -> 'link' {
+            request-body -> %json {
+                my @actions = <LINK_CREATE_LINK LINK_REMOVE_LINK>;
+                bad-request unless %json<type> ⊆ @actions;
+                content 'text/html', '';
+                start {
+                    if (%json<type> eq 'LINK_CREATE_LINK') {
+                        add-link(%json<id>, %json<service>, %json<endpoint>);
+                        my $code = code-link(%json<id>, %json<service>, %json<endpoint>);
+                        send-event('link', { type => 'LINK_CODE',
+                                             id => %json<id>,
+                                             service => %json<service>,
+                                             endpoint => %json<endpoint>,
+                                             :$code });
+                    } elsif (%json<type> eq 'LINK_REMOVE_LINK') {
+                        rm-link(%json<id>, %json<service>, %json<endpoint>);
+                    }
+                    CATCH {
+                        default {
+                            handle-error('link', 'LINK_ERROR', $_);
+                        }
+                    }
+                }
+            }
+        }
+
         get -> 'overview-road' {
             web-socket -> $incoming {
                 supply {
@@ -129,6 +164,29 @@ sub web(Str $host, Int $port, $runner) is export {
                     }
                     my %graph = :@nodes, :@links;
                     send-event('overview', { type => 'OVERVIEW_GRAPH', :%graph });
+                }
+            }
+        }
+        get -> 'link-road' {
+            web-socket -> $incoming {
+                supply {
+                    for links-graph()<outer>.flat -> $s {
+                        my %json = type => 'LINK_ADD_LINK', id => $s.id;
+                        # XXX: Golfing is welcome
+                        my @links;
+                        for $s.links {
+                            my %hash = service  => .service,
+                                       endpoint => .endpoint,
+                                       code => code-link($s.id, .service, .endpoint);
+                            @links.push: %hash;
+                        }
+                        %json<links> = @links;
+                        %json<endpoints> = $s.endpoints.map(*.id);
+                        send-event('link', %json);
+                    }
+                    whenever $link-events.Supply {
+                        emit to-json $_;
+                    }
                 }
             }
         }
