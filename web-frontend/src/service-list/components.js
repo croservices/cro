@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 var Endpoint = props => (
     <div>
@@ -47,6 +48,9 @@ var Service = props => (
     <div className="serviceSubtitle">Endpoints</div>
         <div>
         <ul className="serviceEndPointList">
+          <div className="linksURL"><li>
+              <a onClick={() => {props.history.push('/links/' + props.service.id);}}>Links</a>
+          </li></div>
         {props.service.endpoints.map(v => (
               <div className="serviceEndPoint" key={v[0]}>
                 <Endpoint e={v} />
@@ -64,6 +68,7 @@ var App = props => (
       {Array.from(props.serviceListReducer.services).map(v => (
           <div className="service" key={v[0]}>
             <Service service={v[1]}
+                     history={props.history}
                      onServiceStart={props.onServiceStart}
                      onServiceStop={props.onServiceStop}
                      onServiceRestart={props.onServiceRestart}
