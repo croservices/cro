@@ -123,6 +123,7 @@ sub web(Str $host, Int $port, $runner) is export {
                 bad-request unless %json<type> ⊆ @actions;
                 content 'text/html', '';
                 start {
+                    my $color = 10.rand.Int;
                     if (%json<type> eq 'LINK_CREATE_LINK') {
                         add-link(%json<id>, %json<service>, %json<endpoint>);
                         my $code = code-link(%json<id>, %json<service>, %json<endpoint>);
@@ -131,8 +132,17 @@ sub web(Str $host, Int $port, $runner) is export {
                                              service => %json<service>,
                                              endpoint => %json<endpoint>,
                                              :$code });
+                        send-event('overview', { type => 'OVERVIEW_ADD_LINK',
+                                                 source => %json<id>,
+                                                 target => %json<service>,
+                                                 :$color
+                                               });
                     } elsif (%json<type> eq 'LINK_REMOVE_LINK') {
                         rm-link(%json<id>, %json<service>, %json<endpoint>);
+                        send-event('overview', { type => 'OVERVIEW_REMOVE_LINK',
+                                                 source => %json<id>,
+                                                 target => %json<service>
+                                               });
                     }
                     CATCH {
                         default {
