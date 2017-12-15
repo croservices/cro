@@ -37917,13 +37917,15 @@ function transform(node) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.OVERVIEW_CREATE_NEW = exports.OVERVIEW_ADD_NODE = exports.OVERVIEW_GRAPH = undefined;
+exports.OVERVIEW_CREATE_NEW = exports.OVERVIEW_REMOVE_LINK = exports.OVERVIEW_ADD_LINK = exports.OVERVIEW_ADD_NODE = exports.OVERVIEW_GRAPH = undefined;
 exports.createNew = createNew;
 
 var _reactRouter = __webpack_require__(113);
 
 var OVERVIEW_GRAPH = exports.OVERVIEW_GRAPH = 'OVERVIEW_GRAPH';
 var OVERVIEW_ADD_NODE = exports.OVERVIEW_ADD_NODE = 'OVERVIEW_ADD_NODE';
+var OVERVIEW_ADD_LINK = exports.OVERVIEW_ADD_LINK = 'OVERVIEW_ADD_LINK';
+var OVERVIEW_REMOVE_LINK = exports.OVERVIEW_REMOVE_LINK = 'OVERVIEW_REMOVE_LINK';
 var OVERVIEW_CREATE_NEW = exports.OVERVIEW_CREATE_NEW = 'OVERVIEW_CREATE_NEW';
 
 function createNew() {
@@ -71604,8 +71606,20 @@ function overviewReducer() {
                 graph.links.push(action.links[i]);
             }
             return _extends({}, state, { graph: graph });
-        case ActionTypes.OVERVIEW_CREATE_NEW:
-            return state;
+        case ActionTypes.OVERVIEW_ADD_LINK:
+            var graph = state.graph;
+            var link = { source: action.source,
+                target: action.target,
+                type: action.color };
+            graph.links.push(link);
+            return _extends({}, state, { graph: graph });
+        case ActionTypes.OVERVIEW_REMOVE_LINK:
+            var graph = state.graph;
+            var links = graph.links.filter(function (item) {
+                return !(action.source === item.source.id && action.target === item.target.id);
+            });
+            graph.links = links;
+            return _extends({}, state, { graph: graph });
         default:
             return state;
     }
