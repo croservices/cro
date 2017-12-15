@@ -51,11 +51,11 @@ export default function stubReducer(state = initialState, action) {
     case ActionTypes.STUB_STUBBED:
         return { ...state, stubErrors: '', optionErrors: '',
                  idText: '', pathText: '', nameText: '',
-                 notify: 'Successfully stubbed!', disabled: true }
+                 notify: 'Successfully stubbed!', disable: true }
     case ActionTypes.STUB_OPTIONS_ERROR_OCCURED:
         return { ...state, notify: 'Options error occured:', optionErrors: action.errors }
     case ActionTypes.STUB_STUB_ERROR_OCCURED:
-        return { ...state, notify: 'Error occured during stubbing:', stubErrors: action.errors }
+        return { ...state, notify: 'Error occured during stubbing:', stubErrors: action.errorMsg }
 
     case ActionTypes.STUB_SELECT:
         return { ...state, current: state.templates[action.index], notify: '' }

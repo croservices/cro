@@ -54,13 +54,25 @@ class App extends React.Component {
           <div>
             <h3>Stub New Service</h3>
             {this.props.stubReducer.notify !== '' && this.props.stubReducer.optionErrors.length == 0 && this.props.stubReducer.optionErrors.length == 0 &&
-              <div className="alert alert-success" role="alert">{this.props.stubReducer.notify}</div>
+             <div className="alert alert-success" role="alert">
+               <pre><code>
+                 {this.props.stubReducer.notify}
+               </code></pre>
+             </div>
             }
             {this.props.stubReducer.optionErrors.length != 0 &&
-              <div className="alert alert-danger" role="alert">{this.props.stubReducer.notify} {this.props.stubReducer.optionErrors}</div>
+              <div className="alert alert-danger" role="alert">{this.props.stubReducer.notify}
+                <pre><code>
+                  {this.props.stubReducer.optionErrors}
+                </code></pre>
+             </div>
             }
             {this.props.stubReducer.stubErrors.length != 0 &&
-              <div className="alert alert-danger" role="alert">{this.props.stubReducer.notify} {this.props.stubReducer.stubErrors}</div>
+              <div className="alert alert-danger" role="alert">
+                <pre><code>
+                  {this.props.stubReducer.notify} {this.props.stubReducer.stubErrors}
+                </code></pre>
+             </div>
             }
             <label className="control-label" htmlFor="templateSelectInput">Service Template</label>
             <select id="templateSelectInput" defaultValue={this.props.stubReducer.current && this.props.stubReducer.current.id || ''} className="form-control" onChange={(e) => this.props.onStubSelect(e.target.selectedIndex)}>

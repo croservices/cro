@@ -10,6 +10,8 @@ import LogsApp from './logs/index';
 import logsReducer from './logs/reducer';
 import OverviewApp from './overview/index';
 import overviewReducer from './overview/reducer';
+import LinkApp from './link/index';
+import linkReducer from './link/reducer';
 import thunkMiddleware from 'redux-thunk';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Provider } from 'react-redux';
@@ -23,13 +25,13 @@ const store = createStore(combineReducers({
     serviceListReducer,
     stubReducer,
     logsReducer,
-    overviewReducer
+    overviewReducer,
+    linkReducer
 }), applyMiddleware(thunkMiddleware));
-
 // Set up history.
 const history = syncHistoryWithStore(browserHistory, store);
 
-['overview-road', 'services-road', 'stub-road', 'logs-road'].forEach(endpoint => {
+['overview-road', 'services-road', 'stub-road', 'logs-road', 'link-road'].forEach(endpoint => {
     let host = window.location.host;
     let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
         retryCount: 3,
@@ -37,17 +39,6 @@ const history = syncHistoryWithStore(browserHistory, store);
     });
     wsAction.start();
 });
-
-// Temporary components, to move out later
-var Overview = props => (
-      <OverviewApp />
-);
-var Stub = props => (
-      <StubApp />
-);
-var Logs = props => (
-      <LogsApp />
-);
 
 var Navigation = props => (
     <Navbar>
@@ -71,13 +62,14 @@ ReactDOM.render(
         <div className="container content">
           <div className="row">
             <div className="col-sm-4">
-              <ServiceListApp />
+              <ServiceListApp history={history} />
             </div>
             <div className="col-sm-8">
               <Router history={history}>
-                <Route path="/" component={Overview} />
-                <Route path="/stub" component={Stub} />
-                <Route path="/logs" component={Logs} />
+                <Route path="/" component={OverviewApp} />
+                <Route path="/stub" component={StubApp} />
+                <Route path="/logs" component={LogsApp} />
+                <Route path="/links/:serviceid" component={LinkApp} />
               </Router>
             </div>
           </div>
