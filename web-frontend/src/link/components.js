@@ -41,7 +41,7 @@ var App = props => (
             <option key={sid[0]} value={sid[0]}>{sid[0]}</option>
         ))}
         </select>
-        <select id="linkEndpointInput" defaultValue={props.linkReducer.newLinkEP || ''} className="form-control" onChange={(e) => props.onNewLinkEndpointSelect(e.target.options[e.target.selectedIndex].value, props.service_id)}>
+        <select id="linkEndpointInput" defaultValue={props.linkReducer.newLinkEP || ''} className="form-control" onChange={(e) => props.onNewLinkEndpointSelect(e.target.options[e.target.selectedIndex].value, props.service_id, props.linkReducer.newLinkService)}>
         {props.linkReducer.servicePool.size != 0 && props.linkReducer.servicePool.get(props.linkReducer.newLinkService).map(ep => (
             <option key={ep} value={ep}>{ep}</option>
           ))}

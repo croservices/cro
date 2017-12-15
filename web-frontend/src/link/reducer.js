@@ -12,6 +12,16 @@ const initialState = {
     canCreateLink: true
 };
 
+function findLink(links, service, ep) {
+    for (var i=0; i < links.length; i++) {
+        if (links[i].service == service &&
+            links[i].endpoint == ep) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 export default function linkReducer(state = initialState, action) {
     var links = state.links;
     switch (action.type) {
@@ -19,7 +29,7 @@ export default function linkReducer(state = initialState, action) {
         var currLinks = links.get(action.id);
         currLinks.push({ service: action.service, endpoint: action.endpoint, code: 'Awaiting...' });
         links.set(action.id, currLinks);
-        return { ...state, links };
+        return { ...state, links, canCreateLink: false };
     case ActionTypes.LINK_ADD_LINK:
         if (action.links != undefined) {
             links.set(action.id, action.links);
@@ -39,8 +49,8 @@ export default function linkReducer(state = initialState, action) {
         var code = state.currentCode;
         var codeShown;
         if (state.currentEP != action.link.endpoint) {
-            const serviceLinks = state.links.get(action.id);
             codeShown = true;
+            var serviceLinks = links.get(action.id);
             for (var i=0; i < serviceLinks.length; i++) {
                 if (serviceLinks[i].endpoint == action.link.endpoint) {
                     code = serviceLinks[i].code;
@@ -51,7 +61,7 @@ export default function linkReducer(state = initialState, action) {
         }
         return { ...state, currentCode: code, currentEP: action.link.endpoint, codeShown };
     case ActionTypes.LINK_REMOVE_LINK:
-        var serviceLinks = state.links.get(action.id);
+        var serviceLinks = links.get(action.id);
         serviceLinks = serviceLinks.filter(item =>
                                            item.endpoint !== action.endpoint &&
                                            item.service !== action.service);
@@ -62,33 +72,24 @@ export default function linkReducer(state = initialState, action) {
     case ActionTypes.LINK_NEW_LINK_SERVICE_SELECT:
         var newLinkEP = state.servicePool.get(action.id)[0];
         var canCreateLink = true;
-        var serviceLinks = state.links.get(action.currId);
-        for (var i=0; i < serviceLinks.length; i++) {
-            if (serviceLinks[i].service == action.id
-                && serviceLinks[i].endpoint == newLinkEP) {
-                canCreateLink = false;
-            }
+        var serviceLinks = links.get(action.currId);
+        if (findLink(serviceLinks, action.id, state.newLinkEP) >= 0) {
+            canCreateLink = false;
         }
         return { ...state, newLinkService: action.id, newLinkEP, canCreateLink };
     case ActionTypes.LINK_NEW_LINK_ENDPOINT_SELECT:
         var canCreateLink = true;
-        var serviceLinks = state.links.get(action.currId);
-        for (var i=0; i < serviceLinks.length; i++) {
-            if (serviceLinks[i].service == currId
-                && serviceLinks[i].endpoint == action.id) {
-                canCreateLink = false;
-            }
+        var serviceLinks = links.get(action.currId);
+        if (findLink(serviceLinks, action.currService, action.id) >= 0) {
+            canCreateLink = false;
         }
         return { ...state, newLinkEP: action.id, canCreateLink };
     case ActionTypes.LINK_CODE:
-        var currLinks = links.get(action.id);
-        for (var i=0; i < currLinks.length; i++) {
-            if (currLinks[i].service === action.service &&
-                currLinks[i].endpoint === action.endpoint) {
-                currLinks[i].code = action.code;
-            }
+        var serviceLinks = links.get(action.id);
+        if (findLink(serviceLinks, action.service, action.endpoint) >= 0) {
+            serviceLinks[i].code = action.code;
         }
-        links.set(action.id, currLinks);
+        links.set(action.id, serviceLinks);
         return { ...state, links };
     default:
         return state;

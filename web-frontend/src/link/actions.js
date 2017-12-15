@@ -34,10 +34,10 @@ export function linkRemoveLink(id, service, endpoint) {
     return postAction({ id, service, endpoint, type: LINK_REMOVE_LINK });
 }
 
-export function linkNewLinkServiceSelect(id, currId) {
+export function linkNewLinkServiceSelect(id, currId, currEndpoint) {
     return { id, currId, type : LINK_NEW_LINK_SERVICE_SELECT };
 }
 
-export function linkNewLinkEndpointSelect(id, currId) {
-    return { id, currId, type : LINK_NEW_LINK_ENDPOINT_SELECT };
+export function linkNewLinkEndpointSelect(id, currId, currService) {
+    return { id, currId, currService, type : LINK_NEW_LINK_ENDPOINT_SELECT };
 }

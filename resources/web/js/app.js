@@ -37992,12 +37992,12 @@ function linkRemoveLink(id, service, endpoint) {
     return postAction({ id: id, service: service, endpoint: endpoint, type: LINK_REMOVE_LINK });
 }
 
-function linkNewLinkServiceSelect(id, currId) {
+function linkNewLinkServiceSelect(id, currId, currEndpoint) {
     return { id: id, currId: currId, type: LINK_NEW_LINK_SERVICE_SELECT };
 }
 
-function linkNewLinkEndpointSelect(id, currId) {
-    return { id: id, currId: currId, type: LINK_NEW_LINK_ENDPOINT_SELECT };
+function linkNewLinkEndpointSelect(id, currId, currService) {
+    return { id: id, currId: currId, currService: currService, type: LINK_NEW_LINK_ENDPOINT_SELECT };
 }
 
 /***/ }),
@@ -71671,8 +71671,8 @@ function mapDispatch(dispatch) {
         onNewLinkServiceSelect: function onNewLinkServiceSelect(id, currId) {
             return dispatch(Actions.linkNewLinkServiceSelect(id, currId));
         },
-        onNewLinkEndpointSelect: function onNewLinkEndpointSelect(id, currId) {
-            return dispatch(Actions.linkNewLinkEndpointSelect(id, currId));
+        onNewLinkEndpointSelect: function onNewLinkEndpointSelect(id, currId, service) {
+            return dispatch(Actions.linkNewLinkEndpointSelect(id, currId, service));
         }
     };
 }
@@ -71801,7 +71801,7 @@ var App = function App(props) {
       _react2.default.createElement(
         "select",
         { id: "linkEndpointInput", defaultValue: props.linkReducer.newLinkEP || '', className: "form-control", onChange: function onChange(e) {
-            return props.onNewLinkEndpointSelect(e.target.options[e.target.selectedIndex].value, props.service_id);
+            return props.onNewLinkEndpointSelect(e.target.options[e.target.selectedIndex].value, props.service_id, props.linkReducer.newLinkService);
           } },
         props.linkReducer.servicePool.size != 0 && props.linkReducer.servicePool.get(props.linkReducer.newLinkService).map(function (ep) {
           return _react2.default.createElement(
@@ -71857,6 +71857,15 @@ var initialState = {
     canCreateLink: true
 };
 
+function findLink(links, service, ep) {
+    for (var i = 0; i < links.length; i++) {
+        if (links[i].service == service && links[i].endpoint == ep) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 function linkReducer() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
     var action = arguments[1];
@@ -71867,7 +71876,7 @@ function linkReducer() {
             var currLinks = links.get(action.id);
             currLinks.push({ service: action.service, endpoint: action.endpoint, code: 'Awaiting...' });
             links.set(action.id, currLinks);
-            return _extends({}, state, { links: links });
+            return _extends({}, state, { links: links, canCreateLink: false });
         case ActionTypes.LINK_ADD_LINK:
             if (action.links != undefined) {
                 links.set(action.id, action.links);
@@ -71887,11 +71896,11 @@ function linkReducer() {
             var code = state.currentCode;
             var codeShown;
             if (state.currentEP != action.link.endpoint) {
-                var _serviceLinks = state.links.get(action.id);
                 codeShown = true;
-                for (var i = 0; i < _serviceLinks.length; i++) {
-                    if (_serviceLinks[i].endpoint == action.link.endpoint) {
-                        code = _serviceLinks[i].code;
+                var serviceLinks = links.get(action.id);
+                for (var i = 0; i < serviceLinks.length; i++) {
+                    if (serviceLinks[i].endpoint == action.link.endpoint) {
+                        code = serviceLinks[i].code;
                     }
                 }
             } else {
@@ -71899,7 +71908,7 @@ function linkReducer() {
             }
             return _extends({}, state, { currentCode: code, currentEP: action.link.endpoint, codeShown: codeShown });
         case ActionTypes.LINK_REMOVE_LINK:
-            var serviceLinks = state.links.get(action.id);
+            var serviceLinks = links.get(action.id);
             serviceLinks = serviceLinks.filter(function (item) {
                 return item.endpoint !== action.endpoint && item.service !== action.service;
             });
@@ -71910,30 +71919,24 @@ function linkReducer() {
         case ActionTypes.LINK_NEW_LINK_SERVICE_SELECT:
             var newLinkEP = state.servicePool.get(action.id)[0];
             var canCreateLink = true;
-            var serviceLinks = state.links.get(action.currId);
-            for (var i = 0; i < serviceLinks.length; i++) {
-                if (serviceLinks[i].service == action.id && serviceLinks[i].endpoint == newLinkEP) {
-                    canCreateLink = false;
-                }
+            var serviceLinks = links.get(action.currId);
+            if (findLink(serviceLinks, action.id, state.newLinkEP) >= 0) {
+                canCreateLink = false;
             }
             return _extends({}, state, { newLinkService: action.id, newLinkEP: newLinkEP, canCreateLink: canCreateLink });
         case ActionTypes.LINK_NEW_LINK_ENDPOINT_SELECT:
             var canCreateLink = true;
-            var serviceLinks = state.links.get(action.currId);
-            for (var i = 0; i < serviceLinks.length; i++) {
-                if (serviceLinks[i].service == currId && serviceLinks[i].endpoint == action.id) {
-                    canCreateLink = false;
-                }
+            var serviceLinks = links.get(action.currId);
+            if (findLink(serviceLinks, action.currService, action.id) >= 0) {
+                canCreateLink = false;
             }
             return _extends({}, state, { newLinkEP: action.id, canCreateLink: canCreateLink });
         case ActionTypes.LINK_CODE:
-            var currLinks = links.get(action.id);
-            for (var i = 0; i < currLinks.length; i++) {
-                if (currLinks[i].service === action.service && currLinks[i].endpoint === action.endpoint) {
-                    currLinks[i].code = action.code;
-                }
+            var serviceLinks = links.get(action.id);
+            if (findLink(serviceLinks, action.service, action.endpoint) >= 0) {
+                serviceLinks[i].code = action.code;
             }
-            links.set(action.id, currLinks);
+            links.set(action.id, serviceLinks);
             return _extends({}, state, { links: links });
         default:
             return state;
