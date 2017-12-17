@@ -71,16 +71,31 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
     method app-module-contents($name, $include-websocket, $links) {
         my $module = "use Cro::HTTP::Router;\n";
         $module ~= "use Cro::HTTP::Router::WebSocket;\n" if $include-websocket;
-        $module ~= "\nsub routes(";
-        $module ~= $links ?? ':' ~ $links.map({ .setup-variable }).join(', :') !! '';
-        $module ~= ") is export \{\n";
+
+        my $args = $links ?? ':' ~ $links.map({ .setup-variable }).join(', :') !! '';
+        my $static = self.static-routes($name, $include-websocket, $links);
+        my $websocket = $include-websocket ?? self.websocket-routes($name, $links) !! '';
         $module ~= q:s:to/CODE/;
+
+            sub routes($args) is export {
                 route {
+            $static$websocket    }
+            }
+            CODE
+
+        $module
+    }
+
+    method static-routes($name, $include-websocket, $links) {
+        q:s:to/CODE/;
                     get -> {
                         content 'text/html', "<h1> $name </h1>";
                     }
             CODE
-        $module ~= q:to/CODE/ if $include-websocket;
+    }
+
+    method websocket-routes($name, $links) {
+        q:to/CODE/;
 
                     my $chat = Supplier.new;
                     get -> 'chat' {
@@ -96,12 +111,6 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
                         }
                     }
             CODE
-        $module ~= q:s:to/CODE/;
-                }
-            }
-            CODE
-
-        $module
     }
 
     method write-app-module($file, $name, $include-websocket, $links) {
