@@ -250,4 +250,16 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
             }
             JSON
     }
+
+    method static-routes($name, $include-websocket, $links) {
+        q:to/CODE/;
+                    get -> {
+                        static 'static/index.html'
+                    }
+
+                    get -> 'js', *@path {
+                        static 'static/js', @path
+                    }
+            CODE
+    }
 }
