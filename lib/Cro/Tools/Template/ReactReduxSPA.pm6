@@ -32,8 +32,10 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
 
     method static-index-contents($name) {
         q:c:to/HTML/;
+            <!DOCTYPE html>
             <html>
               <head>
+                <meta charset="utf-8"/>
                 <title>{$name}</title>
               </head>
               <body>
