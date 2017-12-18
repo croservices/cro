@@ -264,4 +264,11 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
                     }
             CODE
     }
+
+    method extra-build-instructions() {
+        q:to/SHELL/;
+            npm install .
+            npm run build
+            SHELL
+    }
 }
