@@ -79,6 +79,9 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
                             value={props.$property}
                             onChange={e => props.\qq[$event](e.target.value)} />
                     </div>
+                    <div>
+                        {props.$property}
+                    </div>
                 </div>
             );
 
