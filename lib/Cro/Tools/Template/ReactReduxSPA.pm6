@@ -108,7 +108,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
             [].forEach(endpoint => {
                 let host = window.location.host;
                 let wsAction = new WSAction(store, 'ws://' + host + '/' + endpoint, {
-                    retryCount:3,
+                    retryCount: 3,
                     reconnectInterval: 3
                 });
                 wsAction.start();
