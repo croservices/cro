@@ -44,18 +44,19 @@ can be installed independently.
 
 ## Router Support
 
-The signature of a route may include one positional parameter that:
+The signature of a route may start with a positional parameter that:
 
 * Is constrained by a type that does the `Cro::HTTP::Auth` role
 * Is marked with the `is auth` trait (this is less convenient, but allows for
   the case where an existing object should be used, but it is not desirable to
   couple it to Cro)
 
-Such a parameter will not be treated as a route segment, but instead will be
-populated with the contents of the `auth` property of the `Cro::HTTP::Request`
-being processed. The type constraint will also be checked; should it fail,
-then a HTTP 401 Unauthorized responses will automatically be produced (which
-middleware may later rewrite into a redirect to a login page, if applicable). 
+Such a parameter will not be treated as the first route segment, but instead
+will be populated with the contents of the `auth` property of the
+`Cro::HTTP::Request` being processed. The type constraint will also be
+checked; should it fail, then a HTTP 401 Unauthorized responses will
+automatically be produced (which middleware may later rewrite into a redirect
+to a login page, if applicable).
 
 For systems where there are different kinds of user, it can be convenient to
 create `subset` types to describe them:
