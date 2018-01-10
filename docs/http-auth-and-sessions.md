@@ -1,10 +1,10 @@
 # HTTP Authentication, Authorization, and Sessions
 
 This document provides an overview of how authentication, authorization, and
-sessions can be handled in Cro a HTTP application. Since applications have a
-wide range of needs in this area, Cro makes it easy for applications to plug
-in their own session and auth handling. At the same time, it provides a range
-of components to handle the most common cases.
+sessions can be handled in Cro for an HTTP application. Since applications
+have a wide range of needs in this area, Cro makes it easy for applications to
+plug in their own session and auth handling. At the same time, it provides a
+range of components to handle the most common cases.
 
 ## The auth property of Cro::HTTP::Request
 
@@ -48,12 +48,13 @@ The signature of a route may include one positional parameter that:
 
 * Is constrained by a type that does the `Cro::HTTP::Auth` role
 * Is marked with the `is auth` trait (this is less convenient, but allows for
-  the case where 
+  the case where an existing object should be used, but it is not desirable to
+  couple it to Cro)
 
 Such a parameter will not be treated as a route segment, but instead will be
 populated with the contents of the `auth` property of the `Cro::HTTP::Request`
 being processed. The type constraint will also be checked; should it fail,
-then a HTTP 401 Unauthorized respones will automatically be produced (which
+then a HTTP 401 Unauthorized responses will automatically be produced (which
 middleware may later rewrite into a redirect to a login page, if applicable). 
 
 For systems where there are different kinds of user, it can be convenient to
@@ -232,7 +233,7 @@ class UserSession does Cro::HTTP::Auth {
     has $.username is rw;
 
     method logged-in() {
-        defiend $!username
+        defined $!username
     }
 }
 
