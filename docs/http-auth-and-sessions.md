@@ -110,7 +110,7 @@ my $app = route {
         cookie-name => 'MY_SESSION_COOKIE_NAME'
     );
 
-    delegate (*,) => route {
+    delegate <*> => route {
         # Protected routes here...
     }
 }
@@ -291,7 +291,7 @@ my $routes = route {
 
 my $app = route {
     # Apply middleware, then delegate to the routes.
-    before Cro::HTTP::Session::InMemory[My::App::Session].new;
-    delegate (*,) => $routes;
+    before Cro::HTTP::Session::InMemory[UserSession].new;
+    delegate <*> => $routes;
 }
 ```
