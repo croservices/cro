@@ -107,7 +107,6 @@ block:
 my $app = route {
     before Cro::HTTP::Session::InMemory[My::App::Session].new(
         expiration => Duration.new(60 * 15),
-        session-cookie => False,
         cookie-name => 'MY_SESSION_COOKIE_NAME'
     );
 
@@ -119,10 +118,11 @@ my $app = route {
 
 Or at server level (pass it to the `before` parameter of `Cro::HTTP::Server`).
 
-The default expiration time is 30 minutes, and the default behavior is to use
-a session cookie (meaning the session ends if the browser is closed). If no
-cookie name is provided, a random name will be generated (to help avoid being
-able to fingerprint the application platform by its session cookie name).
+The default expiration time is 30 minutes, and this impacts both the `max-age`
+set on the cookie as well as the time before session state is deleted from
+memory. If no cookie name is provided, a random name will be generated (to
+help avoid being able to fingerprint the application platform by its session
+cookie name).
 
 Since the session state is stored in memory, it will be lost when the service
 is restarted. Architecturally, it also prevents scaling out beyond a single
