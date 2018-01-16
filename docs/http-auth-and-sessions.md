@@ -81,6 +81,10 @@ my $app = route {
 }
 ```
 
+Note that middleware that populates `auth` must be installed either at the
+server level *or* in a `route` block that **delegates** to this one (*not*
+`include`s it).
+
 ## In-memory session management
 
 The `Cro::HTTP::Session::InMemory[::T]` role implements simple in-memory
@@ -106,6 +110,10 @@ my $app = route {
         session-cookie => False,
         cookie-name => 'MY_SESSION_COOKIE_NAME'
     );
+
+    delegate (*,) => route {
+        # Protected routes here...
+    }
 }
 ```
 
@@ -238,9 +246,7 @@ class UserSession does Cro::HTTP::Auth {
     }
 }
 
-my $app = route {
-    before Cro::HTTP::Session::InMemory[My::App::Session].new;
-
+my $routes = route {
     subset LoggedIn of UserSession where *.logged-in;
 
     get -> UserSession $s {
@@ -281,5 +287,11 @@ my $app = route {
         # Call a database or similar here
         return $username eq 'c-monster' && $password eq 'cookiecookiecookie';
     }
+}
+
+my $app = route {
+    # Apply middleware, then delegate to the routes.
+    before Cro::HTTP::Session::InMemory[My::App::Session].new;
+    delegate (*,) => $routes;
 }
 ```
