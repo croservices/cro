@@ -152,7 +152,7 @@ class MySession {
 }
 class MySessionStore does Cro::HTTP::Session::Persistent[MySession] {
     # This will be called whenever we need to load session state, and the
-    # session ID will be passed. Return Nil or `fail` if it is not possible
+    # session ID will be passed. Return `fail` if it is not possible
     # (e.g. no such session is found).
     method load(Str $session-id --> MySession) {
         !!! 'Load session $session-id, place data into a new MySession instance'
@@ -196,7 +196,7 @@ the session object to go in `auth`, and `$username-prop` is the name of the
 property to set to the username if authentication succeeds (`Nil` will be
 assigned otherwise). 
 
-In the case the requet's `auth` property is empty, then an instance of the
+In the case the request's `auth` property is empty, then an instance of the
 `TSession` object will be created, passing `username-prop` as a parameter
 (so if `$username-prop` was set to `username`, then it would call
 `MySession.new(username => $the-username)`). If `auth` already contains an
