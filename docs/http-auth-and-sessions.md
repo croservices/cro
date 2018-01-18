@@ -242,7 +242,7 @@ class UserSession does Cro::HTTP::Auth {
     has $.username is rw;
 
     method logged-in() {
-        defined $!username
+        defined $!username;
     }
 }
 
@@ -275,7 +275,7 @@ my $routes = route {
         request-body -> (:$username, :$password, *%) {
             if valid-user-pass($username, $password) {
                 $user.username = $username;
-                redirect '/';
+                redirect '/', :see-other;
             }
             else {
                 content 'text/html', "Bad username/password";
