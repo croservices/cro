@@ -222,8 +222,44 @@ class MyBasicAuth does Cro::HTTP::Auth::Basic[MyUser, "username"] {
 
 ## JSON Web Tokens
 
-The module `Cro::HTTP::Auth::WebToken` provides support for verifying JSON Web
-Tokens. It is installed as middlewere, either at route block or server level.
+The `Cro::HTTP::Auth::WebToken` is a base role for verifying JSON Web
+Tokens.  It has `secret` and `public-key` attributes for password or
+OpenSSL's public key accordingly. Either password or public key must
+be set. When a request is and decode it using either password or
+public key. When both `secret` and `public-key` attributes are set,
+`public-key` will be used to decode token.
+
+In case when key pair is used, `RS256` algorithm is used, otherwise
+`HS256` is used.
+
+`auth` attribute will be populated with `Nil` if method
+`get-token($request)` returned `Nil` or died with an
+exception. In case of success, it must return `Str`.
+
+This role has method `set-auth($request, $result)`, that is called to
+set `auth` attribute of a given request. As result of JSON decoding
+may not do `Cro::HTTP::Auth` and so made request unable to be sent to
+a correct route, `Cro::HTTP::Auth::WebToken::Token` wrapper class that
+does `Cro::HTTP::Auth` role is used. It has a single `token` property
+that is populated with the result of decoding JSON Web Token by
+default on calling a `set-auth` method.
+
+The `Cro::HTTP::Auth::WebToken::Bearer` is a role that does
+`Cro::HTTP::Auth::WebToken`. Its `get-token` method is overridden to
+take the token from `Auth` header of the request object. `set-auth` method
+may be overridden by the user to set a custom object that does
+`Cro::HTTP::Auth` role to `auth` attribute. It is installed as
+middlewere, either at route block or server level.
+
+The `Cro::HTTP::Auth::WebToken::FromCookie[Str $cookie-name]` is a
+role that does `Cro::HTTP::Auth::WebToken`. Its `get-token` method is
+overridden to take the token from the request's cookie with given name
+`$cookie-name`. `set-auth` method may be overridden by the user to set
+a custom object that does `Cro::HTTP::Auth` role to `auth`
+attribute. It is installed as middlewere, either at route block or
+server level. Additionally, this role checks `exp` claim of parsed
+token. In case it is invalid, the cookie will be removed from the
+request.
 
 ## Web form based login
 
