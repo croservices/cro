@@ -58,7 +58,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
     }
 
     method write-fake-tls($where) {
-        my $res = $where.add('RESOURCES/');
+        my $res = $where.add('resources/');
         mkdir $res;
         mkdir $res.add('fake-tls');
         for <fake-tls/ca-crt.pem fake-tls/server-crt.pem fake-tls/server-key.pem> -> $fn {
