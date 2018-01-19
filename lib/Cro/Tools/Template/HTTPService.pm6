@@ -148,13 +148,13 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
                         private-key-file => %*ENV<{$env-name}_TLS_KEY> ||
                 CODE
             $entrypoint ~= Q:to/CODE/;
-                            %?RESOURCES<fake-tls/server-key.pem> || <resources/fake-tls/server-key.pem>,
+                            %?RESOURCES<fake-tls/server-key.pem> || "resources/fake-tls/server-key.pem",
                 CODE
             $entrypoint ~= q:c:to/CODE/;
                         certificate-file => %*ENV<{$env-name}_TLS_CERT> ||
                 CODE
             $entrypoint ~= Q:to/CODE/;
-                            %?RESOURCES<fake-tls/server-crt.pem> || <resources/fake-tls/server-key.pem>,
+                            %?RESOURCES<fake-tls/server-crt.pem> || "resources/fake-tls/server-crt.pem",
                     ),
                 CODE
         }
