@@ -138,9 +138,9 @@ the result may not be meaningful).
 
 #### As an object
 
-Implementations of the `Cro::HTTP::BodyParser` role are used to parse a HTTP
-message body into an appropriate object. Examples of what a body parser might
-do include:
+Implementations of the `Cro::BodyParser` role are used to parse a HTTP message
+body into an appropriate object. Examples of what a body parser might do
+include:
 
 * Parsing the `application/x-www-form-urlencoded` and `multipart/form-data`
   request bodies, most typically used by browsers to transmit form data
@@ -153,10 +153,10 @@ do include:
 Cro provides a number of body parsers, which it enables by default. They can
 also be provided externally.
 
-A `Cro::HTTP::Message` has a `Cro::HTTP::BodyParserSelector`, which picks
-the appropriate `Cro::HTTP::BodyParser` implementation to use. This may be
-changed at any point before `body` is called. Body parser selectors can come
-from a range of places:
+A `Cro::HTTP::Message` has a `Cro::BodyParserSelector`, which picks the
+appropriate `Cro::BodyParser` implementation to use. This may be changed at
+any point before `body` is called. Body parser selectors can come from a
+range of places:
 
 * The `Cro::HTTP::ResponseParser` and `Cro::HTTP::RequestParser` objects
   have a default set of body parsers. They may be constructed with extra body
@@ -193,8 +193,8 @@ The final 3 body parsers are in the default set for parsing responses:
 The `set-body` method can be used to set the body. The `Cro::HTTP::Message`
 will typically then reach either a `Cro::HTTP::ResponseSerializer` (servers)
 or `Cro::HTTP::RequestSerializer` (clients), which call `body-byte-stream`. At
-this point, an instance of `Cro::HTTP::BodySerializerSelector` will be used to
-pick a `Cro::HTTP::BodySerializer` to use. Applications can change the selector
+this point, an instance of `Cro::BodySerializerSelector` will be used to
+pick a `Cro::BodySerializer` to use. Applications can change the selector
 in order to add extra body serializers at any point before the message is
 serialized to be sent over the network.
 

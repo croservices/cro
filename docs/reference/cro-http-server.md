@@ -51,8 +51,8 @@ and private key respectively, should be passed.
 
 ## Request body parsers and response body serializers
 
-Additional request body parsers (implementations of `Cro::HTTP::BodyParser`)
-and response body serializers (implementations of `Cro::HTTP::BodySerializer`)
+Additional request body parsers (implementations of `Cro::BodyParser`)
+and response body serializers (implementations of `Cro::BodySerializer`)
 can be added at the server level. Alternatively, the set of default set of
 body parsers and serializers can be replaced entirely.
 

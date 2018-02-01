@@ -107,7 +107,7 @@ my %panda = name => 'Bao Bao', eats => 'bamboo';
 my $resp = await $client.post: 'we.love.pand.as/pandas', body => %panda;
 ```
 
-The `Cro::HTTP::Client` class uses a `Cro::HTTP::BodySerializer` in order to
+The `Cro::HTTP::Client` class uses a `Cro::BodySerializer` in order to
 serialize request bodies for sending. Besides JSON, there are body parsers
 encoding and sending a `Str`:
 

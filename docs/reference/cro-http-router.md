@@ -602,8 +602,8 @@ argument.
 
 ## Adding custom response body serializers
 
-Custom body serializers implement the `Cro::HTTP::BodySerializer` role. They
-can decide when they are applicable by considering the type of the body and/or
+Custom body serializers implement the `Cro::BodySerializer` role. They can
+decide when they are applicable by considering the type of the body and/or
 the response headers (most typically the `content-type` header).
 
 Body serializers can be applied when configuring `Cro::HTTP::Server`, in which
