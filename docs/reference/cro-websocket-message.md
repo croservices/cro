@@ -6,10 +6,11 @@ or more frames.
 
 ## Opcodes
 
-This class exports `Opcode` enum that may be used during Message
-processing. Available values are: `Text`, `Binary`, `Ping`, `Pong`,
-`Close`. Opcode of Continuation is not present, because Message
-includes all frames' content already. It can be used as follows:
+The `Cro::WebSocket::Message::Opcode` enum contains the various kinds of
+message:  `Text`, `Binary`, `Ping`, `Pong`, and `Close`. These are available
+as just `Cro::WebSocket::Message::Close`, for example. The message level has
+no Continuation opcode, because Message includes all frames' content already.
+It can be used as follows:
 
     if $message.opcode ~~ Cro::WebSocket::Message::Close { ... }
 
@@ -32,24 +33,20 @@ frame. It can be determined during serialization(if `body-byte-stream`
 emits more than one value) or during Message parsing(if the first
 Message frame is not final).
 
-## body-byte-stream
-
-`body-byte-stream` is a Supply that emits `Blob`s. It may be used to
-process Payload of every frame in distinct manner, however it is much
-more convenient to use `body-blob` or `body-text` methods for an
-access to the Message payload.
-
 # Methods
 
 ## new
 
-The class may be instantiated with "short-cut" `new` calls or in a
-default way(specifying each attribute). Such constructors can take
+The class may be instantiated with "shortcut" `new` calls or in a
+default way (specifying each attribute). Such constructors can take
 `Blob`, `Str` and `Supply`, that can be used as follows:
 
     my $m1 = Cro::WebSocket::Message.new('Single-frame Message with a text string and Text opcode');
     my $m2 = Cro::WebSocket::Message.new('Single-frame Message with a Blob and Binary opcode'.encode);
     my $m3 = Cro::WebSocket::Message.new(supply { emit "Multi-frame message"; emit "With binary opcode"; });
+
+In the case that a body serializer is being used, then any object that these
+can handle may be passed.
 
 Message instance can be also created as
 
@@ -71,14 +68,29 @@ Returns `Bool` value `True` if the Message's `opcode` is `Binary`.
 Returns `Bool` value `True` if the Message's `opcode` is `Text` or
 `Binary`.
 
+## body-byte-stream
+
+`body-byte-stream` is a Supply that emits `Blob`s. It may be used to process
+the payload of every frame as it arrives over the network, however in cases
+where this streaming behavior is not required it is much more convenient to
+use the `body-blob`, `body-text`, and `body` methods for access to the
+message payload.
+
 ## body-text
 
 Returns a Promise that will be kept on every frame's payload
 collection finish. The `result` value of the Promise will be a `Str`
-that contains all Message payload decoded as `UTF-8`.
+that contains the Message payload decoded as `UTF-8`.
 
 ## body-blob
 
 Returns a Promise that will be kept on every frame's payload
 collection finish. The `result` value of the Promise will be a `Buf`
-that contains all Message payload.
+that contains the Message payload.
+
+## body
+
+By default, this will be a `Str` for Text messages and a `Buf` for Binary
+messages. However, if an alternate body parser/serializer has been set up,
+then it might be some other object (for example, if a JSON body parser is
+configured then it would be the `Hash` or `List` resulting from JSON parsing).
