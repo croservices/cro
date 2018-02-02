@@ -49,7 +49,7 @@ var Service = props => (
         <div>
         <ul className="serviceEndPointList">
           <div className="linksURL"><li>
-              <a onClick={() => {props.history.push('/links/' + props.service.id);}}>Links</a>
+        <a onClick={() => props.onGotoLinks(props.service.id)}>Links</a>
           </li></div>
         {props.service.endpoints.map(v => (
               <div className="serviceEndPoint" key={v[0]}>
@@ -73,7 +73,8 @@ var App = props => (
                      onServiceStop={props.onServiceStop}
                      onServiceRestart={props.onServiceRestart}
                      onServiceTraceFlip={props.onServiceTraceFlip}
-                     onGotoLogs={props.onGotoLogs} />
+                     onGotoLogs={props.onGotoLogs}
+                     onGotoLinks={props.onGotoLinks} />
           </div>
       ))}
     </div>

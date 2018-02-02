@@ -17,7 +17,7 @@ var App = props => (
                  <li>
                    <div className="linkName">{l.service}:{l.endpoint}</div>
                    <div className="linkControlPanel">
-                     <button className="btn btn-primary linkCodeButton" onClick={(e) => props.onShowCode(props.service_id, l)}>Show code</button>
+                     <button className="btn btn-primary linkCodeButton" onClick={(e) => props.onShowCode(l)}>Show code</button>
                      <button className="btn btn-primary linkRemoveButton" onClick={(e) => props.onRemoveLink(props.service_id, l.service, l.endpoint)}>Remove link</button>
                    </div>
                  </li>
@@ -36,12 +36,12 @@ var App = props => (
         || props.linkReducer.links.get(props.service_id).length == 0) &&
        <div>No links yet.</div>}
       <div id="addLinkContainer">
-        <select id="linkServiceInput" defaultValue={props.linkReducer.newLinkService || ''} className="form-control" onChange={(e) => props.onNewLinkServiceSelect(e.target.options[e.target.selectedIndex].value, props.service_id)}>
+        <select id="linkServiceInput" defaultValue={props.linkReducer.newLinkService || ''} className="form-control" onChange={(e) => props.onNewLinkServiceSelect(e.target.options[e.target.selectedIndex].value)}>
         {props.linkReducer.servicePool.size != 0 && Array.from(props.linkReducer.servicePool).filter(item => item[0] !== props.service_id).map((sid) => (
             <option key={sid[0]} value={sid[0]}>{sid[0]}</option>
         ))}
         </select>
-        <select id="linkEndpointInput" defaultValue={props.linkReducer.newLinkEP || ''} className="form-control" onChange={(e) => props.onNewLinkEndpointSelect(e.target.options[e.target.selectedIndex].value, props.service_id, props.linkReducer.newLinkService)}>
+        <select id="linkEndpointInput" defaultValue={props.linkReducer.newLinkEP || ''} className="form-control" onChange={(e) => props.onNewLinkEndpointSelect(e.target.options[e.target.selectedIndex].value, props.linkReducer.newLinkService)}>
         {props.linkReducer.servicePool.size != 0 && props.linkReducer.servicePool.get(props.linkReducer.newLinkService).map(ep => (
             <option key={ep} value={ep}>{ep}</option>
           ))}

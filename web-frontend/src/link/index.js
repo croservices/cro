@@ -11,9 +11,9 @@ function mapDispatch(dispatch) {
     return {
         onCreateLink: (id, service, endpoint) => dispatch(Actions.linkCreateLink(id, service, endpoint)),
         onRemoveLink: (id, service, endpoint) => dispatch(Actions.linkRemoveLink(id, service, endpoint)),
-        onShowCode: (id, link) => dispatch(Actions.linkShowCode(id, link)),
-        onNewLinkServiceSelect: (id, currId) => dispatch(Actions.linkNewLinkServiceSelect(id, currId)),
-        onNewLinkEndpointSelect: (id, currId, service) => dispatch(Actions.linkNewLinkEndpointSelect(id, currId, service))
+        onShowCode: (link) => dispatch(Actions.linkShowCode(link)),
+        onNewLinkServiceSelect: (id) => dispatch(Actions.linkNewLinkServiceSelect(id)),
+        onNewLinkEndpointSelect: (id, service) => dispatch(Actions.linkNewLinkEndpointSelect(id, service))
     }
 }
 

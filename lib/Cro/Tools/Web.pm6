@@ -180,9 +180,9 @@ sub web(Str $host, Int $port, $runner) is export {
         get -> 'link-road' {
             web-socket -> $incoming {
                 supply {
+                    my %result = type => 'LINK_INIT';
+                    my @services;
                     for links-graph()<outer>.flat -> $s {
-                        my %json = type => 'LINK_ADD_LINK', id => $s.id;
-                        # XXX: Golfing is welcome
                         my @links;
                         for $s.links {
                             my %hash = service  => .service,
@@ -190,10 +190,10 @@ sub web(Str $host, Int $port, $runner) is export {
                                        code => code-link($s.id, .service, .endpoint);
                             @links.push: %hash;
                         }
-                        %json<links> = @links;
-                        %json<endpoints> = $s.endpoints.map(*.id);
-                        send-event('link', %json);
+                        @services.push({id => $s.id, :@links, endpoints => $s.endpoints.map(*.id)});
                     }
+                    %result<services> = @services;
+                    send-event('link', %result);
                     whenever $link-events.Supply {
                         emit to-json $_;
                     }
