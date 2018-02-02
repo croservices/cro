@@ -53,8 +53,12 @@ class Cro::Tools::CroFile {
     has Link @.links;
     has Environment @.env;
 
+    # TODO Remove lock once https://github.com/Leont/yamlish/issues/19 is
+    # resolved, though if it's a Rakudo bug in the end then we might need to
+    # keep this workaround for longer.
+    my $load-yaml-lock = Lock.new;
     method parse(Str $yaml) {
-        my %conf = load-yaml($yaml);
+        my %conf = $load-yaml-lock.protect: { load-yaml($yaml) };
         validate(%conf);
         self.bless(
             id => %conf<id>,
