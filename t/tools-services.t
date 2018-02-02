@@ -26,11 +26,17 @@ with-test-dir -> $dir {
 
     is $first-found.path.Str, "$dir/nested/service2",
         'First service has correct path';
+    with $first-found.cro-file-error {
+        diag $_;
+    }
     is $first-found.cro-file.id, 'service2',
         'First service has correct .cro.yml';
 
     is $second-found.path.Str, "$dir/service1",
         'Second service has correct path';
+    with $second-found.cro-file-error {
+        diag $_;
+    }
     is $second-found.cro-file.id, 'service1',
         'Second service has correct .cro.yml';
 
@@ -46,6 +52,9 @@ with-test-dir -> $dir {
         'Third service created after startup is found';
     is $third-found.path.Str, "$dir/service3",
         'Third service has correct path';
+    with $third-found.cro-file-error {
+        diag $_;
+    }
     is $third-found.cro-file.id, 'service-3',
         'Third service has correct .cro.yml';
 
