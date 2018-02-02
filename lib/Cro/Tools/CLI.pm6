@@ -27,7 +27,6 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
     %options .= grep({ not .key eq 'link' });
 
     my (@generated-links, @links);
-    say @option-links;
     populate-links(@option-links, @generated-links, @links);
 
     my @templates = get-available-templates(Cro::Tools::Template);
