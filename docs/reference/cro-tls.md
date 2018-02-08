@@ -8,7 +8,8 @@ Cro pipelines.
 The `Cro::TLS::Listener` class is a `Cro::Source`. It is constructed with the
 `port` named argument, and an optional `host` named argument (which defaults
 to `localhost`). Any further named arguments will be passed along to
-`IO::Socket::Async::SSL.listen`, providing full access to its feature set.
+`IO::Socket::Async::SSL.listen`, providing full access to that module's
+feature set.
 
 Typically, the keys `private-key-file` and `certificate-file` should be passed,
 which indicate the files containing the private key and certificate for the
