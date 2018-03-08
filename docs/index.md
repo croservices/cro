@@ -18,6 +18,7 @@ as well as covering some more advanced topics:
 * [Module Structure](docs/module-structure)
 * [The cro Development Tool](docs/cro-tool)
 * [The .cro.yml File](docs/cro-yml)
+* [Docker Deployment with Cro](docs/docker-deployment)
 
 ## Reference
 
