@@ -169,7 +169,7 @@ Is this ok? (yes)
 Next, let's install the webpack tool as a development dependency:
 
 ```
-npm install --save-dev webpack
+npm install --save-dev webpack webpack-cli
 ```
 
 While that runs: what's webpack for? It helps out in various ways:
@@ -528,7 +528,7 @@ module.exports = {
         path: path.resolve(__dirname, 'static/js')
     },
     module : {
-        loaders : [
+        rules : [
             {
                 test: /\.js/,
                 include: path.resolve(__dirname, 'frontend'),
