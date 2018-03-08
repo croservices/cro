@@ -1,5 +1,8 @@
 use Cro::Tools::CroFile;
+use Docker::File;
 use META6;
+
+my constant CRO_DOCKER_VERSION = '0.7.3';
 
 role Cro::Tools::Template::Common {
     method new-directories($where) { () }
@@ -16,6 +19,9 @@ role Cro::Tools::Template::Common {
 
     method cro-file-endpoints($id-uc, %options) { ... }
 
+    method docker-ignore-entries() { '.precomp/' }
+
+    method docker-base-image(%options) { 'croservices/cro-core' }
 
     method make-directories($where) {
         my @dirs = self.new-directories($where);
@@ -28,6 +34,8 @@ role Cro::Tools::Template::Common {
         self.write-meta($where.add('META6.json'), $name, %options);
         self.write-readme($where.add('README.md'), $name, %options);
         self.write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
+        self.write-docker-ignore-file($where.add('.dockerignore'));
+        self.write-docker-file($where.add('Dockerfile'), $id, %options);
     }
 
     method write-entrypoint($file, $id, %options, $links) {
@@ -93,6 +101,52 @@ role Cro::Tools::Template::Common {
         my @endpoints = self.cro-file-endpoints($id-uc, %options);
         my $entrypoint = 'service.p6';
         Cro::Tools::CroFile.new(:$id, :$name, :$entrypoint, :@endpoints, :@links)
+    }
+
+    method write-docker-ignore-file($file) {
+        my @ignores = self.docker-ignore-entries();
+        if @ignores {
+            spurt $file, @ignores.map({ "$_\n" }).join;
+        }
+    }
+
+    method write-docker-file($file, $id, %options) {
+        my $env-base = self.env-name($id) ~ '_';
+        spurt $file, ~Docker::File.new(
+            images => [
+                Docker::File::Image.new(
+                    from-short => self.docker-base-image(%options),
+                    from-tag => CRO_DOCKER_VERSION,
+                    entries => [
+                        Docker::File::RunShell.new(
+                            command => 'mkdir /app'
+                        ),
+                        Docker::File::Copy.new(
+                            sources => '.',
+                            destination => '/app'
+                        ),
+                        Docker::File::WorkDir.new(
+                            dir => '/app'
+                        ),
+                        Docker::File::RunShell.new(
+                            command => 'zef install --deps-only . && perl6 -c -Ilib service.p6'
+                        ),
+                        Docker::File::Env.new(
+                            variables => {
+                                $env-base ~ "HOST" => '0.0.0.0',
+                                $env-base ~ "PORT" => '10000'
+                            }
+                        ),
+                        Docker::File::Expose.new(
+                            ports => 10000
+                        ),
+                        Docker::File::CmdShell.new(
+                            command => 'perl6 -Ilib service.p6'
+                        )
+                    ]
+                )
+            ]
+        );
     }
 
     method env-name($id) {

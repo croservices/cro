@@ -9,7 +9,8 @@
     "depends"       : [ "IO::Socket::Async::SSL", "JSON::Fast",
                         "META6", "Shell::Command",
                         "File::Find", "Terminal::ANSIColor",
-                        "OO::Monitors", "YAMLish", "Cro::WebSocket" ],
+                        "OO::Monitors", "YAMLish", "Cro::WebSocket",
+                        "Docker::File" ],
     "provides"      : {
                 "cro": "bin/cro",
                 "Cro::Tools::CLI": "lib/Cro/Tools/CLI.pm6",
