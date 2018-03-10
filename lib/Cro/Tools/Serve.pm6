@@ -3,6 +3,9 @@ use Cro::HTTP::Server;
 
 sub serve(Str $host, Int $port, Str $directory) is export {
     my $application = route {
+        get -> {
+            static "$directory/index.html";
+        }
         get -> *@path {
             static $directory, @path;
         }
