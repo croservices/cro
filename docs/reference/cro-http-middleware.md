@@ -39,7 +39,7 @@ Middleware can be applied either:
   applying middleware at this level: the processing pipeline with server-level
   middleware is built per connection, and re-used for multiple requests with
   HTTP/1.1 persistent connections as well as with HTTP/2.0 where there is
-  typially a single longer-lived connection per client.
+  typically a single longer-lived connection per client.
 * At the level of a `route` block (using `Cro::HTTP::Router`). When composing
   a larger application out of many `route` blocks, using `include` or
   `delegate`, this allows for more localized application of middleware (for
