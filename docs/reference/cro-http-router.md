@@ -581,7 +581,8 @@ directory:
     }
 
 This form will never serve content outside of the base directory; a path that
-tries to do `../` tricks shall not be able to escape.
+tries to do `../` tricks shall not be able to escape. The base can also be
+specified as an `IO::Path` object.
 
 For either of these forms, if no file is found then a HTTP 404 response will
 be served. If the path resolves to anything that is not a normal file (such as
@@ -598,6 +599,15 @@ argument.
         static 'files', @path, mime-types => {
             'foo' => 'application/x-foo'
         }
+    }
+
+To serve an index file when a directory is requested (so, for example, a
+request to `content/foo/` would serve `downloads/foo/index.html`), pass the
+`indexes` named argument, specifying the filenames that should be considered:
+
+    get -> 'content', *@path {
+        static 'static-data/content', @path,
+            :indexes<index.html index.htm>;
     }
 
 ## Adding custom response body serializers
