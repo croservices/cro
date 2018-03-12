@@ -145,7 +145,7 @@ session state (updating the last seen timestamp), and clearing outdated
 session state.
 
 ```
-class MySession {
+class MySession does Cro::HTTP::Auth {
     has $.is-logged-in;
     has $.admin;
     has @.recently-viewed-items;
