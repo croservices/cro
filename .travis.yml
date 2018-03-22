@@ -1,5 +1,9 @@
 language: perl6
 
+os:
+    - linux
+    - osx
+
 perl6:
     - '2017.09'
     - '2017.10'
