@@ -89,6 +89,13 @@ role Cro::Tools::Template::Common {
             zef install --depsonly .
             {$extra}cro run
             ```
+
+            You can also build and run a docker image while in the app root using:
+
+            ```
+            docker build -t {$name} .
+            docker run --rm -p 10000:10000 {$name}
+            ```
             MARKDOWN
     }
 
