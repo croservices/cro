@@ -150,6 +150,6 @@ role Cro::Tools::Template::Common {
     }
 
     method env-name($id) {
-        $id.uc.subst(/<-[A..Za..z_]>/, '_', :g)
+        $id.uc.subst(/<-[A..Za..z0..9_]>/, '_', :g)
     }
 }
