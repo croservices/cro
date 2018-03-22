@@ -110,6 +110,10 @@ role Cro::Tools::Template::Common {
         }
     }
 
+    method docker-file-build-commands() {
+        'zef install --deps-only . && perl6 -c -Ilib service.p6'
+    }
+
     method write-docker-file($file, $id, %options) {
         my $env-base = self.env-name($id) ~ '_';
         spurt $file, ~Docker::File.new(
@@ -129,7 +133,7 @@ role Cro::Tools::Template::Common {
                             dir => '/app'
                         ),
                         Docker::File::RunShell.new(
-                            command => 'zef install --deps-only . && perl6 -c -Ilib service.p6'
+                            command => self.docker-file-build-commands
                         ),
                         Docker::File::Env.new(
                             variables => {
