@@ -274,4 +274,18 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
             npm run build
             SHELL
     }
+
+    method docker-file-build-commands() {
+        q:to/DOCKER/;
+        set -x \
+            && echo "deb http://deb.debian.org/debian sid main" >> /etc/apt/sources.list \
+            && apt-get update \
+            && apt-get --yes install --no-install-recommends npm nodejs \
+            && rm -rf /var/lib/apt/lists/* \
+            && zef install --deps-only . \
+            && npm install . \
+            && npm run build \
+            && perl6 -c -Ilib service.p6
+        DOCKER
+    }
 }

@@ -34,6 +34,7 @@ role Cro::Tools::Template::Common {
         self.write-meta($where.add('META6.json'), $name, %options);
         self.write-readme($where.add('README.md'), $name, %options);
         self.write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
+        self.write-git-ignore-file($where.add('.gitignore'));
         self.write-docker-ignore-file($where.add('.dockerignore'));
         self.write-docker-file($where.add('Dockerfile'), $id, %options);
     }
@@ -89,6 +90,13 @@ role Cro::Tools::Template::Common {
             zef install --depsonly .
             {$extra}cro run
             ```
+
+            You can also build and run a docker image while in the app root using:
+
+            ```
+            docker build -t {$name} .
+            docker run --rm -p 10000:10000 {$name}
+            ```
             MARKDOWN
     }
 
@@ -103,11 +111,30 @@ role Cro::Tools::Template::Common {
         Cro::Tools::CroFile.new(:$id, :$name, :$entrypoint, :@endpoints, :@links)
     }
 
+    method write-git-ignore-file($file) {
+        $file.spurt(self.git-ignore-contents);
+    }
+
+    method git-ignore-contents() {
+        q:to/GITIGNORE/;
+            # Caches
+            .precomp/
+            node_modules/
+
+            # Backup files
+            *~
+            GITIGNORE
+    }
+
     method write-docker-ignore-file($file) {
         my @ignores = self.docker-ignore-entries();
         if @ignores {
             spurt $file, @ignores.map({ "$_\n" }).join;
         }
+    }
+
+    method docker-file-build-commands() {
+        'zef install --deps-only . && perl6 -c -Ilib service.p6'
     }
 
     method write-docker-file($file, $id, %options) {
@@ -129,7 +156,7 @@ role Cro::Tools::Template::Common {
                             dir => '/app'
                         ),
                         Docker::File::RunShell.new(
-                            command => 'zef install --deps-only . && perl6 -c -Ilib service.p6'
+                            command => self.docker-file-build-commands
                         ),
                         Docker::File::Env.new(
                             variables => {
@@ -150,6 +177,6 @@ role Cro::Tools::Template::Common {
     }
 
     method env-name($id) {
-        $id.uc.subst(/<-[A..Za..z_]>/, '_', :g)
+        $id.uc.subst(/<-[A..Za..z0..9_]>/, '_', :g)
     }
 }
