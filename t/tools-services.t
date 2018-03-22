@@ -10,7 +10,7 @@ sub with-test-dir(&test-case) {
     test-case($temp-dir);
 }
 
-with-test-dir -> $dir {
+with-test-dir -> IO() $dir {
     my $services = Cro::Tools::Services.new(base-path => $dir.IO);
     my $found = $services.services.Channel;
 
@@ -24,7 +24,7 @@ with-test-dir -> $dir {
     ($first-found, $second-found) = ($second-found, $first-found)
         if $first-found.path gt $second-found.path;
 
-    is $first-found.path.Str, "$dir/nested/service2",
+    is $first-found.path.Str, $dir.child("nested/service2").absolute,
         'First service has correct path';
     with $first-found.cro-file-error {
         diag $_;
@@ -32,7 +32,7 @@ with-test-dir -> $dir {
     is $first-found.cro-file.id, 'service2',
         'First service has correct .cro.yml';
 
-    is $second-found.path.Str, "$dir/service1",
+    is $second-found.path.Str, $dir.child("service1").absolute,
         'Second service has correct path';
     with $second-found.cro-file-error {
         diag $_;
@@ -50,7 +50,7 @@ with-test-dir -> $dir {
     my $third-found = $found.receive;
     ok $third-found ~~ Cro::Tools::Services::Service,
         'Third service created after startup is found';
-    is $third-found.path.Str, "$dir/service3",
+    is $third-found.path.Str, $dir.child("service3").absolute,
         'Third service has correct path';
     with $third-found.cro-file-error {
         diag $_;
@@ -75,7 +75,7 @@ with-test-dir -> $dir {
         nok $s1-change.poll, 'No initial source change reported';
         mkdir "$dir/nested/service2/lib";
         spurt "$dir/nested/service2/lib/Foo.pm6", "say 42";
-        is $s1-change.receive, "$dir/nested/service2/lib/Foo.pm6",
+        is $s1-change.receive, $dir.child("nested/service2/lib/Foo.pm6").absolute,
             'Got notified of changed service source file';
 
         nok $s2-meta-change.poll,
