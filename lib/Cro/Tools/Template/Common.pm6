@@ -34,6 +34,7 @@ role Cro::Tools::Template::Common {
         self.write-meta($where.add('META6.json'), $name, %options);
         self.write-readme($where.add('README.md'), $name, %options);
         self.write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
+        self.write-git-ignore-file($where.add('.gitignore'));
         self.write-docker-ignore-file($where.add('.dockerignore'));
         self.write-docker-file($where.add('Dockerfile'), $id, %options);
     }
@@ -108,6 +109,21 @@ role Cro::Tools::Template::Common {
         my @endpoints = self.cro-file-endpoints($id-uc, %options);
         my $entrypoint = 'service.p6';
         Cro::Tools::CroFile.new(:$id, :$name, :$entrypoint, :@endpoints, :@links)
+    }
+
+    method write-git-ignore-file($file) {
+        $file.spurt(self.git-ignore-contents);
+    }
+
+    method git-ignore-contents() {
+        q:to/GITIGNORE/;
+            # Caches
+            .precomp/
+            node_modules/
+
+            # Backup files
+            *~
+            GITIGNORE
     }
 
     method write-docker-ignore-file($file) {
