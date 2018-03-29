@@ -352,9 +352,6 @@ is the only supported mechanism for deciding which protocol to use.
 
 ## Push promises
 
-**Upcoming Feature::** *This section describes a feature that will be included
-in an upcoming Cro release.*
-
 HTTP/2.0 proides push promises, which allow the server to push extra resources
 to the client as part of the response. By default, `Cro::HTTP::Client` will
 instruct the remote server to **not** send push promises. To opt in to this
