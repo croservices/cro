@@ -1,5 +1,60 @@
 # Cro Release History
 
+## 0.7.4
+
+This release brings a number of new features, along with some bug fixes. The
+Cro team now provide [Docker base images](https://hub.docker.com/r/croservices/)
+for aiding deployment of Cro services. The `cro stub` command also generates a
+`Dockerfile` that uses these base images, meaning stubbed services now can be
+built into a container without any further work.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Add relative URL parsing support to `Cro::Uri`
+* Add `Cro::Iri`, a class for parsing and working with Internationalized
+  Resource Identifiers
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Make the `static` router function accept an `IO::Path` as the first (base
+  directory) argument
+* Make the `static` router function slurp up the rest of its positional
+  arguments and use them as the path below the base; previously, it took
+  an optional array
+* Make the `static` router function support an `:indexes[...]` option, which
+  configures files that should be served as a directory index
+* Switch to using the `DateTime::Parse` module instead of having our own
+  such parser
+* Make `Cro::HTTP::Router::RouteSet` more subclass-friendly, by making a
+  number of attributes public and exposing the `Handler` base role
+* Implement `cookies` option to `Cro::HTTP::Client`, for setting cookies to be
+  sent with the request
+* Make `Cro::HTTP::Client` more tolerant of an SSL library with no ALPN support
+  under default usage
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Make `Upgrade` header matching case-insensitive
+
+The following changes were made to the `cro` distribution:
+
+* Generate a `Dockerfile` in HTTP projects produced by `cro stub`
+* Provide Docker deployment documentation
+* Follow changes in Webpack 4.0 in the SPA tutorial
+* Make `cro serve` serve some common directory index files
+* Document new `static` features
+* Correct session example in documentation to do `Cro::HTTP::Auth`
+* Fix `watch-dir` test on OSX
+* Don't remove digits in environment variable names when mangling the service
+  ID in `cro stub`
+* Write a `.gitignore` file as part of `cro stub`
+* Be a bit more liberal with runner test timeout, for slower systems
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support), together with the
+following community members: Geoffrey Broadwell, Itsuki Toyota, Nick Logan,
+scriplit, Tobias Leich.
+
 ## 0.7.3
 
 This release brings a range of new features, fixes, and improvements. The key
