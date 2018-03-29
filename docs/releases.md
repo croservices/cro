@@ -3,9 +3,9 @@
 ## 0.7.4
 
 This release brings a number of new features, along with some bug fixes. The
-Cro team now provide [Docker base images](https://hub.docker.com/r/croservices/)
+Cro team now provides [Docker base images](https://hub.docker.com/r/croservices/)
 for aiding deployment of Cro services. The `cro stub` command also generates a
-`Dockerfile` that uses these base images, meaning stubbed services now can be
+`Dockerfile` that uses these base images, meaning stubbed services can be
 built into a container without any further work.
 
 The following changes were made to the `Cro::Core` distribution:
