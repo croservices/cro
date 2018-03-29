@@ -1,7 +1,7 @@
 {
     "perl"          : "6.*",
     "name"          : "cro",
-    "version"       : "0.7.3",
+    "version"       : "0.7.4",
     "description"   : "Libraries and tools for building reactive services in Perl 6. This installs the cro command line and web tool, along with HTTP (including HTTPS and HTTP/2.0) and WebSocket support.",
     "tags"          : [ "HTTP", "WebSocket" ],
     "authors"       : [ "Jonathan Worthington <jnthn@jnthn.net>" ],
