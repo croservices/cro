@@ -15,7 +15,7 @@ sub with-test-dir(&test-case) {
 
 sub test-request($url) {
     my $got-body;
-    for ^20 -> $i {
+    for ^40 -> $i {
         sleep 1;
         my $request = Cro::HTTP::Client.get($url);
         await Promise.anyof($request, Promise.in(5));
