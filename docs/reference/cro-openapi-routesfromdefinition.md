@@ -199,8 +199,8 @@ various response helpers (such as `content`) are also available.
 A request will be validated against the OpenAPI definition. The following
 aspects of the request will be validated:
 
-* Method (`GET`, `POST`, etc.) (failure to match will result in an automatic
-  405 response).
+* Method (`GET`, `POST`, etc.) (failure to match will result in an automatic 405
+  response).
 * Route (path) arguments from the target URI (failure to match these will
   result in an automatic 404 response).
 * Query string arguments, headers, and cookies (failure to match these will

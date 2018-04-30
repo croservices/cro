@@ -101,3 +101,6 @@ These aren't specific to Cro, but are worth a mention.
   then the logs can be introspected by `docker log`, `kubectl log`, etc.
 * Prefer using a tool like Kubernetes rather than managing containers and
   configuration by hand
+
+Docker containers can be deployed on various cloud providers, some of which
+provide hosted Kubernetes.
