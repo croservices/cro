@@ -1,5 +1,53 @@
 # Cro Release History
 
+## 0.7.5
+
+This release brings two major new features:
+
+* The `Cro::OpenAPI::RoutesFromDefinition` module, which supports implementing
+  services specified using an [OpenAPI v3](https://github.com/OAI/OpenAPI-Specification)
+  document without needing to repeat the routes, validation, and so forth
+  from the document. This work was funded by [Nick Logan (ugexe)](https://deathbyperl6.com/).
+  Three modules for wider Perl 6 use were produced and released as part of
+  this work: `JSON::Pointer`, `OpenAPI::Model`, and `OpenAPI::Schema::Validate`.
+* The `Cro::HTTP::Test` module, which offers a convenient way to write tests
+  for HTTP services. It is, of course, primarily aimed at those services built
+  using Cro, but may also be provided with a URI as the test target rather than
+  a Cro application, and thus can be used to write tests for any HTTP service.
+  This work was funded by [Oetiker+Partner](https://www.oetiker.ch/).
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Add `parse-relative` and `parse-ref` to `Cro::Uri`, which parse a relative
+  URI and a URI reference (either relative or absolute URI) respectively
+* Provide an `add` method to `Cro::Uri`, which implements relative URI
+  reference resolution
+* When a `Cro::Uri` is constructed with an authority component but no
+  host, parse the authority component
+* The `Str` method on `Cro::Uri` now assembles the string from the URI
+  components, rather than depending on retaining the original URI
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Use the new `Cro::Uri.add(...)` method to implement the `base-uri` feature
+  of `Cro::HTTP::Client`, making it vastly more correct
+* Make it possible to replace the `Cro::HTTP::Client` connector pipeline
+  component when subclassing the client
+* Make `:@query` parameters in `Cro::HTTP::Router` reflect the original query
+  string order
+
+The following changes were made to the `Cro` distribution:
+
+* Add documentation for `Cro::HTTP::Test`
+* Add documentation for `Cro::OpenAPI::RoutesFromDefinition`
+* Document new features for `Cro::Uri`, as well as others that existed, but
+  were missing from the documentation
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support). We would like to thank
+[Nick Logan (ugexe)](https://deathbyperl6.com/) and [Oetiker+Partner](https://www.oetiker.ch/)
+for supporting the key new features found in this release.
+
 ## 0.7.4
 
 This release brings a number of new features, along with some bug fixes. The
