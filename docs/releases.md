@@ -36,6 +36,11 @@ The following changes were made to the `Cro::HTTP` distribution:
 * Make `:@query` parameters in `Cro::HTTP::Router` reflect the original query
   string order
 
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Make matching of the `Upgrade` header's value case-insensitive, so as to
+  permit the `WebSocket` some servers send instead of `websocket`.
+
 The following changes were made to the `Cro` distribution:
 
 * Add documentation for `Cro::HTTP::Test`
