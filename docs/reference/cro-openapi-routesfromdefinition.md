@@ -70,8 +70,8 @@ my $app = route {
 }
 ```
 
-Since it is also a `Cro::Transform`, then it may be hosted directly as the
-application using `Cro::HTTP::Server`.
+Since it does the `Cro::Transform` role, it may be hosted directly as the
+application using `Cro::HTTP::Server`:
 
 ```
 my $service = Cro::HTTP::Server:
@@ -148,10 +148,8 @@ The `openapi` sub may be passed the following options:
   longer). It is fine to register multiple paths to serve the document for a
   given format at.
 
-All operations in the OpenAPI document should have an `operationId` in order
-to be implementable. Unless configured with `:ignore-unimplemented`, such
-operations will be complained about, with a note that it is not even possible
-to implement them.
+All operations in the OpenAPI document should have an `operationId`, otherwise
+it is not possible to implement a Cro route handler for them.
 
 ## The operation sub
 
@@ -194,7 +192,7 @@ with `Cro::HTTP::Router`. The `request` and `response` terms provide access to
 the request and response objects, the `request-body` sub is available, and the
 various response helpers (such as `content`) are also available.
 
-## Automatic Validation
+## Automatic validation
 
 A request will be validated against the OpenAPI definition. The following
 aspects of the request will be validated:
@@ -284,7 +282,7 @@ role Cro::OpenAPI::RoutesFromDefinition::SecurityChecker {
 
 For the case of API keys, the role provides a `get-api-key($scheme, $request)`
 method that will use the scheme to look up the API key from the request. It will
-return a `Failure` if the is no such header, cookie, or query string parameter, or
+return a `Failure` if there is no such header, cookie, or query string parameter, or
 if the scheme type is not `apiKey`.
 
 An example implementation of the role looks like this:

@@ -73,7 +73,7 @@ thus testing authorization. The `http` argument specifies the HTTP version to
 run the tests under. Since we control both client and server side in the test,
 a setting of `:http<1.1 2>` is not allowed. The default is `:http<2>`.
 
-The `test-service($uri, &tests) candidate runs the tests against the specified
+The `test-service($uri, &tests)` candidate runs the tests against the specified
 base URI, connecting to it through `Cro::HTTP::Client`. This makes it possible
 to use `Cro::HTTP::Test` to write tests for services built using something other
 than Cro.
@@ -90,7 +90,7 @@ test, and named parameters indicating the expected properties of the response.
 The request is specified by calling one of `get`, `put`, `post`, `delete`,
 `head`, or `patch`. There's also `request($method, ...)` for other HTTP methods
 (in fact, `get` will just call `request('GET', ...)`). These functions accept
-an optional positional parameter providing a relative URI, which is provided
+an optional positional parameter providing a relative URI, which if provided
 will be appended to the current effective base URI. The `:$json` named parameter
 is treated specially, expanding to `{ content-type => 'application/json`, body
 => $json)`. All other named parameters will be passed on to the `Cro::HTTP::Client`
@@ -104,7 +104,7 @@ are as follows.
 
 Smartmatches the `status` property of the response against the
 check. While an integer, such as `status => 200`, will be most common, it is
-also possible to so thigns like `status => * < 400` (e.g. not an error).
+also possible to so things like `status => * < 400` (e.g. not an error).
 
 ### content-type
 
