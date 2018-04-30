@@ -61,6 +61,10 @@ Requests, responses, and related types:
 * [Cro::HTTP::Request](docs/reference/cro-http-request)
 * [Cro::HTTP::Response](docs/reference/cro-http-response)
 
+### Cro::HTTP::Test
+
+* [Cro::HTTP::Test](docs/reference/cro-http-test)
+
 ### Cro::WebSocket
 
 For application developers:
@@ -77,6 +81,10 @@ Pipeline components:
 * [Cro::WebSocket::Handler](docs/reference/cro-websocket-handler)
 * [Cro::WebSocket::MessageParser](docs/reference/cro-websocket-messageparser)
 * [Cro::WebSocket::MessageSerializer](docs/reference/cro-websocket-messageserializer)
+
+### Cro::OpenAPI::RoutesFromDefinition
+
+* [Cro::OpenAPI::RoutesFromDefinition](docs/reference/cro-openapi-routesfromdefinition)
 
 ### Cro::ZeroMQ
 
