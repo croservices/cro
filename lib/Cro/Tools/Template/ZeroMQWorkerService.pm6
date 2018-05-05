@@ -70,5 +70,5 @@ class Cro::Tools::Template::ZeroMQWorkerService does Cro::Tools::Template does C
         ),
     }
 
-    method meta6-depends(%options) { <Cro::ZMQ> }
+    method meta6-depends(%options) { <Cro::ZeroMQ> }
 }
