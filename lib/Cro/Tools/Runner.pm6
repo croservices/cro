@@ -242,6 +242,7 @@ class Cro::Tools::Runner {
             sub service-proc($cro-file, %endpoint-ports, :$trace) {
                 my $service-id = $cro-file.id;
                 my %env = %*ENV;
+                for $cro-file.env -> $_ { %env{.name} = .value }
                 for $cro-file.endpoints -> $endpoint {
                     with $endpoint.host-env {
                         %env{$_} = 'localhost';
