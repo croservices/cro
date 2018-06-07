@@ -37,17 +37,20 @@ your needs.
 
 The following base images are available for application deployment:
 
-* **`cro-core`** - includes the Cro::Core distribution; ideal when no other
+* [**`cro-core`**](https://hub.docker.com/r/croservices/cro-core/) -
+  includes the Cro::Core distribution; ideal when no other
   base image is applicable, but at least saves installing the `Cro::Core`
   library.
-* **`cro-http`** - includes the `Cro::HTTP` distribution, which in turn
+* [**`cro-http`**](https://hub.docker.com/r/croservices/cro-http/) -
+  includes the `Cro::HTTP` distribution, which in turn
   depends on `Cro::TLS` and `Cro::Core`. Includes libraries required for TLS
   to work. Ideal for web services.
-* **`cro-http-websocket`** - as for `cro-core-http`, but also includes
+* [**`cro-http-websocket`**](https://hub.docker.com/r/croservices/cro-http-websocket/) - as for `cro-core-http`, but also includes
   the `Cro::WebSocket` distribution. Ideal for web servies that also use web
   sockets.
 
-There is also a `cro` base image which includes the development tools. This is
+There is also a [`cro` base image](https://hub.docker.com/r/croservices/cro/)
+which includes the development tools. This is
 not a good choice for deployment, since it includes a lot of modules that are
 only depended on by the `cro` command line tool. However, it may be convenient
 for trying out Cro without needing a local install.
@@ -94,7 +97,7 @@ Also consider having a `.dockerignore` file containing:
 
 These aren't specific to Cro, but are worth a mention.
 
-* Always use a versioned base image rather than `:latest`
+* Always use a versioned base image; there is no `:latest` tag.
 * Make sure logging has been added to services, and preferably set up some
   kind of log aggregation. Unless you have an arrangement in place to send
   logs to a centralized logging solution, prefer logging to STDOUT/STDERR, as
