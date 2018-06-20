@@ -128,3 +128,19 @@ env:
   - name: JWT_SECRET
     value: my-dev-not-so-secret
 ```
+
+## Controlling automatic restarts
+
+By default, `cro run` and `cro web` will automatically restart the service
+when a file changes in any directory beneath where the `.cro.yml` is located.
+All hidden files and directories are ignored by default (those starting with a
+`.`, for example `.precomp/` and `.git/` directories).
+
+To add extra directories to ignore, create an `ignore` section with a list of
+patterns in the `.cro.yml` file. These are processed like `.gitignore`. For
+example:
+
+```
+ignore:
+  - node_modules/
+```
