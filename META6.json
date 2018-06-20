@@ -12,7 +12,6 @@
                         "OO::Monitors", "YAMLish", "Cro::WebSocket",
                         "Docker::File" ],
     "provides"      : {
-                "cro": "bin/cro",
                 "Cro::Tools::CLI": "lib/Cro/Tools/CLI.pm6",
                 "Cro::Tools::CroFile": "lib/Cro/Tools/CroFile.pm6",
                 "Cro::Tools::Link::Editor": "lib/Cro/Tools/Link/Editor.pm6",
