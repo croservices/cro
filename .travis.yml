@@ -5,8 +5,8 @@ os:
     - osx
 
 perl6:
-    - '2017.09'
     - '2017.10'
+    - '2018.01'
     - latest
 
 install:
