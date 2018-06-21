@@ -33,6 +33,7 @@ sub test-request($url) {
 }
 
 with-test-dir -> $test-dir {
+
     my $r = Cro::Tools::Runner.new(
         services => Cro::Tools::Services.new(base-path => $test-dir.IO),
         service-id-filter => 'service1'

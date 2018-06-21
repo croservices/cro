@@ -1,3 +1,4 @@
+use File::Ignore;
 use YAMLish;
 
 class X::Cro::Tools::CroFile::Version is Exception {
@@ -52,6 +53,7 @@ class Cro::Tools::CroFile {
     has Endpoint @.endpoints;
     has Link @.links;
     has Environment @.env;
+    has File::Ignore $.ignore;
 
     # TODO Remove lock once https://github.com/Leont/yamlish/issues/19 is
     # resolved, though if it's a Rakudo bug in the end then we might need to
@@ -66,12 +68,13 @@ class Cro::Tools::CroFile {
             entrypoint => %conf<entrypoint>,
             endpoints => (%conf<endpoints> // ()).map({ Endpoint.new(|$_) }),
             links => (%conf<links> // ()).map({ Link.new(|$_) }),
-            env => (%conf<env> // ()).map({ Environment.new(|$_) })
+            env => (%conf<env> // ()).map({ Environment.new(|$_) }),
+            ignore => (File::Ignore.new(rules => (%conf<ignore> // ())))
         )
     }
 
     sub validate(%conf) {
-        check-fields %conf, :require<cro id entrypoint>, :allow<name endpoints links env>;
+        check-fields %conf, :require<cro id entrypoint>, :allow<name endpoints links env ignore>;
         die X::Cro::Tools::CroFile::Version.new(got => %conf<cro>) if %conf<cro> ne '1';
         for @(%conf<endpoints> // ()) {
             check-fields $_, :require<id protocol host-env port-env>, :allow['name'],

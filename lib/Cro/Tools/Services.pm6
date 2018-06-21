@@ -39,9 +39,15 @@ class Cro::Tools::Services {
             }
         }
 
+        method !check-ignore($item) {
+            return True if !($!cro-file.defined) || $!cro-file.ignore.elems == 0;
+            return !($!cro-file.ignore.ignore-file($item.path) || $!cro-file.ignore.ignore-directory($item.path));
+        }
+
         method source-changed(--> Supply) {
             supply {
-                whenever $!file-changed.grep(!*.path.IO.basename.starts-with('.')) {
+                whenever $!file-changed.grep(!*.path.IO.basename.starts-with('.'))
+                .grep({ self!check-ignore($_) }) {
                     emit .path;
                 }
                 whenever $!deleted {

@@ -10,7 +10,7 @@
                         "META6", "Shell::Command",
                         "File::Find", "Terminal::ANSIColor",
                         "OO::Monitors", "YAMLish", "Cro::WebSocket",
-                        "Docker::File" ],
+                        "Docker::File", "File::Ignore" ],
     "provides"      : {
                 "Cro::Tools::CLI": "lib/Cro/Tools/CLI.pm6",
                 "Cro::Tools::CroFile": "lib/Cro/Tools/CroFile.pm6",

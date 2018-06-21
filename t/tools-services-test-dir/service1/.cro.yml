@@ -8,3 +8,5 @@ endpoints:
       protocol: http
       host-env: SERVICE1_HTTP_HOST
       port-env: SERVICE1_HTTP_PORT
+ignore:
+    - ignored_directory/
