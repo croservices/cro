@@ -188,18 +188,27 @@ requesting the enitre body) or a `Supply` (when the body is to be delivered as
 it arrives).
 
 The `body` method returns a `Promise` that will be kept when the body has
-been received and parsed. There default set of body parsers are:
+been received and parsed.
+
+```
+my $resp = await Cro::HTTP::Client.get($some-json-api-url);
+my $json = await $resp.body;
+```
+
+The `body` method will offer the response to each available body parser, and
+returns a `Promise` that will be kept when the first applicable body parser has
+completely parsed the body. The default body parsers available are:
 
 * JSON, which will be used when the `Content-type` header is either
   `application/json` or uses the `+json` suffix. `JSON::Fast` will be used to
   perform the parsing.
-* String fallback, which is used when the `Content-type` type is `text`. A
+* String fallback, which is used when the `Content-type` type is `text/*`. A
   `Str` will be returned.
 * Blob fallback, which is used in all other cases and returns a `Blob` with
   the body.
 
-A `Cro::HTTP::Client` can be configured either with a replacement set of body
-parsers by passing the `body-parsers` argument:
+A `Cro::HTTP::Client` instance can be configured either with a replacement set
+of body parsers by passing the `body-parsers` argument:
 
     my $client = Cro::HTTP::Client.new:
         body-parsers => [
@@ -207,7 +216,7 @@ parsers by passing the `body-parsers` argument:
             My::BodyParser::XML
         ];
 
-Or to add extra body parsers atop of the default set use `add-body-parsers`:
+Or to prepend extra body parsers to the default set, use `add-body-parsers`:
 
     my $client = Cro::HTTP::Client.new:
         add-body-parsers => [ My::BodyParser::XML ];
