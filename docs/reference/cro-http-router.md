@@ -82,33 +82,6 @@ In the case of a `subset` type, the underlying nominal type must be `Str` or
 `Int` (or `Any` or `Mu`, which are treated equivalent to `Str`). All other
 types on URL segments are disallowed.
 
-Besides `get`, the HTTP methods `post`, `put`, `delete`, and `patch` may be
-used.
-
-```
-my $app = route {
-    # POST /catalogue/products
-    post -> 'catalogue', 'products' {
-        ...
-    }
-
-    # PUT /catalogue/products/42
-    post -> 'catalogue', 'products', uint32 $id {
-        ...
-    }
-
-    # DELETE /catalogue/products/42
-    delete -> 'catalogue', 'products', uint32 $id {
-        ...
-    }
-    
-    # PATCH /catalogue/products/42
-    patch -> 'catalogue', 'products', uint32 $id {
-        ...
-    }
-}
-```
-
 A variable segment may be made optional, in which case the route will match
 even if the segment is absent.
 
@@ -149,9 +122,75 @@ routes based upon their order of declaration. The rules are as follows:
   will be tested in the order they were written in source.
 
 In the event no route matches on segments, the router will produce a HTTP 404
-Not Found response. If a route matches on segments, but not on the HTTP method
-(for example, a `PUT` was performed but the only routes matching are for `GET`
-and `POST`), then it will instead produce a HTTP 405 Method Not Allowed.
+Not Found response.
+
+## Request methods
+
+Besides `get`, the router exports subs for the HTTP methods `post`, `put`,
+`delete`, and `patch`.
+
+```
+my $app = route {
+    # POST /catalogue/products
+    post -> 'catalogue', 'products' {
+        ...
+    }
+
+    # PUT /catalogue/products/42
+    post -> 'catalogue', 'products', uint32 $id {
+        ...
+    }
+
+    # DELETE /catalogue/products/42
+    delete -> 'catalogue', 'products', uint32 $id {
+        ...
+    }
+
+    # PATCH /catalogue/products/42
+    patch -> 'catalogue', 'products', uint32 $id {
+        ...
+    }
+}
+```
+
+These are all short for the `http` sub:
+
+```
+my $app = route {
+    # POST /catalogue/products
+    http 'POST', -> 'catalogue', 'products' {
+        ...
+    }
+
+    # PUT /catalogue/products/42
+    http 'PUT', -> 'catalogue', 'products', uint32 $id {
+        ...
+    }
+
+    ...
+}
+```
+
+Except that it may be used with any HTTP request method:
+
+```
+my $app = route {
+    http 'LINK', -> $id {
+        ...
+    }
+    http 'UNLINK', -> $id {
+        ...
+    }
+}
+```
+
+However, **these will not work** unless the `Cro::HTTP::Server` being used to
+host the application is configured to accept them using its `allowed-methods`
+constructor parameter.
+
+If a route matches on segments, but not on the HTTP method (for example, a
+`PUT` was performed, but the only routes matching are for `GET` and `POST`),
+the result will be a HTTP 405 Method Not Allowed response.
 
 ## Query string, headers, and cookies
 
