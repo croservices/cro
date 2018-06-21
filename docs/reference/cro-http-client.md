@@ -386,3 +386,17 @@ react {
     }
 }
 ```
+
+## Custom HTTP methods
+
+The `get`, `post`, `put`, `delete`, `patch` and `head` methods are convenience
+forms of the more general `request` method, which takes the HTTP request
+method as a first argument. The `request` method can be used to make requests
+with other HTTP methods. For example, making a request with the `LINK` method
+can be achieved using:
+
+```
+my $resp = await Cro::HTTP::Client.request('LINK', $url);
+```
+
+This may also be useful if the request method to use is held in a variable.
