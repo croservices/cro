@@ -195,3 +195,27 @@ If `:http<1.1 2>` is specified and ALPN support is not available, then an
 exception will be thrown. ALPN is the only supported mechanism for selecting
 between HTTP/1.1 and HTTP/2, thus the requirement on it for this configuration
 (and why there is no option for both versions with HTTP).
+
+## Allowed request methods
+
+By default, the following HTTP request methods are allowed:
+
+* GET
+* HEAD
+* POST
+* PUT
+* DELETE
+* PATCH
+* CONNECT
+* OPTIONS
+
+A request using a request method other than these shall be refused. To change
+set of allowed request methods, pass a list using the `allowed-methods` named
+constructor parameter:
+
+```
+my $service = Cro::HTTP::Server.new(
+    :host('localhost'), :port(8888), :$application,
+    :allowed-methods<GET HEAD PUT POST DELETE LINK UNLINK>
+);
+```
