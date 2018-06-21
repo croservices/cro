@@ -1,17 +1,19 @@
 # Cro::HTTP::Client
 
-The `Cro::HTTP::Client` class provides a flexible HTTP and HTTPS client
-implementation, scaling from simple to more complex use cases. It can be
+The `Cro::HTTP::Client` class provides a flexible asynchronous HTTP and
+HTTPS client, scaling from simple to more complex use cases. It can be
 consumed in two ways:
 
 * By making calls on the type object (`Cro::HTTP::Client.get($url)`). This
   is good for one-off requests, but does not provide connection re-use when
-  making multiple requests to the same server (such as by using keep-alive).
+  making multiple requests to the same server (such as by using HTTP/1.1
+  persistent connections or HTTP/2.0 mutliplexing).
 * By making an instance of `Cro::HTTP::Client`. By default, this enables
-  re-use of a pool of connections. It may also be configured with a default
-  base URL, default authorization data to pass along, and even middleware to
-  insert into the request/response processing pipeline. An instance of
-  `Cro::HTTP::Client` may be used concurrently.
+  re-use of a pool of connections (HTTP/1.1) or multiplexing (HTTP/2.0). It
+  may also be configured with a default base URL, default authorization data
+  to pass along, and even middleware to insert into the request/response
+  processing pipeline. An instance of `Cro::HTTP::Client` may be used
+  concurrently.
 
 In general, if you are going to make a one-off request, just use the type
 object. If you are going to make many requests to the same server or set of
