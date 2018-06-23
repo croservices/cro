@@ -1,5 +1,70 @@
 # Cro Release History
 
+## 0.7.6
+
+This release contains a number of minor new features (better support for
+working with the less commonly used HTTP methods, and an `ignore` section in
+the `.cro.yml` file). It also contains numerous fixes and tweaks, as well as
+some documentation improvements.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Allow a trailing `;` in media types
+* Fix media type parse error on many-dot subtype
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Set default ciphers to Moz. Modern Compatibility
+* Do not provide a default randomized cookie name for the persistent session
+  role, and instead give an error if the user does not set `cookie-name`. It's
+  useless to keep sessions in a database if the cookie name changes on every
+  application restart, but providing a hardcoded default is a platform
+  fingerprinting risk. Making the user specify a cookie name is thus a better
+  way forward.
+* Fix WWWUrlEncode body parser applicability test to use `Cro::MediaType` and
+  so check more robustly (it used to do a string match on the header, and so
+  would get confused by a `charset` parameter).
+* Fix `static` mime type handling on serving index files
+* Use `original-target` in `Cro::HTTP::Log::File`, so that delegated routes
+  will produce the full request target in the logs
+* Provide `allowed-methods` on `Cro::HTTP::Server` in order to set the HTTP
+  methods that will be accepted
+* `Cro::HTTP::Router` now exports a `http` sub, providing a more convenient
+  way to write routes for some of the less widely used HTTP methods (or for
+  implementing protocols based on HTTP)
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Don't force the `ca` argument to be passed in order to use `wss://` in
+  `Cro::WebSocket::Client`
+* Force HTTP/1.1 use in `Cro::WebSocket::Client` (connecting to a secure
+  endpoint hosted by a server supporting HTTP/2.0 could upgrade and then find
+  itself unable to speak the WebSocket protocol, which is tied to HTTP/1.1)
+* Fix various issues with URI handling in `Cro::WebSocket::Client`
+* Provide more detailed trace output for WebSocket frames and messages
+
+The following changes were made to the `Cro` distribution:
+
+* Remove `bin/cro` from the `provides` section of `META6.json`
+* Implement support for the `env` section in the `.cro.yml` file, so that
+  additional environment variables can be provided at development time
+* Implement an `ignore` section in the `.cro.yml` file to ignore certain paths
+  from being watched to decide to make a service restart
+* Fix dependencies of a generated ZeroMQ project
+* Clarify deployment documentation
+* Document new `ignore` support in `.cro.yml`
+* Document `allowed-methods` HTTP server option
+* Document new `http` sub for custom request methods in router
+* Text tweaks to HTTP client introduction text
+* Document custom HTTP methods in the client
+* Add a code example of .body in HTTP client docs
+* Various typo fixes in the documentation
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support), together with the
+following community members: cono, FCO, Fritz Zaucker, Lance Wicks, Moritz
+Lenz, Nick Logan.
+
 ## 0.7.5
 
 This release brings two major new features:
