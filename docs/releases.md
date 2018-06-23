@@ -260,7 +260,7 @@ for use with `cro stub`. Read on for details of the full set of improvements.
 The following changes were made to the `Cro::Core` distribution:
 
 * Factor out trace output repeated code
-* Avoid trace output throwing execptions on Windows
+* Avoid trace output throwing exceptions on Windows
 
 The following changes were made to the `Cro::HTTP` distribution:
 
