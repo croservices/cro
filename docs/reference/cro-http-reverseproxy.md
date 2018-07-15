@@ -81,7 +81,7 @@ my $app = route {
     # Everything under /images/ proxied to a really cute cat picture
     # (provide your own, or there's just a few on the internet...)
     delegate <images *> => Cro::HTTP::ReverseProxy.new:
-        to => 'http://really-cute.cat/picture.gif';
+        to-absolute => 'http://really-cute.cat/picture.gif';
 }
 ```
 
