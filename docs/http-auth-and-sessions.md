@@ -209,7 +209,7 @@ the username and password to authenticate, and should return `True` if it is
 a valid combination and `False` otherwise.
 
 ```
-class MyUser {
+class MyUser does Cro::HTTP::Auth {
     has $.username;
 }
 class MyBasicAuth does Cro::HTTP::Auth::Basic[MyUser, "username"] {
