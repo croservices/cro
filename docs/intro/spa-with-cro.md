@@ -594,7 +594,7 @@ var SubmitTip = () => (
     <div>
         <h2>Got a tip?</h2>
         <div>
-            <textarea rows="2" cols="100" maxlength="200" />
+            <textarea rows="2" cols="100" maxLength="200" />
         </div>
         <input type="button" value="Add Tip" />
     </div>
