@@ -212,7 +212,7 @@ any named parameters that are specified to `get` or `request` will override
 those specified in `test-given`.
 
 ```
-test-given '/add', header => { X-Precision => '15' } {
+test-given '/add', headers => { X-Precision => '15' } {
     ...
 }
 ```
@@ -220,7 +220,7 @@ test-given '/add', header => { X-Precision => '15' } {
 The second form doesn't require a relative URI, and instead just takes options:
 
 ```
-test-given header => { X-Precision => '15' } {
+test-given headers => { X-Precision => '15' } {
     ...
 }
 ```
