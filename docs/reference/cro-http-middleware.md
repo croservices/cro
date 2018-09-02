@@ -57,7 +57,7 @@ Note that the third case could also be done using an `include` of a nested
 
 ```
 include 'endpoint' => route {
-    before TheMiddleware;
+    before-matched TheMiddleware;
     delegate GraphQLThing.new(...);
 }
 ```
@@ -70,9 +70,9 @@ or `route`-block level. As a rough guideline:
 
 * If it is service-level infrastructure (such as logging or applying HSTS),
   then apply it at the server level.
-* If it should only apply to some routes, then use the `include` feature of
-  `Cro::HTTP::Router` to segregate the routes where it applies, and apply the
-  middleware at `route`-block level where needed.
+* If it should only apply to some routes, then use the `include` and `delegate`
+  features of `Cro::HTTP::Router` to segregate the routes where it applies, and
+  apply the middleware at `route`-block level where needed.
 * If it feels more like part of the application than infrastructure, lean
   towards putting it at the `route` block level.
 
