@@ -910,39 +910,86 @@ bit worse.
 
 ## Applying middleware in a route block
 
+*Note: The semantics described here are for Cro 0.8.0 and above. Earlier
+versions lacked the current `before` and `after` semantics, and instead their
+`before` and `after` had the semantics now provided by `before-matched` and
+`after-matched`.*
+
 In Cro, middleware is a component in the request processing pipeline. It may
 be installed at the server level (see `Cro::HTTP::Server` for more), but also
-per `route` block using the `before` and `after` functions. For readers new to
-middleware in Cro, the [HTTP middleware guide](docs/reference/cro-http-middleware)
-gives an overview of what middleware is, and the trade-offs between the different
-ways of writing and using HTTP middleware in Cro.
+per `route` block using the `before`, `before-matched`, `after`, and
+`after-matched` functions. For readers new to middleware in Cro, the
+[HTTP middleware guide](docs/reference/cro-http-middleware) gives an overview
+of what middleware is, and the trade-offs between the different ways of
+writing and using HTTP middleware in Cro.
 
-The `before` function is used to install middleware that operates on requests
-before their route handler is called. It may be called with a `Cro::Transform`
-that consumes a `Cro::HTTP::Request` and produces a `Cro::HTTP::Request`.
+The `before` function is used to have middleware applied *before* the `route`
+block is processed. Similarly, `after` applies the middleware *after* the
+`route` block has been processed. Therefore:
 
 ```
-before My::Request::Middleware;
+my $app = route {
+    before SomeMiddleware;
+    after SomeOtherMiddleware;
+    get -> {
+        content 'text/plain', 'Hello with middleware';
+    }
+}
 ```
 
-The `after` function is used to install middleware that operates on responses
-produced by a route handler. It may be called with a `Cro::Transform` that
+Is equivalent to:
+
+```
+my $routes = route {
+    get -> {
+        content 'text/plain', 'Hello with middleware';
+    }
+}
+my $app = Cro.compose(SomeMiddleware, $routes, SomeOtherMiddleware);
+```
+
+This is mainly useful when the middleware:
+
+* Might influence what routes match (for example, session and authorization
+  middleware)
+* Should be executed whether or not any routes from the `route` block match
+
+A `route` block which uses `before` and `after` cannot be used with `include`.
+The middleware should run before matching, however before matching it's not
+possible to know if one of the included `route`s would match. Use `delegate`
+instead.
+
+By contrast, `before-matched` and `after-matched` specify middleware to be
+used *only when a route has been matched*. Therefore, it is possible to use
+`include` on a `route` block that uses them.
+
+Therefore, the overall process can be seen as:
+
+```
+Run any before middleware
+If a route matches then
+    Run applicable before-matched middleware
+    Run the route handler
+    Run applicable after-matched middleware
+Run any after middleware
+```
+
+Both `before` and `before-matched` may be called with any `Cro::Transform` that
+consumes a `Cro::HTTP::Request` and produces a `Cro::HTTP::Request`.
+
+Both `after` and `after-matched` may be called with a `Cro::Transform` that
 consumes a `Cro::HTTP::Response` and produces a `Cro::HTTP::Response`.
 
-```
-after My::Response::Middleware;
-```
+It is allowed to use all of the middleware addition functions multiple times
+in a single route block, and the middleware will be added in the order that
+it appears. 
 
-It is allowed to use `before` and `after` many times in a single route block,
-and the middleware will be placed into the pipeline in the order that the
-`before` and `after` calls are made.
-
-As a convenience, the `before` and `after` functions may be passed a `Block`.
-This will be invoked with the `Cro::HTTP::Request` or `Cro::HTTP::Response`
-object as an argument, and it can mutate the request or response (the return
-value of the block is ignored). The various response helper functions that are
-available inside of a route handler are also available, so adding an extra
-header to the response can be achieved by:
+As a convenience, the `before`, `before-matched`, `after`, and `after-matched`
+functions may be passed a `Block`. This will be invoked with the
+`Cro::HTTP::Request` or `Cro::HTTP::Response` object as an argument, and it can
+mutate the request or response (the return value of the block is ignored). The
+various response helper functions that are available inside of a route handler
+are also available, so adding an extra header to the response can be achieved by:
 
 ```
 after {
@@ -994,13 +1041,8 @@ after {
 }
 ```
 
-When `include` is used, the `before` middleware of the including `route` block
-will be applied ahead of any middleware in the target of the `include`, and
-the `after` middleware of the including `route` block will be applied after
-the target of the include. Effectively, the middleware of the including route
-block wraps around those of the included.
-
-With `delegate`, `before` and `after` middleware is applied before delegation
-takes place, and `after` middleware on any response that it produces. A
-`before` middleware that produces a response will, as with any other route,
-result in the delegation never being performed.
+When `include` is used, the `before-matched` middleware of the including
+`route` block will be applied ahead of any middleware in the target of the
+`include`, and the `after-matched` middleware of the including `route` block
+will be applied after the target of the include. Effectively, the middleware
+of the including route block wraps around those of the included.
