@@ -49,7 +49,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
                     %options, $generated-links, @links) {
         my %dir = self.make-directories($where);
         self.write-fake-tls($where) if %options<secure>;
-        self.write-app-module(%dir<lib>.add('Routes.pm6'), $name, %options<websocket>, $generated-links);
+        self.write-app-module(%dir<lib>.add('Routes.pm6'), $name, %options, $generated-links);
         self.generate-common($where, $id, $name, %options, $generated-links, @links);
     }
 
@@ -68,7 +68,8 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
         }
     }
 
-    method app-module-contents($name, $include-websocket, $links) {
+    method app-module-contents($name, %options, $links) {
+        my $include-websocket = %options<websocket>;
         my $module = "use Cro::HTTP::Router;\n";
         $module ~= "use Cro::HTTP::Router::WebSocket;\n" if $include-websocket;
 
