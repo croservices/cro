@@ -133,15 +133,11 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
     method frontend-actions-contents($id) {
         my $function = 'change'  ~ $id    ~ 'Text';
         my $action   = 'CHANGE_' ~ $id.uc ~ '_TEXT';
-        q:s:to/CODE/;
-            import \q[$] from 'jquery';
-
-            export const $action = '$action';
-
-            export function \qq[$function](text) {
-                return { type: $action, text };
-            }
-            CODE
+        "import \$ from 'jquery';\n" ~
+        "export const $action = '$action';\n\n" ~
+        "export function $function\(text\) \{\n" ~
+        "    return \{ type: $action, text \};\n" ~
+        "}\n"
     }
 
     method write-frontend-reducer($file, $id) {
