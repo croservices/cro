@@ -703,7 +703,7 @@ be:
 This could be used with static file serving:
 
     get -> 'css', *@path {
-        cache-control :public, :maxage(300);
+        cache-control :public, :max-age(300);
         static 'css', @path;
     }
 
@@ -737,7 +737,7 @@ get -> {
     content 'text/html', $some-content;
 }
 get 'css', *@path {
-    cache-control :public, :maxage(300);
+    cache-control :public, :max-age(300);
     static 'assets/css', @path;
 }
 ```
