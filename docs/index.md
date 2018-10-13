@@ -15,9 +15,10 @@ Ready to dig a deeper? These articles explain the Cro design and structure,
 as well as covering some more advanced topics:
 
 * [The Cro Approach](docs/approach)
-* [Module Structure](docs/module-structure)
+* [Cro Module Structure](docs/module-structure)
 * [The cro Development Tool](docs/cro-tool)
 * [The .cro.yml File](docs/cro-yml)
+* [Structuring larger HTTP services and applications](docs/structuring-services)
 * [Docker Deployment with Cro](docs/docker-deployment)
 
 ## Getting Help
