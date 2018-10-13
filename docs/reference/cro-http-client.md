@@ -428,3 +428,14 @@ my $resp = await Cro::HTTP::Client.request('LINK', $url);
 ```
 
 This may also be useful if the request method to use is held in a variable.
+
+## Tracing
+
+To debug problems with the Cro HTTP client, or to understand in more detail
+exactly what is being sent and received, set `CRO_TRACE=1` in the environment.
+(Note that this turns on tracing for all Cro components, not just the client.)
+
+Long binary blobs (such as dumps of the TCP packets arriving) will be
+truncated in the debug output. To raise the limit, put something like
+`CRO_TRACE_MAX_BINARY_DUMP=8192` in the environment (you may wish to pick a
+higher value).
