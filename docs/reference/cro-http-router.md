@@ -343,6 +343,27 @@ which take a block. These routines will call the appropriate method on the
 request object, `await` it, and then invoke the block with it. For example:
 
 ```
+post -> 'product' {
+    # Get the body produced by the body parser for a JSON request body (it
+    # is deserialized automatically if the content-type of the request
+    # indicates JSON).
+    request-body -> %json-object {
+        # Save it, and then...
+        created 'product/42', 'application/json', %json-object;
+    }
+}
+
+post -> 'photos', 'add' {
+    # Given a HTML form using enctype="multipart/form-data", with a text
+    # input "title" and an file upload input "photo", get the title and
+    # uploaded file's filename and contents.
+    request-body -> (:$title, :$photo, *%rest) {
+        my $file-name = $photo.filename;
+        my $file-content = $photo.body-blob;
+        # Process the upload
+    }
+}
+
 put -> 'product', $id, 'description' {
     # Get the body as text (assumes the client set the body to some text; note
     # this is not something a web browser form would do).
@@ -352,17 +373,11 @@ put -> 'product', $id, 'description' {
 }
 
 put -> 'product', $id, 'image', $filename {
-    # Get the body as a binary blob.
+    # Get the body as a binary blob (again, this assumes that a client send a
+    # request with a body that's a bunch of bytes that we want; this may happen
+    # in a HTTP API, but not from a browser).
     request-body-blob -> $image {
         # Save it; produce no content
-    }
-}
-
-post -> 'product' {
-    # Get the body produced by the body parser.
-    request-body -> %json-object {
-        # Save it, and then...
-        created 'product/42', 'application/json', %json-object;
     }
 }
 ```
