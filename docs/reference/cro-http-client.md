@@ -33,8 +33,19 @@ error occurs.
 
 The response will be provided as a `Cro::HTTP::Response` object. It will be
 produced as soon as the request headers are available; the body may not yet
-have been received. By default, errors (4xx and 5xx status codes) will result
-in an exception that does the `X::Cro::HTTP::Error` role, which has a
+have been received.
+
+To set a base URL for every client's request, base URL can be passed
+to `Cro::HTTP::Client` instance as `base-uri` argument.
+
+    my $client = Cro::HTTP::Client.new(base-uri => "http://persistent.url.com");
+    await $client.get('/first');   # http://persistent.url.com/first
+    await $client.get('/another'); # http://persistent.url.com/another
+
+## Error handling
+
+By default, error responses (4xx and 5xx status codes) will result in an
+exception that does the `X::Cro::HTTP::Error` role. Such exceptions have a
 `response` property containing the `Cro::HTTP::Response` object.
 
     my $resp = await Cro::HTTP::Client.delete($product-url);
@@ -54,12 +65,20 @@ The actual exception type will be either `X::Cro::HTTP::Error::Client` for
 when setting up retries that should distinguish server errors from client
 errors).
 
-To set a base URL for every client's request, base URL can be passed
-to `Cro::HTTP::Client` instance as `base-uri` argument.
+The exception also has a `request` property, which provides access to the
+`Cro::HTTP::Request` that was sent.
 
-    my $client = Cro::HTTP::Client.new(base-uri => "http://persistent.url.com");
-    await $client.get('/first');   # http://persistent.url.com/first
-    await $client.get('/another'); # http://persistent.url.com/another
+    my $resp = await Cro::HTTP::Client.get($url);
+    CATCH {
+        when X::Cro::HTTP::Error {
+            say "Problem fetching " ~ .request.target;
+        }
+    }
+
+This method simply delegates to `.response.request`, since each response
+object has the request that was sent attached to it. In the event of a
+redirect, the request object will be that of the redirected request, not the
+originally sent request.
 
 ## Adding extra request headers
 
