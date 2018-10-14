@@ -324,6 +324,14 @@ caching of permanent redirects takes place. They retain the original request
 method. 302 and 303 instead cause a `GET` request to be issued, regardless of
 the original request method.
 
+The `.request` property of the response object will refer to the final request
+that was issued after a redirect (or sequence of redirects). Therefore, to get
+the URI that a request was eventually redirected to, use the `.uri` property
+of that request object.
+
+    my $resp = await Cro::HTTP::Client.get($some-url);
+    say "Eventually requested $resp.request.uri()";
+
 ## Authentication
 
 Both basic authentication and bearer authentication are supported directly by

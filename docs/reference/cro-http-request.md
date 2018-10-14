@@ -26,6 +26,14 @@ range of methods for accessing it. These read-only methods include:
   separated)
 * `query-value($key)` - looks up a value in the `query-hash`
 
+## Full request URI
+
+The `uri` method returns the full request URI as an instance of `Cro::Uri`.
+In the case of a client side request, it is the URI that was requested. In
+the case of a server side request, the URI is reconstructed using available
+information, such as the host header or - should that be missing - the remote
+host and port information from the underlying socket.
+
 ## Cookies
 
 Cookies in a request are placed in a single `Cookie` header. This is somewhat
