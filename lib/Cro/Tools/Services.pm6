@@ -179,7 +179,7 @@ class Cro::Tools::Services {
                 }
             }
 
-            add-dir($path);
+            add-dir($path, :initial);
         }
     }
 }
