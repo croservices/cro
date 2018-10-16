@@ -32,6 +32,10 @@ class Cro::Tools::Runner {
     class UnableToStart does Message {
         has $.cro-file;
     }
+    class BadCroFile does Message {
+        has IO::Path $.path;
+        has Exception $.exception;
+    }
 
     has Cro::Tools::Services $.services is required;
     has $.service-id-filter = *;
@@ -136,24 +140,28 @@ class Cro::Tools::Runner {
 
             whenever $!services.services -> $service {
                 $first-service.keep unless $first-service.status ~~ Kept;
-                my $cro-file = $service.cro-file;
-                my $service-id = $cro-file.id;
-                if $service-id ~~ $!service-id-filter {
-                    my %endpoint-ports = assign-ports($cro-file.endpoints);
-                    my ($proc, %env) = service-proc($cro-file, %endpoint-ports);
-                    if $cro-file.links == 0
-                    || $cro-file.links».service ⊆ %services.keys {
-                        # No dependencies, just start it
-                        enable-service($proc, $service, %endpoint-ports, %env);
-                    } else {
-                        my @dependencies = $cro-file.links.grep({ !%services{.service} })>>.service.List;
-                        %services{$service-id} = Service.new(
-                            path => $service.path,
-                            :$proc, :$cro-file,
-                            :$service, :%endpoint-ports,
-                            :%env, state => WaitingState,
-                            tracing => $!trace, :@dependencies);
+                with $service.cro-file -> $cro-file {
+                    my $service-id = $cro-file.id;
+                    if $service-id ~~ $!service-id-filter {
+                        my %endpoint-ports = assign-ports($cro-file.endpoints);
+                        my ($proc, %env) = service-proc($cro-file, %endpoint-ports);
+                        if $cro-file.links == 0
+                        || $cro-file.links».service ⊆ %services.keys {
+                            # No dependencies, just start it
+                            enable-service($proc, $service, %endpoint-ports, %env);
+                        } else {
+                            my @dependencies = $cro-file.links.grep({ !%services{.service} })>>.service.List;
+                            %services{$service-id} = Service.new(
+                                path => $service.path,
+                                :$proc, :$cro-file,
+                                :$service, :%endpoint-ports,
+                                :%env, state => WaitingState,
+                                tracing => $!trace, :@dependencies);
+                        }
                     }
+                }
+                else {
+                    emit BadCroFile.new(:path($service.path), :exception($service.cro-file-error));
                 }
             }
 

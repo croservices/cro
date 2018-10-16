@@ -95,4 +95,25 @@ with-test-dir -> $test-dir {
         'Service is shut down when tap closed';
 }
 
+{
+    my $r = Cro::Tools::Runner.new(
+        services => Cro::Tools::Services.new(base-path => 't/bad-cro-yml'.IO),
+    );
+    my $messages = Channel.new;
+    my $run-tap = $r.run.tap:
+        { $messages.send($_) },
+        done => { $messages.close() },
+        quit => { $messages.fail($_) };
+    react {
+        whenever $messages.receive -> $msg {
+            isa-ok $msg, Cro::Tools::Runner::BadCroFile,
+                'Bad .cro.yml emits a useful message about that';
+            done;
+        }
+        whenever Promise.in(10) {
+            flunk "Timed out waiting for error";
+        }
+    }
+}
+
 done-testing;

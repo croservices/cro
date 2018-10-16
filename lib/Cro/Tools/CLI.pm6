@@ -230,7 +230,14 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
         whenever $runner.run() {
             when Cro::Tools::Runner::UnableToStart {
                 my $color = %service-id-colors{.service-id} = next-color();
-                note color($color), "\c[WARNING SIGN] {.service-id} cannot be started", RESET();
+                note color($color),
+                    "\c[WARNING SIGN] {.service-id} cannot be started due; missing linked service",
+                    RESET();
+            }
+            when Cro::Tools::Runner::BadCroFile {
+                note color("red"),
+                    "\c[WARNING SIGN] Failed to load $_.path.add(".cro.yml").relative(): $_.exception()",
+                    RESET();
             }
             when Cro::Tools::Runner::Started {
                 my $color = %service-id-colors{.service-id} = next-color();
