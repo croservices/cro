@@ -106,7 +106,16 @@ class Cro::Tools::Services {
             }
 
             whenever tap-on(self!scan(), $*SCHEDULER) {
-                maybe-add-service($_);
+                if .add('.cro.yml').s == 0 {
+                    # We may have seen the file creation, but it's not had its
+                    # content written yet.
+                    whenever Promise.in(1) {
+                        maybe-add-service($_);
+                    }
+                }
+                else {
+                    maybe-add-service($_);
+                }
             }
 
             whenever watch-recursive($!base-path) {
