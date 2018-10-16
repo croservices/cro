@@ -7,6 +7,7 @@ my $service2 = 't/tools-services-test-dir/nested/service2/.cro.yml'.IO;
 my $content2 = slurp $service2;
 my $current = $content1;
 
+chdir 't/tools-services-test-dir';
 lives-ok { add-link('service1', 'service2', 'http') }, 'Can add link';
 $current = slurp $service1;
 like $current, /'links: ' \n/, 'Links section is filled';
