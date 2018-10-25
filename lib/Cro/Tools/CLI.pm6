@@ -266,6 +266,7 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
                 say colored
                     "\c[BLACK UNIVERSAL RECYCLING SYMBOL] Restarting {.cro-file.name} ({.service-id})",
                     "bold $color";
+                say "  ($_)" with .cause;
             }
             when Cro::Tools::Runner::Output {
                 my $color = %service-id-colors{.service-id};

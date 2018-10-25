@@ -15,7 +15,9 @@ class Cro::Tools::Runner {
         has %.endpoint-ports;
     }
 
-    class Restarted does ServiceMessage {}
+    class Restarted does ServiceMessage {
+        has $.cause;
+    }
     class Stopped does ServiceMessage {}
 
     class Output does Message {
@@ -104,9 +106,9 @@ class Cro::Tools::Runner {
                 );
 
                 whenever $proc.ready {
-                    whenever $service.metadata-changed.merge($service.source-changed).stable(1) {
+                    whenever $service.metadata-changed.merge($service.source-changed).stable(1) -> $path {
                         %services{$cro-file.id}.cro-file = $service.cro-file;
-                        restart-service(%services{$cro-file.id});
+                        restart-service(%services{$cro-file.id}, "change to $path");
                     }
                     %services{$cro-file.id}.state = StartedState;
                     emit Started.new(service-id => $cro-file.id, :$cro-file, :%endpoint-ports, tracing => $!trace);
@@ -187,25 +189,25 @@ class Cro::Tools::Runner {
                     }
                     when 'restart' {
                         my $service = %services{%command<id>};
-                        restart-service($service);
+                        restart-service($service, 'explicitly requested');
                     }
                     when 'trace' {
                         my $service = %services{%command<id>};
                         if $service.tracing ^^ (%command<command> eq 'on') {
                             $service.tracing = !$service.tracing;
-                            restart-service($service) if $service.state != StoppedState;
+                            restart-service($service, 'tracing enabled') if $service.state != StoppedState;
                         }
                     }
                     when 'trace-all' {
                         for %services.keys -> $s {
                             $s.tracing = %command<command> eq 'on';
-                            restart-service($s) if $s.state != StoppedState;
+                            restart-service($s, 'tracing enabled') if $s.state != StoppedState;
                         }
                     }
                 }
             }
 
-            sub restart-service($service) {
+            sub restart-service($service, $cause) {
                 try $service.proc.kill(SIGINT);
                 whenever $service.proc-exit {
                     given $service {
@@ -214,7 +216,8 @@ class Cro::Tools::Runner {
                         emit Restarted.new:
                             service-id => $service.cro-file.id,
                             cro-file => $service.cro-file,
-                            tracing => .tracing;
+                            tracing => .tracing,
+                            cause => $cause;
                     }
                 }
             }
