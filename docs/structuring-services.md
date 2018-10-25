@@ -120,7 +120,7 @@ sub routes() is export {
         # /catalogue prefix
         include 'catalogue' => catalogue-routes();
         # /shop/checkout prefix
-        incldue <shop checkout> => checkout-routes();
+        include <shop checkout> => checkout-routes();
     }
 }
 ```
