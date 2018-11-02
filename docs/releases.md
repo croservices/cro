@@ -1,5 +1,97 @@
 # Cro Release History
 
+## 0.8.0
+
+This release introduces a backwards-incompatible change to the HTTP
+router's middleware semantics, the new behavior resolving a common
+point of confusion when dealing with authorization middleware.
+The release also contains many other bug fixes and tweaks.
+
+Before this release, middleware applied with `before` and `after`
+ran once a route was matched and after a request was processed by a
+matched route. This made it impossible to apply authentication
+middleware without an extra level of `route`/`delegate`, since the
+authentication and authorization is handled as part of route matching.
+
+The previous behavior (applying middleware only to a route that has been
+matched) is preserved and renamed to `before-matched` and `after-matched`.
+Therefore, any code can be adapated by replacing calls to `before` to
+use `before-matched`, and replacing calls to `after` to `after-matched`.
+
+The new `before` and `after`-applied middleware semantics result in a
+`route` block returning the Cro composition of the `before` components,
+followed by the route handler, followed by the `after` components - much
+as happens when apply middleware at the server level. 
+
+Further, all middleware application in a `route` block will apply to all
+routes inside of the block, not just those located textually after it as
+was the case before. This is trivially the case for `before` and `after`
+(there's no other way it could be, given the new semantics), but is also
+now the case with `before-matched` and `after-matched`
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* New middleware semantics, as described above.
+* Fix handling of cookies with the `expires` property defined instead of
+  `max-age`.
+* Properly set a `Cro::HTTP::Request` object to the `request` attribute of
+  a HTTP response received with `Cro::HTTP::Client`. Also add a `request`
+  method to the client exception types as a shortcut for getting the request
+  object that resulted in an error.
+* Add new `uri` method to `Cro::HTTP::Request` which gives the full
+  request URI. This is especially useful if the HTTP client followed a
+  redirect and one wishes to know exactly what URI was fetched in the end.
+* Fix an exception in `Cro::HTTP2::FrameParser` related to data decoding
+  of HTTP/2.0 frame.
+* Fix a bug that led to lowercasing of cookie values in HTTP/2.0. This in
+  turn fixes usage of `Cro::HTTP::Session::InMemory` under HTTP/2.0.
+* Indicate with an exception situation when HTTP/2.0 client/server
+  sends RST frame of stream that Cro server/client does not know about.
+* Fix cookie setting path.
+* Make session cookie be always set to `/` path, so now Cro session
+  mechanism correctly updates cookie with a new session after the old
+  one expires.
+* Use the `Authorization` header name instead of `Auth` in
+  `Cro::HTTP::Auth::WebToken::Bearer`.
+* Fix compilance with the HTTP spec on the host header: now we append
+  `Host` header when non-standard HTTP port (not 80 nor 443) is used.
+* Force use of Perl 6.d semantics in the HTTP client, which avoids
+  various ways that it might end up working slowly due to eating too
+  many real threads.
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Do a `note` of unhandled exceptions in WebSocket handlers,  instead
+  of silently losing them.
+
+The following changes were made to the `Cro` distribution:
+
+* Document new router middleware semantics of `Cro::HTTP::Router`.
+* Make `Cro::Tools::Template::HTTPService` easier to inherit by
+  changing `$include-websocket` specialised parameter into more
+  generic `%options` one.
+* Fix indentation-related warning on Cro installation.
+* Add a multipart/form-data body handling example on
+  `Cro::HTTP::Router` documentation page.
+* Add document on structuring larger services/apps with Cro.
+* Document `request` property of HTTP client exception.
+* Document using `CRO_TRACE` with the HTTP client.
+* Document `uri` method of `Cro::HTTP::Request`.
+* Fix a long-standing issue with instant restart of Cro service right
+  after its start with `cro run`.
+* Issues with `.cro.yml` file are now reported to user when `cro
+  run` is being used, instead of too generic `service cannot be
+  started` message.
+* Consider case when `.cro.yml` file is created, but its content is
+  not yet written, which could lead to an exception before.
+* Better document `Cro::WebSocket::Client`.
+* Indicate cause of a service restart to to user to make it easier
+  to discover which files to ignore if getting unwanted restarts.
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support), together with the
+following community members: Xliff, lukasvalle, Rod Taylor, Lance Wicks, Nick Logan.
+
 ## 0.7.6
 
 This release contains a number of minor new features (better support for
