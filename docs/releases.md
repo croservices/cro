@@ -53,7 +53,7 @@ The following changes were made to the `Cro::HTTP` distribution:
   one expires.
 * Use the `Authorization` header name instead of `Auth` in
   `Cro::HTTP::Auth::WebToken::Bearer`.
-* Fix compilance with the HTTP spec on the host header: now we append
+* Fix compliance with the HTTP spec on the host header: now we append
   `Host` header when non-standard HTTP port (not 80 nor 443) is used.
 * Force use of Perl 6.d semantics in the HTTP client, which avoids
   various ways that it might end up working slowly due to eating too
@@ -87,7 +87,7 @@ The following changes were made to the `Cro` distribution:
 * Consider case when `.cro.yml` file is created, but its content is
   not yet written, which could lead to an exception before.
 * Better document `Cro::WebSocket::Client`.
-* Indicate cause of a service restart to to user to make it easier
+* Indicate cause of a service restart to the user to make it easier
   to discover which files to ignore if getting unwanted restarts.
 
 This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
