@@ -2,7 +2,7 @@ use Cro::Tools::CroFile;
 use Docker::File;
 use META6;
 
-my constant CRO_DOCKER_VERSION = '0.7.6';
+my constant CRO_DOCKER_VERSION = '0.8.0';
 
 role Cro::Tools::Template::Common {
     method new-directories($where) { () }
