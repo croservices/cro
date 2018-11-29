@@ -21,7 +21,7 @@ use `before-matched`, and replacing calls to `after` to `after-matched`.
 The new `before` and `after`-applied middleware semantics result in a
 `route` block returning the Cro composition of the `before` components,
 followed by the route handler, followed by the `after` components - much
-as happens when apply middleware at the server level. 
+as happens when applying middleware at the server level.
 
 Further, all middleware application in a `route` block will apply to all
 routes inside of the block, not just those located textually after it as
@@ -58,6 +58,8 @@ The following changes were made to the `Cro::HTTP` distribution:
 * Force use of Perl 6.d semantics in the HTTP client, which avoids
   various ways that it might end up working slowly due to eating too
   many real threads.
+* When a route fails to match with 400 or 401, and another route fails
+  to match with a 405, perfer the 400 or 401 error.
 
 The following changes were made to the `Cro::WebSocket` distribution:
 
