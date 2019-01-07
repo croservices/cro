@@ -71,7 +71,9 @@ will prepend a middleware that sets the `auth` of the request to the
 specified object. This is useful for simulating a user or session and
 thus testing authorization. The `http` argument specifies the HTTP version to
 run the tests under. Since we control both client and server side in the test,
-a setting of `:http<1.1 2>` is not allowed. The default is `:http<2>`.
+a setting of `:http<1.1 2>` is not allowed. The default is `:http<2>`. It is
+also possible to fake the `peer-host` and `peer-port` by passing these named
+arguments to `test-service`.
 
 The `test-service($uri, &tests)` candidate runs the tests against the specified
 base URI, connecting to it through `Cro::HTTP::Client`. This makes it possible
