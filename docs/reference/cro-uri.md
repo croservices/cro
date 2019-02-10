@@ -111,7 +111,7 @@ in HTTP applications, use `Cro::Uri::HTTP`, which adds this functionality).
 
 ### fragment
 
-Returns the fragment part of the URI. For example, giveni
+Returns the fragment part of the URI. For example, given
 `http://bar.com/baz#abc`, it would return `abc`.
 
 ## Stringifying a URI
