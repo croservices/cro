@@ -61,7 +61,7 @@ with-test-dir -> $test-dir {
 
     my $got-body = test-request("http://localhost:$port/");
     ok $got-body.defined, 'Could call the started service';
-    is $got-body, 'Service 1 OK', 'Got expected resposne from service';
+    is $got-body, 'Service 1 OK', 'Got expected response from service';
 
     my $log = $other-messages.receive;
     isa-ok $log, Cro::Tools::Runner::Output, 'Got an output message after request';
