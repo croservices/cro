@@ -512,7 +512,7 @@ be produced by calling methods on the `response` term:
 
 ```
 my $app = route {
-    get => 'test' {
+    get -> 'test' {
         given response {
             .append-header('Content-type', 'text/html');
             .set-body: q:to/HTML/;
@@ -551,7 +551,7 @@ Therefore, a simple HTML response can be written as:
 
 ```
 my $app = route {
-    get => 'test' {
+    get -> 'test' {
         content 'text/html', q:to/HTML/;
             <h1>Did you know...</h1>
             <p>
@@ -584,7 +584,7 @@ request method.
 
 ```
 my $app = route {
-    get => 'testing' {
+    get -> 'testing' {
         redirect :permanent, '/test';
     }
 }
@@ -751,7 +751,7 @@ get -> {
     push-promise '/css/main.css';
     content 'text/html', $some-content;
 }
-get 'css', *@path {
+get -> 'css', *@path {
     cache-control :public, :max-age(300);
     static 'assets/css', @path;
 }
