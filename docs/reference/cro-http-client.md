@@ -178,6 +178,8 @@ To replace the set of body serializers that a client will use, pass an array
 of them when constructing an instance of `Cro::HTTP::Client` using the
 `body-serializers` named argument:
 
+    use Cro::HTTP::BodySerializers;
+    
     my $client = Cro::HTTP::Client.new:
         body-serializers => [
             Cro::HTTP::BodySerializer::JSON,
@@ -229,6 +231,8 @@ completely parsed the body. The default body parsers available are:
 A `Cro::HTTP::Client` instance can be configured either with a replacement set
 of body parsers by passing the `body-parsers` argument:
 
+    use Cro::HTTP::BodyParsers;
+    
     my $client = Cro::HTTP::Client.new:
         body-parsers => [
             Cro::HTTP::BodyParser::JSON,
