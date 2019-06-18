@@ -544,7 +544,7 @@ default set of body serializers in effect allow for:
   parameter in the `content-type`
 * Providing a `Blob`, which will be used as the body
 * Providing a `Supply`, which will be taken to mean the body will produced
-  over time; unless a `content-length` header has been sit explicitly, then
+  over time; unless a `content-length` header has been set explicitly, then
   the response will be sent with the chunked transfer coding
 
 Therefore, a simple HTML response can be written as:
