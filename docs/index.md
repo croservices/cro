@@ -34,6 +34,7 @@ The full details, organized by module:
 
 ### Cro::Core
 
+* [Cro::MediaType](docs/reference/cro-mediatype)
 * [Cro::Uri](docs/reference/cro-uri)
 
 ### Cro::TLS
