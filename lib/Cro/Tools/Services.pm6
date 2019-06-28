@@ -120,7 +120,7 @@ class Cro::Tools::Services {
 
             whenever watch-recursive($!base-path) {
                 my $path-io = .path.IO;
-                next if $path-io.d;
+                next if try $path-io.d;
                 my $handled = False;
                 for %known-services.kv -> $path, $info {
                     if .path.starts-with($path) {
@@ -130,7 +130,7 @@ class Cro::Tools::Services {
                     }
                 }
                 if !$handled {
-                    if $path-io.f && $path-io.basename eq '.cro.yml' {
+                    if try $path-io.f && $path-io.basename eq '.cro.yml' {
                         maybe-add-service($path-io.parent);
                     }
                 }
@@ -142,10 +142,10 @@ class Cro::Tools::Services {
         supply {
             sub search($path) {
                 for $path.dir {
-                    when .d {
+                    if .d {
                         search($_) unless .basename.starts-with('.');
                     }
-                    when .f {
+                    elsif .f {
                         if .basename eq '.cro.yml' {
                             emit $path;
                         }
@@ -163,12 +163,19 @@ class Cro::Tools::Services {
             sub add-dir(IO::Path $dir, :$initial) {
                 %watched-dirs{$dir} = True;
 
-                whenever $dir.watch {
-                    emit $_;
-                    my $path-io = .path.IO;
-                    when ($path-io.d // False) {
-                        unless $path-io.basename.starts-with('.') {
-                            add-dir($path-io) unless %watched-dirs{$path-io};
+                with $dir.watch -> $dir-watch {
+                    whenever $dir-watch {
+                        emit $_;
+                        my $path-io = .path.IO;
+                        if $path-io.d {
+                            unless $path-io.basename.starts-with('.') {
+                                add-dir($path-io) unless %watched-dirs{$path-io};
+                            }
+                        }
+                        CATCH {
+                            default {
+                                # Perhaps the directory went away; disregard.
+                            }
                         }
                     }
                 }
@@ -180,7 +187,7 @@ class Cro::Tools::Services {
                             event => FileChanged
                         );
                     }
-                    when .d {
+                    if .d {
                         unless .basename.starts-with('.') {
                             add-dir($_, :$initial);
                         }
