@@ -34,6 +34,18 @@ the case of a server side request, the URI is reconstructed using available
 information, such as the host header or - should that be missing - the remote
 host and port information from the underlying socket.
 
+## Underlying connection
+
+The `connection` method returns the underlying connection, which - in the
+context of a HTTP server - will be either a `Cro::TCP::Connection` or a
+`Cro::TLS::Connection`. Either way, that object has `peer-host` and
+`peer-port` methods, which can be used to obtain the host and port of the
+client making the request.
+
+```
+note "Request from {.peer-host}:{.peer-port}" given request.connection;
+```
+
 ## Cookies
 
 Cookies in a request are placed in a single `Cookie` header. This is somewhat
