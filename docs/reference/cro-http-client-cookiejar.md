@@ -22,6 +22,11 @@ be an instance of `Cro::HTTP::Request` and the URI an instance of `Cro::Uri`.
 
     $jar.add-to-request($req, $uri);
 
+## Adding cookies directly to the jar
+
+Call the `add-cookie` method to add a cookie directly to the jar. It requires
+a `Cro::HTTP::Cookie` object to be passed.
+
 ## Introspecting the jar contents
 
 To get a `List` of all cookies in the jar, use `contents`. This returns a
