@@ -1,5 +1,82 @@
 # Cro Release History
 
+## 0.8.1
+
+This release brings a new distribution, `Cro::WebApp`, which is aimed at those
+who wish to use Cro to build server-side web applications that render dynamic
+content server-side (as opposed to Single Page Applications, where the backend
+consists almost entirely of a HTTP API called by a JavaScript application that
+runs in the browser). The distribution provides `Cro::WebApp::Template`, which
+is a templating engine that integrates neatly with Cro. We already have been
+using this successfully in production at Edument for many months.
+
+Another interesting change in this release is integration with `Log::Timeline`,
+which allows visualization of Cro HTTP requests using Comma IDE (this feature
+is available in Comma Complete from 2019.5, and will be included in the Comma
+Community release in 2019.7). The request visualization allows one to better
+understand the time taken in the request pipeline, as well as see parallel
+processing of requests. Further, this can be seen alongside any other
+`Log::Timeline` logging you place into your application.
+
+Besides that, this release has numerous other bug fixes and improvements.
+There are no intended compatibility breaks with Cro 0.8.0.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Ensure that the connection manager terminates all connection
+  pipelines when the server is stopped; previously it did not keep
+  track of the subscriptions properly in order to do so
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Support adding cookies directly into `Cro::HTTP::CookieJar`
+* Add a `static-resource` response function, for serving content out of
+  `%?RESOURCES`
+* Integrate `Log::Timeline` to provide insight into Cro HTTP pipelines
+* Fix a problem with handling of `mutlipart/form-data` bodies exposed
+  by using them with OpenAPI validation
+* Don't leak top-level global symbols out of `Cro::HTTP::Cookie`; expose
+  things with qualified names or as lexical exports instead
+* Tolerate missing spaces in cookie headers; some servers have bugs that
+  produce such malformed cookie headers
+* Export route verbs like `get` and `put` as `multi` candidates, so we don't
+  hide the `put` built-in, which may be used for debugging output
+* Correctly report which response function was used outside of a
+  `route` block
+* Support latest version of `JSON::Fast`
+* Fix router tests on Windows
+* Fix a test that could fail in the absence of ALPN
+* Fix possible issues if running tests in parallel
+* Eliminate use of `v6.d.PREVIEW`
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Fix some cases where connection closed was not conveyed properly
+* Improve connection closed error reporting
+* Ensure that sending an unserializable value does not result in a silent
+  failure
+* When reporting a crash in a WebSocket handler, note that's where it came
+  from
+* Code cleanup in WebSocket client
+* Fix accidental reliance on a Rakudo optimizer bug in the WebSocket
+  frame parser
+* Add tests to cover `wss` with customer CA
+
+The following changes were made to the `Cro` distribution:
+
+* Make the runner's file watching more robust
+* Document faking `peer-host` and `peer-port` in tests
+* Document directly adding to the cookie jar
+* Document `Cro::HTTP::Request`'s `connection` method
+* Document `Cro::MediaType`
+* Note the need for a `use` statement in body parser and serializer examples
+* Assorted typo fixes in the documentation
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support), together with the
+following community members: Clifton Wood, Elizabeth Mattijsen, Itsuki Toyota,
+Martin Barth, Olivier Mengué, Patrick Böker.
+
 ## 0.8.0
 
 This release introduces a backwards-incompatible change to the HTTP
