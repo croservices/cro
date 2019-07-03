@@ -84,6 +84,10 @@ Pipeline components:
 * [Cro::WebSocket::MessageParser](docs/reference/cro-websocket-messageparser)
 * [Cro::WebSocket::MessageSerializer](docs/reference/cro-websocket-messageserializer)
 
+### Cro::WebApp
+
+* [Cro::WebApp::Template](docs/reference/cro-webapp-template.md)
+
 ### Cro::OpenAPI::RoutesFromDefinition
 
 * [Cro::OpenAPI::RoutesFromDefinition](docs/reference/cro-openapi-routesfromdefinition)
