@@ -11,9 +11,9 @@ is a templating engine that integrates neatly with Cro. We already have been
 using this successfully in production at Edument for many months.
 
 Another interesting change in this release is integration with `Log::Timeline`,
-which allows visualization of Cro HTTP requests using Comma IDE (this feature
+which allows visualization of Cro HTTP requests using [Comma IDE](https://commaide.com/) (this feature
 is available in Comma Complete from 2019.5, and will be included in the Comma
-Community release in 2019.7). The request visualization allows one to better
+Community release 2019.7). The request visualization allows one to better
 understand the time taken in the request pipeline, as well as see parallel
 processing of requests. Further, this can be seen alongside any other
 `Log::Timeline` logging you place into your application.
@@ -25,7 +25,7 @@ The following changes were made to the `Cro::Core` distribution:
 
 * Ensure that the connection manager terminates all connection
   pipelines when the server is stopped; previously it did not keep
-  track of the subscriptions properly in order to do so
+  track of the subscriptions properly
 
 The following changes were made to the `Cro::HTTP` distribution:
 
@@ -45,7 +45,7 @@ The following changes were made to the `Cro::HTTP` distribution:
   `route` block
 * Support latest version of `JSON::Fast`
 * Fix router tests on Windows
-* Fix a test that could fail in the absence of ALPN
+* Fix a test that could fail in the absence of ALPN support
 * Fix possible issues if running tests in parallel
 * Eliminate use of `v6.d.PREVIEW`
 
@@ -60,7 +60,7 @@ The following changes were made to the `Cro::WebSocket` distribution:
 * Code cleanup in WebSocket client
 * Fix accidental reliance on a Rakudo optimizer bug in the WebSocket
   frame parser
-* Add tests to cover `wss` with customer CA
+* Add tests to cover `wss` with a custom CA
 
 The following changes were made to the `Cro` distribution:
 
