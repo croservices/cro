@@ -266,7 +266,7 @@ class Cro::Tools::Runner {
                     %env<CRO_TRACE> = '1';
                     %env<CRO_TRACE_MACHINE_READABLE> = '1';
                 }
-                my $proc = Proc::Async.new('perl6', '-Ilib', $cro-file.entrypoint);
+                my $proc = Proc::Async.new($*EXECUTABLE.absolute,'-Ilib', $cro-file.entrypoint);
                 whenever $proc.stdout.lines -> $line {
                     emit Output.new(:$service-id, :!on-stderr, :$line);
                 }
