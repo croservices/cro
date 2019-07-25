@@ -198,7 +198,7 @@ return a `Supply` that, for each request received, will `emit` either:
 * That request object, perhaps after some tweaks. The request object will
   continue onwards through the pipeline "as normal".
 * A `Cro::HTTP::Response` object, which represents an early response. This
-  will be forwraded to a later point in the pipeline, skipping over the usual
+  will be forwarded to a later point in the pipeline, skipping over the usual
   request processing.
 
 For example, to respond to incoming requests that are not from the loopback
