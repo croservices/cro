@@ -105,7 +105,7 @@ this method would return the list `('baz', 'oh wow')`.
 ### query
 
 Returns the query string part of the URI. For example, given
-`http://bar.com:42/baz?x=1&y=2`, it would return `x=1&y=2`. No perecent
+`http://bar.com:42/baz?x=1&y=2`, it would return `x=1&y=2`. No percent
 sequence decoding is performed. (For parsing of the query string as it is used
 in HTTP applications, use `Cro::Uri::HTTP`, which adds this functionality).
 
