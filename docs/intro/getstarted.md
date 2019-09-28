@@ -61,9 +61,7 @@ There should now be a page saying 'Hello Cro!' at http://localhost:10000
 
 Congratulations, you have successfully installed Cro!
 
-Now learn more about [building an HTTP service](http-server).
-
-## Extra credit: use `cro stub` and `cro run`
+## Extra credit: use the cro development tool
 
 The `cro stub` command generates stub services for you, to get started more
 quickly and with better defaults. Here we use it to create a simple HTTP
@@ -82,3 +80,14 @@ cro run
 
 You can change the service by editing files in the `hello/` subdirectory. The
 HTTP routes, for example, are in `hello/lib/Routes.pm6`.
+
+## What next?
+
+* Learn about routing URLs to handlers, working with query strings and request
+  bodies, and producing responses using `Cro::HTTP::Router`
+* Learn about using templates to produce responses using `Cro::WebApp::Template`
+* Learn about [sessions and authentication](docs/http-auth-and-sessions)
+* Learn about writing WebSocket handlers using `Cro::HTTP::Router::WebSocket`
+* Learn more about the [cro development tool](docs/cro-tool) and the associated
+  [.cro.yml file](docs/cro-yml)
+* Learn how to [structure larger services](docs/structuring-services)
