@@ -1,5 +1,49 @@
 # Cro Release History
 
+## 0.8.2
+
+This release contains a number of small fixes and improvements, as well as
+adding documentation comments to the most commonly used parts of Cro.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Provide an `encode-percents` function that is optionally exported by
+  `Cro::Uri` when the `:encode-percents` tag is used
+* Directly cover the `decode-percents` function in `Cro::Uri` in the
+  tests
+* Add documentation comments to various types and routines
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Fix a memory leak in the HTTP/2 frame parser when using more recent Rakudo
+  versions; the parser accidentally relied on an optimizer bug, which as fixed
+  in Rakudo
+* Update the default TLS cipher list, restoring an SSL Labs rating of "A" out
+  of the box
+* Add support for the `SameSite` cookie directive
+* No longer buffer the logs written by `Cro::HTTP::Log::File` by default; this
+  avoids delayed or lost log output when there is not a TTY attached to the
+  service
+* Add documentation comments to various types and routines
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* Support all of the Perl 6 string comparison operators
+* Add documentation comments to various types and routines
+
+The following changes were made to the `Cro` distribution:
+
+* Don't hardcode the name `perl6` for the executable, since that is both
+  unportable and won't work well with those using a `raku` executable
+* Suggest next steps in the getting started documentation
+* Document the new `encode-percents` function in `Cro::Uri`
+* Various typo fixes
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support), together with the
+following community members: AnaTofuZ, Elizabeth Mattijsen, James Raspass,
+Jeremy Studer, Nick Logan, Patrick Böker.
+
 ## 0.8.1
 
 This release brings a new distribution, `Cro::WebApp`, which is aimed at those
