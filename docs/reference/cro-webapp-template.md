@@ -338,7 +338,7 @@ Template subs and macros can be factored out into other template files, and
 then imported with `<:use ...>`:
 
 ```
-<:use "common.crotmp">
+<:use 'common.crotmp'>
 ```
 
 ### Inserting HTML and JavaScript
