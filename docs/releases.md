@@ -16,7 +16,7 @@ The following changes were made to the `Cro::Core` distribution:
 The following changes were made to the `Cro::HTTP` distribution:
 
 * Fix a memory leak in the HTTP/2 frame parser when using more recent Rakudo
-  versions; the parser accidentally relied on an optimizer bug, which as fixed
+  versions; the parser accidentally relied on an optimizer bug, which was fixed
   in Rakudo
 * Update the default TLS cipher list, restoring an SSL Labs rating of "A" out
   of the box
