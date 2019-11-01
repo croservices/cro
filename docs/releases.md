@@ -28,6 +28,8 @@ The following changes were made to the `Cro::HTTP` distribution:
 
 The following changes were made to the `Cro::WebApp` distribution:
 
+* Implement template conditionals directly using variables, like
+  `<?$foo>...</?>` and `<!$foo>...</!>`
 * Support all of the Perl 6 string comparison operators
 * Add documentation comments to various types and routines
 
