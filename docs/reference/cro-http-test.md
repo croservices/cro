@@ -94,7 +94,7 @@ The request is specified by calling one of `get`, `put`, `post`, `delete`,
 (in fact, `get` will just call `request('GET', ...)`). These functions accept
 an optional positional parameter providing a relative URI, which if provided
 will be appended to the current effective base URI. The `:$json` named parameter
-is treated specially, expanding to `{ content-type => 'application/json`, body
+is treated specially, expanding to `{ content-type => 'application/json', body
 => $json)`. All other named parameters will be passed on to the `Cro::HTTP::Client`
 `request` method, thus making all of the HTTP client's functionality available.
 
