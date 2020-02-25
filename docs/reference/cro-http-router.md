@@ -24,7 +24,7 @@ Literal URL segments are expressed as literals:
 
 ```
 my $app = route {
-    # GET /catalogue/
+    # GET /catalogue
     get -> 'catalogue' {
         ...
     }
