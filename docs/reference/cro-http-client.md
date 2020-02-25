@@ -103,6 +103,15 @@ construction time:
             User-agent => 'Cro'
         ];
 
+## Adding query string parameters
+
+Query string parameters can be added to the request by passing the `query` named
+argument. It can be either a list of `Pair`s or a `Hash`. Both keys and values
+will be encoded.
+
+    my $resp = await Cro::HTTP::Client.get: 'we.love.pand.as/pandas/search',
+        query => { location => 'Chengdu', maxweight => 90 };
+
 ## Setting the request body
 
 To give the request a body, pass the `body` named argument. The `content-type`
