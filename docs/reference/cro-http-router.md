@@ -734,9 +734,6 @@ to instead use:
 
 ## Push Promises
 
-**Upcoming Feature::** *This section describes a feature that will be included
-in an upcoming Cro release.*
-
 HTTP/2.0 allows the response to include push promises. A push promise is used
 to push content associated with the response to the client. For example, CSS,
 JavaScript, or images needed for a page might be pushed, so as to save the
