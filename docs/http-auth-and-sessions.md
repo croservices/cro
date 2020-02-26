@@ -198,9 +198,10 @@ In the case the request's `auth` property is empty, then an instance of the
 `TSession` object will be created, passing `username-prop` as a parameter
 (so if `$username-prop` was set to `username`, then it would call
 `MySession.new(username => $the-username)`). If `auth` already contains an
-object, it would do `$that-object.username = $the-username` (and thus the
-property must be `rw`). This makes it possible to apply a session middleware
-before this middleware, and have the current user added to the data.
+object, it assumes the property name is actually an attribute name, and
+uses the metamodel to set it (thus meaning it need not be `is rw`). This
+makes it possible to apply a session middleware before this middleware,
+and have the current user added to the data.
 
 The role requires the `authenticate` method to be implemented. It is passed
 the username and password to authenticate, and should return `True` if it is
