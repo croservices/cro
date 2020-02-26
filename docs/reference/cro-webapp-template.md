@@ -1,10 +1,10 @@
 # Cro::WebApp::Template
 
-Templates are typically used to render some data into HTML. The Cro template
-engine is designed with HTML in mind, and takes care to escape data as it
-should be escaped in HTML. A template is compiled once into Perl 6 code, and
-then may be used many times by passing it different input. The input data can
-be any Perl 6 object, including a `Hash` or `Array`.
+Templates are typically used to render some data into HTML. The template engine
+is designed with HTML in mind, and takes care to escape data as it should be
+escaped in HTML. A template is compiled once into Raku code, and then may be
+used many times by passing it different input. The input data can be any Raku
+object, including a `Hash` or `Array`.
 
 ## Using a template
 
@@ -76,10 +76,10 @@ done-testing;
 
 ## Template language
 
-The template language is designed to feel natural to Perl 6 developers, taking
-syntactic and semantic inspiration from Perl 6.
+The template language is designed to feel natural to Raku developers, taking
+syntactic and semantic inspiration from Raku.
 
-### Generalities
+## Generalities
 
 A template starts out in content mode, meaning that a template file consisting
 of plain HTML:
@@ -98,14 +98,16 @@ require one to write out the full opener again, just to match the "sigil". One
 may repeat the opening alphabetic characters of an opener in the closer if
 desired, however (so `<@foo>` could be closed with `</@foo>`).
 
-As with Perl 6, there is a notion of current topic, like the Perl 6 `$_`.
+As with Raku, there is a notion of current topic, like the Raku `$_`.
 
-### Unpacking hash and object properties
+## Unpacking hash and object properties
 
 The `<.name>` form can be used to access object properties of the current topic.
 If the current topic does the `Associative` role, then this form will prefer to
 take the value under the `name` hash key, falling back to looking for a method
-`name` if there is no such key.
+`name` if there is no such key. Failure to find the method is a soft failure in
+the case of an `Associative` (e.g. it just produces `Nil`), and an exception
+otherwise.
 
 For example, given a template:
 
@@ -147,7 +149,7 @@ leading `.` is required, thus `<.<foo>.<bar>>` could be just `<.<foo><bar>>`.
 The result of the indexing or method call will be strigified, and then HTML
 encoded for insertion into the document.
 
-### Variables
+## Variables
 
 The `<$...>` syntax can be used to refer to a variable. It will be stringified,
 HTML encoded, and inserted into the document. It is a template compilation time
@@ -159,18 +161,18 @@ It is allowed to follow the variable with any of the syntax allowed in a
 example assuming the variables `$person` and `$weather` are defined, then:
 
 ```
-<p>Hello, <$person.name>. The weather is <$weather.description>, wich a low of
+<p>Hello, <$person.name>. The weather is <$weather.description>, with a low of
   <$weather.low>C and a high of <$weather.high>C.</p>
 ```
 
 Would render something like:
 
 ```
-<p>Hello, Darya. The weather is sunny, wich a low of
+<p>Hello, Darya. The weather is sunny, with a low of
   14C and a high of 25C.</p>
 ```
 
-### Iteration
+## Iteration
 
 The `@` tag sigil is used for iteration. It may be used with any `Iterable`
 source of data, and must have a closing tag `</@>`. The region between the
@@ -230,14 +232,15 @@ itself be `Iterable`, it is permissible to write simply `<@_>...</@_>`.
 If the opening and closing iteration tags are the only thing on the line, then
 no output will be generated for those lines, making the output more pleasant.
 
-### Conditionals
+## Conditionals
 
 The `<?$foo>...</?>` ("if") and `<!$foo>...</!>` ("unless") may be used for
 conditional execution. These perform a boolean test on the specified variable.
-It is also allowed to use them with the topic deference sytax, such as
-`<?.is-admin>...</?>`. For more complex conditions, a subset of Perl 6
+It is also allowed to use them with the topic deference syntax, such as
+`<?.is-admin>...</?>`, or variables and dereferences together, such as
+`<?$user.is-admin>...</?>`. For more complex conditions, a subset of Raku
 expressions is accepted, using the syntax `<?{ $a eq $b }>...</?>`. The only
-thing notably different from Perl 6 is that `<?{ .answer == 42 }>...</?>` will
+thing notably different from Raku is that `<?{ .answer == 42 }>...</?>` will
 have the same hash/object semantics as in `<.answer>`, for consistency with the
 rest of the templating language.
 
@@ -261,7 +264,7 @@ the template.
 If the opening and closing condition tags are the only thing on the line, then
 no output will be generated for those lines, making the output more pleasant.
 
-### Subroutines and macros
+## Subroutines and macros
 
 It is possible to declare template subroutines that may be re-used, in order to
 factor out common elements.
@@ -305,6 +308,24 @@ And then call it with arguments:
 The arguments may be an expression as valid in a <?{ ... }> condition - that is,
 literals, variable access, dereferences, and some basic operators are allowed.
 
+As in Raku, you can have named - optional - arguments as well:
+
+```
+<:sub haz(:$name)>
+  I can haz <$name>!
+</:>
+
+<&haz(:name('named arguments'))>
+```
+
+Defaults can also be set (and implicitly make positional parameters optional too):
+
+```
+<:sub result($value = 0, :$unit = 'kg')>
+  <$value> <$unit>
+</:>
+```
+
 A template macro works somewhat like a template subroutine, except that the usage
 of it has a body. This body is passed as a thunk, meaning that the macro can choose
 to render it 0 or more times), optionally setting a new default target. For example,
@@ -332,16 +353,44 @@ be used as:
 
 To set the current target for the body in a macro, use `<:body $target>`.
 
-### Factoring out subs and macros
+## Factoring out subs and macros within an application
 
 Template subs and macros can be factored out into other template files, and
-then imported with `<:use ...>`:
+then imported with `<:use ...>`, passing the filename as a string literal:
 
 ```
 <:use 'common.crotmp'>
 ```
 
-### Inserting HTML and JavaScript
+## Providing modules that export template subs and macros
+
+It is also possible to create libraries of Cro template subs and macros, for
+reuse across multiple applications and potentially for publication in the Raku
+ecosystem. Such a library should:
+
+1. Place one or more Cro template files in `resources`.
+2. Make sure those resources are mentioned in the `META6.json`
+3. Have a Raku module with an `EXPORT` sub, which is defined in terms of the
+   `template-library` function exported by `Cro::WebApp::Template::Library`.
+
+The module looks like this:
+
+```
+my %exports := template-library %?RESOURCES<foo.crotmp>, %?RESOURCES<bar.crotmp>;
+
+sub EXPORT() {
+    return %exports;
+}
+```
+
+Supposing that the above code was in a module `Some::Template::Library`, they can
+then be imported into another Cro template as:
+
+```
+<:use Some::Template::Library>
+```
+
+## Inserting HTML and JavaScript
 
 Everything is HTML escaped by default. However, sometimes it is required to
 place a blob of pre-rendered HTML into the template output. There are two
