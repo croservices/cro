@@ -86,8 +86,8 @@ HTTP routes, for example, are in `hello/lib/Routes.pm6`.
 * Learn about routing URLs to handlers, working with query strings and request
   bodies, and producing responses using `Cro::HTTP::Router`
 * Learn about using templates to produce responses using `Cro::WebApp::Template`
-* Learn about [sessions and authentication](docs/http-auth-and-sessions)
+* Learn about [sessions and authentication](/docs/http-auth-and-sessions)
 * Learn about writing WebSocket handlers using `Cro::HTTP::Router::WebSocket`
-* Learn more about the [cro development tool](docs/cro-tool) and the associated
-  [.cro.yml file](docs/cro-yml)
-* Learn how to [structure larger services](docs/structuring-services)
+* Learn more about the [cro development tool](/docs/cro-tool) and the associated
+  [.cro.yml file](/docs/cro-yml)
+* Learn how to [structure larger services](/docs/structuring-services)
