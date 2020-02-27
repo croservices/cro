@@ -1,5 +1,78 @@
 # Cro Release History
 
+## 0.8.3
+
+This release brings a major new feature in `Cro::WebApp`: forms, which takes
+much of the tedium out of gathering data using forms. It also contains
+various fixes to HTTP/2 and WebSocket support, significant performance
+improvements for WebSockets, a range of new features relating to templates,
+and assorted smaller new features, fixes, and documentation improvements.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Make `Cro::Uri.parse` and related methods respect subclassing
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Emit a HTTP/2 request or response object as soon as we have the
+  headers, rather than waiting for the body. This brings it in line
+  with how things work for HTTP/1, and also resolves issues where a
+  hang could occur due to the `await` of the response never completing
+  if there was an error while receiving the body.
+* Translate `host` header to `:authority` in HTTP/2 requests; some
+  servers mandate this
+* Make sure that the trace output reports HTTP/2 when it is being used
+* Give `Cro::Uri::HTTP` a way to add query string arguments, taking care
+  of the encoding of them
+* Add a `query` option to the request methods in `Cro::HTTP::Client`, to
+  make it easy to form a query string
+* Ensure that basic authentication adds a `WWW-Authenticate` header on
+  missing or failed authorization, and provide a way to set the realm
+* Fix `Cro::HTTP::Auth::Basic` in the case it was meant to update an
+  existing session, not create one by itself
+* Fix a test that tried to use port 8080, which is commonly in use
+* Add more declarator docs, for better in-IDE documentation support
+* Assorted small code quality improvements 
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Fix mishandling of 2-byte extended payload length
+* Speed up payload masking by a factor of 200x
+* Simplify and improve performance of the WebSocket frame parser, up
+  to around 4x faster
+* Simplify and improve performance of the WebSocket frame serializer
+  by around 5-10%
+* Clean up logic in the message parser
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* Add `Cro::WebApp::Form`, a mechanism for working with forms in web
+  applications.
+* Implement named arguments and parameters in the template subs and macros
+  (including the `:$foo`, `:foo` and `:!foo` forms)
+* Implement defaults on both positional and named arguments
+* Add `True` and `False` terms, which can be used as template arguments
+* Allow use of `<?$foo.bar>...</?>` in templates; this previously had to
+  be written as `<?{ $foo.bar }>...</?>`
+* Don't blow up on `<.foo>` when it is dereferencing a hash and the hash
+  key is missing; now it evaluates to `Nil`
+* Fixed transitive `<:use ...>` of templates
+* Implement support for template libraries, meaning that one can provide
+  libraries of templates through the module ecosystem
+
+The following changes were made to the `Cro` distribution:
+
+* Document the new `Cro::HTTP::Client` `query` option
+* Fix incorrect trailing `/` on an example in the HTTP router documentation
+* Correct documentation about HTTP basic authentication support
+* Bring the `Cro::WebApp::Template` documentation up to date with all new
+  features
+* Add documentation for `Cro::WebApp::Form`
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington
+from [Edument](http://cro.services/training-support), as well as Geoffrey
+Broadwell (who is to thank for the numerous `Cro::WebSocket` improvements).
+
 ## 0.8.2
 
 This release contains a number of small fixes and improvements, as well as
