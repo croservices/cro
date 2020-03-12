@@ -86,7 +86,7 @@ Pipeline components:
 
 ### Cro::WebApp
 
-* [Cro::WebApp::Template](docs/reference/cro-webapp-form)
+* [Cro::WebApp::Form](docs/reference/cro-webapp-form)
 * [Cro::WebApp::Template](docs/reference/cro-webapp-template)
 
 ### Cro::OpenAPI::RoutesFromDefinition
