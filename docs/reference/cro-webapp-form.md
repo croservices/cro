@@ -115,7 +115,7 @@ Taking care to use `is email` and `is telephone` is especially helpful for mobil
 * `is color` - a color input
 * `is date` - a date input
 * `is datetime-local` / `is datetime` - a datetime-local input
-* `is eamil` - an email input
+* `is email` - an email input
 * `is month` - a month input
 * `is multiline` - a multiline text input (rendered as a text area); can have the number
   of rows and columns specified as named arguments, such as `is multiline(:5rows, :60cols)`
