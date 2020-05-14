@@ -292,8 +292,8 @@ It is possible to declare a template sub that takes parameters:
 ```
 <:sub select($options, $name)>
   <select name="<$name>">
-    <@options>
-      <option value="<$value>"><$text></option>
+    <@$options>
+      <option value="<.value>"><.text></option>
     </@>
   </select>
 </:>
