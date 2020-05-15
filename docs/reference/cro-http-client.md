@@ -29,7 +29,7 @@ the type object or an instance of `Cro::HTTP::Client`. They will all return a
 `Promise`, which will be kept if the request is successful or broken if an
 error occurs.
 
-    my $resp = await Cro::HTTP::Client.get('https://www.perl6.org/');
+    my $resp = await Cro::HTTP::Client.get('https://www.raku.org/');
 
 The response will be provided as a `Cro::HTTP::Response` object. It will be
 produced as soon as the request headers are available; the body may not yet

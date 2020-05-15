@@ -103,7 +103,7 @@ The following changes were made to the `Cro::WebApp` distribution:
 
 * Implement template conditionals directly using variables, like
   `<?$foo>...</?>` and `<!$foo>...</!>`
-* Support all of the Perl 6 string comparison operators
+* Support all of the Raku string comparison operators
 * Add documentation comments to various types and routines
 
 The following changes were made to the `Cro` distribution:
@@ -251,7 +251,7 @@ The following changes were made to the `Cro::HTTP` distribution:
   `Cro::HTTP::Auth::WebToken::Bearer`.
 * Fix compliance with the HTTP spec on the host header: now we append
   `Host` header when non-standard HTTP port (not 80 nor 443) is used.
-* Force use of Perl 6.d semantics in the HTTP client, which avoids
+* Force use of Raku.d semantics in the HTTP client, which avoids
   various ways that it might end up working slowly due to eating too
   many real threads.
 * When a route fails to match with 400 or 401, and another route fails
@@ -363,7 +363,7 @@ This release brings two major new features:
   services specified using an [OpenAPI v3](https://github.com/OAI/OpenAPI-Specification)
   document without needing to repeat the routes, validation, and so forth
   from the document. This work was funded by [Nick Logan (ugexe)](https://deathbyperl6.com/).
-  Three modules for wider Perl 6 use were produced and released as part of
+  Three modules for wider Raku use were produced and released as part of
   this work: `JSON::Pointer`, `OpenAPI::Model`, and `OpenAPI::Schema::Validate`.
 * The `Cro::HTTP::Test` module, which offers a convenient way to write tests
   for HTTP services. It is, of course, primarily aimed at those services built

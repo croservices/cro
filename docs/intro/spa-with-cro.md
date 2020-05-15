@@ -70,7 +70,7 @@ $ curl http://localhost:20000
 ```
 
 I like to regularly commit as I work. So, I'll create a git repository, add
-a `.gitignore` file (to ignore Perl 6 precompilation output), and commit the
+a `.gitignore` file (to ignore Raku precompilation output), and commit the
 stub.
 
 ```
@@ -667,7 +667,7 @@ as network I/O). They are pure calculation. Our state will, for now, be very
 simple: just the content of the text box.
 
 Writing reducers is much more convenient when we have the upcoming spread
-operator in JavaScript; it's a prefix `...`, and works much like Perl 6's
+operator in JavaScript; it's a prefix `...`, and works much like Raku's
 prefix `|` operator for flattening. Since we already have a build toolchain,
 we can add it by installing another syntax transform:
 
@@ -1506,7 +1506,7 @@ $ git commit -m "Add agree/disagree feature" .
 
 In this tutorial we've gone from zero to reactive single page application. The
 frontend is written in modern ES6 using React and Redux. The backend is in
-Perl 6, using Cro. They communicate using both HTTP and web sockets. And both
+Raku, using Cro. They communicate using both HTTP and web sockets. And both
 declare their dependencies, so getting started for a new developer is just a
 case of:
 

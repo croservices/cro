@@ -9,7 +9,7 @@ push promise.
 
 ## Getting the promised response
 
-The `response` method returns a Perl 6 `Promise` that will be `Kept` with a
+The `response` method returns a Raku `Promise` that will be `Kept` with a
 `Cro::HTTP::Response` object when the promised response is delivered. Should
 that not be possible for some reason, then the `Promise` will be broken.
 

@@ -1,6 +1,6 @@
 # The Cro approach
 
-At its heart, Cro is all about building up chains of Perl 6 supplies that
+At its heart, Cro is all about building up chains of Raku supplies that
 process messages that arrive from the network and produce messages to be sent
 over the network.
 
@@ -185,11 +185,11 @@ my Cro::Connector $conn = Cro.compose(
 
 my $req = supply {
     my Cro::HTTP::Request $req .= new(:method<GET>, :target</>);
-    $req.add-header('Host', 'www.perl6.org');
+    $req.add-header('Host', 'www.raku.org');
     emit $req;
 }
 react {
-    whenever $conn.establish($req, :host<www.perl6.org>, :port(80)) {
+    whenever $conn.establish($req, :host<www.raku.org>, :port(80)) {
         say ~$response; # Dump headers
     }
 }

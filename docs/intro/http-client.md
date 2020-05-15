@@ -10,7 +10,7 @@ The simplest `GET` request can be written as:
 use Cro::HTTP::Client;
 
 # Make the request
-my $resp = await Cro::HTTP::Client.get('https://www.perl6.org/');
+my $resp = await Cro::HTTP::Client.get('https://www.raku.org/');
 ```
 
 Different methods represent different HTTP methods, such as `get`,
@@ -33,7 +33,7 @@ my $client = Cro::HTTP::Client.new(
     headers => [
         User-agent => 'Cro'
     ]);
-my $resp = await $client.get('https://www.perl6.org/');
+my $resp = await $client.get('https://www.raku.org/');
 ```
 
 Making an instance has the advantage that connections will be re-used between

@@ -22,7 +22,7 @@ The `.cro.yml` file should be a dictionary at the top level. It must include:
   letters A..Z and a..z, the digits 0..9, the underscore (`_`), the dash (`-`)
   and the forward slash ('/'). This will be used to identify the service when
   using the CLI (such as in `cro run service-id`).
-* The key `entrypoint`, which is the Perl 6 source file that should be run to
+* The key `entrypoint`, which is the Raku source file that should be run to
   start the service. It should be specified relative to the `.cro.yml` file.
   This will be used by the `cro` development tool to start the service.
 
