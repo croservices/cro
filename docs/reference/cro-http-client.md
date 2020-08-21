@@ -35,12 +35,14 @@ The response will be provided as a `Cro::HTTP::Response` object. It will be
 produced as soon as the request headers are available; the body may not yet
 have been received.
 
-To set a base URL for every client's request, base URL can be passed
-to `Cro::HTTP::Client` instance as `base-uri` argument.
+If making an instance of `Cro::HTTP::Client`, a base URI may be specified.
+The URI passed to request methods will be appended to the base URI using
+the relative URI resolution algorithm.
 
-    my $client = Cro::HTTP::Client.new(base-uri => "http://persistent.url.com");
-    await $client.get('/first');   # http://persistent.url.com/first
-    await $client.get('/another'); # http://persistent.url.com/another
+    my $client = Cro::HTTP::Client.new(base-uri => "http://foo.com/some/path/");
+    await $client.get('added');             # http://foo.com/some/path/added
+    await $client.get('/rooted');           # http://foo.com/rooted
+    await $client.get('http://bar.com/');   # http://bar.com
 
 ## Error handling
 
