@@ -195,15 +195,15 @@ multi MAIN('link', 'rm', $from-service-id, $to-service-id, $to-endpoint-id?) {
     rm-link($from-service-id, $to-service-id, $to-endpoint-id);
 }
 
-multi MAIN('run', Str:D :$host? = 'localhost') {
+multi MAIN('run', Str:D :$host = 'localhost') {
     run-services(:$host);
 }
 
-multi MAIN('run', *@service-name, Str:D :$host? = 'localhost') {
+multi MAIN('run', *@service-name, Str:D :$host = 'localhost') {
     run-services(filter => any(@service-name), :$host);
 }
 
-multi MAIN('trace', *@service-name-or-filter, Str:D :$host? = 'localhost') {
+multi MAIN('trace', *@service-name-or-filter, Str:D :$host = 'localhost') {
     my @service-name;
     my @trace-filters;
     for @service-name-or-filter {
