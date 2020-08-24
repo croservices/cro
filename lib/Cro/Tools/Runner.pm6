@@ -43,6 +43,7 @@ class Cro::Tools::Runner {
     has $.service-id-filter = *;
     has Bool $.trace = False;
     has Str @.trace-filters;
+    has Str:D $.host = 'localhost';
     has Supplier $!commands = Supplier.new;
 
     my enum State (StartedState => 1, WaitingState => 0, StoppedState => -1);
@@ -86,7 +87,7 @@ class Cro::Tools::Runner {
 
                 for $cro-file.links -> $link {
                     with $link.host-env {
-                        %env{$_} = 'localhost'
+                        %env{$_} = $!host;
                     }
                     with $link.port-env {
                         my $port = %services{$link.service}.endpoint-ports{$link.endpoint};
@@ -235,7 +236,7 @@ class Cro::Tools::Runner {
             my $next-try-port = 20000;
             sub free-port() {
                 loop {
-                    my $try-conn = IO::Socket::Async.connect('localhost', $next-try-port);
+                    my $try-conn = IO::Socket::Async.connect($!host, $next-try-port);
                     await Promise.anyof($try-conn, Promise.in(1));
                     if $try-conn.status == Kept {
                         $try-conn.result.close;
@@ -256,7 +257,7 @@ class Cro::Tools::Runner {
                 for $cro-file.env -> $_ { %env{.name} = .value }
                 for $cro-file.endpoints -> $endpoint {
                     with $endpoint.host-env {
-                        %env{$_} = 'localhost';
+                        %env{$_} = $!host;
                     }
                     with $endpoint.port-env {
                         %env{$_} = %endpoint-ports{$endpoint.id};
