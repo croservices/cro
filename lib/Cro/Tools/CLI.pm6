@@ -196,15 +196,15 @@ multi MAIN('link', 'rm', $from-service-id, $to-service-id, $to-endpoint-id?) {
     rm-link($from-service-id, $to-service-id, $to-endpoint-id);
 }
 
-multi MAIN('run') {
-    run-services();
+multi MAIN('run', Str:D :$host = 'localhost') {
+    run-services(:$host);
 }
 
-multi MAIN('run', *@service-name) {
-    run-services(filter => any(@service-name));
+multi MAIN('run', *@service-name, Str:D :$host = 'localhost') {
+    run-services(filter => any(@service-name), :$host);
 }
 
-multi MAIN('trace', *@service-name-or-filter) {
+multi MAIN('trace', *@service-name-or-filter, Str:D :$host = 'localhost') {
     my @service-name;
     my @trace-filters;
     for @service-name-or-filter {
@@ -217,13 +217,13 @@ multi MAIN('trace', *@service-name-or-filter) {
     }
     run-services
         filter => @service-name ?? any(@service-name) !! *,
-        :trace, :@trace-filters;
+        :trace, :@trace-filters, :$host;
 }
 
-sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
+sub run-services(:$filter = *, :$trace = False, :@trace-filters, :$host) {
     my $runner = Cro::Tools::Runner.new(
         services => Cro::Tools::Services.new(base-path => $*CWD),
-        :$filter, :$trace, :@trace-filters
+        :$filter, :$trace, :@trace-filters, :$host
     );
     react {
         my %service-id-colors;
@@ -248,16 +248,17 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
                 my %endpoint-ports = .endpoint-ports;
                 for .cro-file.endpoints -> $endpoint {
                     my $port = %endpoint-ports{$endpoint.id};
+                    my $url-host = $host.contains(':') ?? "[" ~ $host ~ "]" !! $host;
                     print color($color) ~ "\c[ELECTRIC PLUG] Endpoint $endpoint.name() will be ";
                     given $endpoint.protocol {
                         when 'http' {
-                            say "at http://localhost:$port/" ~ RESET();
+                            say "at http://$url-host:$port/" ~ RESET();
                         }
                         when 'https' {
-                            say "at https://localhost:$port/" ~ RESET();
+                            say "at https://$url-host:$port/" ~ RESET();
                         }
                         default {
-                            say "on port $port" ~ RESET();
+                            say "on host $host port $port" ~ RESET();
                         }
                     }
                 }
