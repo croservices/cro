@@ -17,6 +17,7 @@ multi MAIN('web', Str $host-port = '10203',
         :$filter, :$trace, :@trace-filters
     );
     my $service = web $host, $port, $runner;
+    $host = "[" ~ $host ~ "]" if $host.contains(":"); # Handle IPv6 literals
     say "Cro web interface running at http://$host:$port/";
     stop-on-sigint($service);
 }
@@ -324,10 +325,17 @@ sub parse-host-port($host-port) {
     my ($host, $port);
     given $host-port {
         when /^(\d+)$/ {
+            # Just a port number
             $host = 'localhost';
             $port = +$host-port;
         }
+        when /^ '[' (.+) ']:' (\d+) $/ {
+            # IPv6 literal in URL format with port
+            $host = ~$0;
+            $port = +$1;
+        }
         when /^ (.+) ':' (\d+) $/ {
+            # Hostname followed by port
             $host = ~$0;
             $port = +$1;
         }
