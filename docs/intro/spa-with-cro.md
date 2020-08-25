@@ -423,6 +423,7 @@ react {
     whenever $tipsy.latest-tips.skip(2).head(1) {
         is .tip, 'Try the vanilla stout for sure',
             'Get new tips emitted live';
+        done;
     }
     $tipsy.add-tip('Try the vanilla stout for sure');
 }
