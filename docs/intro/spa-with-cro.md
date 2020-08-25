@@ -420,7 +420,7 @@ given $tipsy.latest-tips.head(2).list -> @tips {
 }
 
 react {
-    whenever $tipsy.latest-tips.skip(2).head(1) {
+    whenever $tipsy.latest-tips.skip(2).head {
         is .tip, 'Try the vanilla stout for sure',
             'Get new tips emitted live';
     }
