@@ -7,7 +7,7 @@ in turn produce responses.
 
 ## URI segment matching
 
-The router uses Perl 6 signatures to match URLs and extract segments from them.
+The router uses Raku signatures to match URLs and extract segments from them.
 A set of routes are placed in a `route` block. The empty signature corresponds
 to `/`.
 
@@ -197,7 +197,7 @@ the result will be a HTTP 405 Method Not Allowed response.
 Named parameters in a route signature can be used to unpack and constrain the
 route match on additional aspects of the request. By default, values are taken
 from the query string, however traits can be applied to have them use data
-from other sources. Note that named parameters in Perl 6 are optional by default;
+from other sources. Note that named parameters in Raku are optional by default;
 if the query string parameter is required, then it should be marked as such.
 
 ```
@@ -382,7 +382,7 @@ put -> 'product', $id, 'image', $filename {
 }
 ```
 
-The block signature may use Perl 6 signatures in order to unpack the data that
+The block signature may use Raku signatures in order to unpack the data that
 was submitted. This is useful to, for example, unpack a JSON object:
 
 ```
@@ -604,7 +604,7 @@ arguments on to `content` after setting the status code. They are:
 * `forbidden`, for HTTP 403 Forbidden
 * `conflict`, for HTTP 409 Conflict
 
-If the request handler evaluates to `...` (that is, the Perl 6 syntax for stub
+If the request handler evaluates to `...` (that is, the Raku syntax for stub
 code), then a HTTP 510 Not Implemented response will be produced. If evaluating
 the route handler produces an exception, then the exception will be passed on.
 It will then typically be handled by the response serializer, which will produce

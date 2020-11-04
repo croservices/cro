@@ -24,7 +24,7 @@ as well as covering some more advanced topics:
 ## Getting Help
 
 * Post your question on [Stack Overflow](https://stackoverflow.com/) (be sure
-  to tag it `perl6` and `cro`)
+  to tag it `raku` and `cro`)
 * Visit the `#cro` IRC channel on freenode
 * Get [commercial support and training](/training-support)
 

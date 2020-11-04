@@ -24,7 +24,7 @@ Where
   to the stub, together with options specific to the service type
 
 If the links and options are not specified, then they will be requested
-interactively. To provide the options, place them in quotes using Perl 6
+interactively. To provide the options, place them in quotes using Raku
 colonpair-like syntax, where `:foo` enables an option, `:!foo` disables an
 option, and `:foo<bar>` is the option `foo` with the value `bar`. For example:
 

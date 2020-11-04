@@ -15,9 +15,9 @@ modified version of an existing instance, passed to `clone`.
   allowed in `cookie-name` per RFC 6265 (required)
 * `value` - the cookie value; constrained to only contain the characters
   in the range specified in `cookie-octet` in RFC 6265 (required)
-* `expires` - the expiration time of the cookie, specified as a Perl 6
+* `expires` - the expiration time of the cookie, specified as a Raku
   `DateTime`
-* `max-age` - the maximum age of the cookie in seconds, specified as a Perl 6
+* `max-age` - the maximum age of the cookie in seconds, specified as a Raku
   `Duration` (in the constructor any `Real` may be passed; fractional parts
   will be rounded)
 * `domain` - the domain the cookie is restricted to, if any; specified as a
