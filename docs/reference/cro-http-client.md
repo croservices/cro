@@ -396,6 +396,18 @@ initial request with a 401 response, set the `if-asked` option to `True`.
         if-asked => True
     }
 
+## Proxying
+
+By default, `Cro::HTTP::Client` will honor the `HTTP_PROXY` and `HTTPS_PROXY`
+enrivonment variabless. It is also possible to pass the `http-proxy` and/or
+`https-proxy` arguments when constructing `Cro::HTTP::Client`; these will be
+used for all requests made with that instance (and take preference over any
+proxy found via the environment).
+
+It is not possible to override the proxy at a per-request level. There is no
+mechanism to ignore the `HTTP_PROXY` or `HTTPS_PROXY` environment variables,
+however one could delete them from `%*ENV` if needed.
+
 ## Persistent connections
 
 An instance of `Cro::HTTP::Client` will use persistent connections by default.
