@@ -398,11 +398,12 @@ initial request with a 401 response, set the `if-asked` option to `True`.
 
 ## Proxying
 
-By default, `Cro::HTTP::Client` will honor the `HTTP_PROXY` and `HTTPS_PROXY`
-enrivonment variabless. It is also possible to pass the `http-proxy` and/or
-`https-proxy` arguments when constructing `Cro::HTTP::Client`; these will be
-used for all requests made with that instance (and take preference over any
-proxy found via the environment).
+By default, `Cro::HTTP::Client` will honor the `HTTP_PROXY`, `HTTPS_PROXY`
+and `NO_PROXY` enrivonment variables. It is also possible to pass the
+`http-proxy` and/or `https-proxy` named arguments when constructing
+`Cro::HTTP::Client`; these will be used for all requests made with that
+instance (and take preference over any proxy found via the environment,
+and furthermore cause `NO_PROXY` to be disregarded).
 
 It is not possible to override the proxy at a per-request level. There is no
 mechanism to ignore the `HTTP_PROXY` or `HTTPS_PROXY` environment variables,
