@@ -1,5 +1,97 @@
 # Cro Release History
 
+## 0.8.4
+
+This release brings lots of small improvements and plenty of bug fixes. Of
+note, the WebSocket client received a lot of reliability fixes, and the HTTP
+client gained support for proxies, automatically honoring the `HTTP_PROXY` and
+`HTTPS_PROXY` environment variables. For those building HTTP services, a new
+`around` feature in the router allows for easier lifting out of error handling
+across all request handlers (and probably a few more interesting things that
+we didn't think of yet). No compatibility issues are foreseen.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Add `Cro::UnhandledErrorReporter` to provide user control over the reporting
+  of unhandled errors
+* Provide a means to give more context when there is a problem serializing a
+  message body
+* Remove a workaround for a long-fixed Rakudo bug with the `CLOSE` phaser
+
+The following changes were made to the `Cro::TLS` distribution:
+
+* Add a certificate regeneration script and update the certificates used by
+  the tests
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* `Cro::HTTP::Client` now has a `user-agent` option for specifying the user
+  agent, which is more convenient than setting it via the headers mechanism.
+  Furthermore, a default `User-agent` header with the value `Cro` is now set.
+* Decode `+` in query string to a space. This isn't part of the URI spec,
+  but is a widely supported extension for query strings.
+* Support the `identity` transfer encoding
+* Handle the `:authority` pseudo-header in HTTP/2, mapping it to the `Host`
+  header
+* Simplify the `SameSite` cookie processing code
+* Introduce the `around` router function, which enables installation of a
+  wrapper around all of a `route` block's handlers
+* Give `Cro::HTTP::Body::WWWFormUrlEncoded` `keys` and `values` methods to
+  make it behave a bit more like a standard hash, as well as a rather more
+  useful `gist` output
+* Make `Cro::HTTP::Client` honor the `HTTP_PROXY` and `HTTPS_PROXY` environment
+  variables, as well as providing a means to set proxy servers to use at the
+  time the client is constructed
+* Improve error reporting then a response body cannot be serialized; the type
+  of the body and the request URI that was being processed are now reported
+* Fix upgraded connections sometimes not being closed when the body ends
+* Ensure body streams are terminated on all kinds of connection termination
+  (this issue was most commonly observed with WebSocket connections)
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Honor override of `Sec-WebSocket-Protocol` header
+* Fix a deadlock that could occur in the client when a ping was received
+  while a message was being sent
+* Avoid a possible race and exception when a ping times out in the client
+* Ensure all outstanding client-sent pings fail upon connection close, to
+  avoid a hang in any code awaiting them
+* Make handling of unexpected connection close more consistent in the client
+* Make sure the close message is consistently set correctly in the client
+* Ensure that all kinds of serialization failure are conveyed back to the
+  client `send` caller, fixing a potential hang when serialization failed in
+  certain ways
+* Make sure tests can run reliably in parallel
+* Assorted small code quality improvements
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* The `Date` and `DateTime` types may now be used on form field attributes,
+  and imply the `date` and `datetime-local` control types respectively
+* Give generated forms a name, otherwise multi-select lists refuse to display
+  the selected items in Firefox
+* Fix loss of current value with some control types in forms
+* In templates, support `<@$foo>` and `<@$foo.bar>` for iterating the
+  contents of a variable
+* Add a direct dependency on `OO::Monitors`
+
+The following changes were made to the `Cro` distribution:
+
+* Allow specification of the host for `cro run` and `cro trace` through a
+  `--host` option
+* Handle IPv6 literals in the URL format to `cro web`
+* Add documentation for all new features
+* Clarify how base-uri is used in the HTTP client documentation
+* Fix assorted errors in the `Cro::WebApp::Form` documentation
+* Fix an example in the SPA tutorial so that it doesn't hang
+* Fix link to the Cro site in the README
+
+This release was contributed to by Alexander Kiryuhin, Jonathan Worthington,
+and vendethiel from [Edument](http://cro.services/training-support), together
+with the following community members: Alastair Douglas, Elizabeth Mattijsen,
+Geoffrey Broadwell, Jeremy Studer, Joelle Maslak, Jonathan Stowe, Lukas Valle,
+Patrick Böker, and Stefan Seifert.
+
 ## 0.8.3
 
 This release brings a major new feature in `Cro::WebApp`: forms, which takes
