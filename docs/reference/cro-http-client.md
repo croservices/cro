@@ -82,6 +82,23 @@ object has the request that was sent attached to it. In the event of a
 redirect, the request object will be that of the redirected request, not the
 originally sent request.
 
+## Setting the user agent
+
+By default, `Cro::HTTP::Client` sends a `User-agent` header with the value `Cro`.
+This can be done at the request level:
+
+    my $resp = await Cro::HTTP::Client.get: 'example.com',
+        user-agent => 'MyCrawler v42';
+
+Or set at construction time when making an instance of the client, in which case
+it will be used for all requests (unless overridden in a specific request):
+
+    my $client = Cro::HTTP::Client.new:
+        user-agent => 'MyCrawler v42';
+
+To suppress sending a `User-agent` header, pass either `False`, `Nil`, or the
+empty string.
+
 ## Adding extra request headers
 
 One or more headers can be set for a request by passing an array to the
@@ -92,8 +109,8 @@ of `Cro::HTTP::Header`, or a mix of the two.
         headers => [
             referer => 'http://anotherexample.com',
             Cro::HTTP::Header.new(
-                name => 'User-agent',
-                value => 'Cro'
+                name => 'X-MyCustomHeader',
+                value => 'pancake'
             )
         ];
 
@@ -102,7 +119,7 @@ construction time:
 
     my $client = Cro::HTTP::Client.new:
         headers => [
-            User-agent => 'Cro'
+            X-MyCustomHeader => 'strudel'
         ];
 
 ## Adding query string parameters
