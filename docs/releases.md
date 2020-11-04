@@ -28,7 +28,7 @@ The following changes were made to the `Cro::HTTP` distribution:
 * `Cro::HTTP::Client` now has a `user-agent` option for specifying the user
   agent, which is more convenient than setting it via the headers mechanism.
   Furthermore, a default `User-agent` header with the value `Cro` is now set.
-* Decode `+` in query string to a space. This isn't part of the URI spec,
+* Decode `+` characters in query strings to spaces. This isn't part of the URI spec,
   but is a widely supported extension for query strings.
 * Support the `identity` transfer encoding
 * Handle the `:authority` pseudo-header in HTTP/2, mapping it to the `Host`
