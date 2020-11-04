@@ -1058,3 +1058,38 @@ When `include` is used, the `before-matched` middleware of the including
 `include`, and the `after-matched` middleware of the including `route` block
 will be applied after the target of the include. Effectively, the middleware
 of the including route block wraps around those of the included.
+
+## Wrapping route handlers
+
+The `around` function can be used at `route`-block level to wrap all handlers
+within that `route` block. This could be used to provide uniform exception
+handling across a set of request handlers.
+
+```
+my $application = route {
+    around -> &handler {
+        # Invoke the route handler
+        handler();
+        CATCH {
+            # If any handler produces this exception...
+            when Some::Domain::Exception::UpdatingOldVersion {
+                # ...return a HTTP 409 Conflict response.
+                conflict;
+            }
+        }
+    }
+}
+```
+
+Both `request` and `response` are available inside of an `around` handler. At
+the point it is called, the handler to call and its arguments will already
+have been determined. The most you can do is choose not to invoke the handler.
+Unlike with `after-matched` middleware, the default mapping of unhandled
+exceptions to a `500` status code will not have been performed yet, making it
+a good place to factor out mapping of domain exceptions into HTTP errors.
+
+The first `around` call will be the innermost wrapping. Wrappings from an
+`include`d `route` block will be considered inner to those in the `route`
+block doing the `include`. If one `around` handler throws an exception,
+another handler outer to it may catch it. Unlike with middleware, `around`
+handlers are not considered pipeline components.
