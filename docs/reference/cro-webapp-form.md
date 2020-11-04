@@ -100,7 +100,11 @@ to use the numeric types `Int`, `Rat`, and `Num`. The values will be parsed into
 these types, and a validation error produced if they are malformed. This will also
 cause the generation of a `number` input type in the rendered HTML.
 
-Finally, use of `Bool` will result in a checkbox.
+Some further attribute types come with control type defaults too:
+
+* `Bool` will result in a `checkbox` control
+* `Date` will result in a `date` control
+* `DateTime` will result in a `datetime-local` control
  
 ### Form controls
 
