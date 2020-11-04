@@ -88,6 +88,12 @@ It's also possible to list multiple services:
 The output of the services will be displayed, prefixed with the `service-name`.
 Sending SIGINT (hitting Ctrl+C) will kill all of the services.
 
+Ports are automatically allocated and the environment variable set per the
+`.cro.yml` for the service. The host environment variable will be set to
+`localhost` by default, however can be specified with the `--host` option:
+
+    cro --host=dev-vm run
+
 ## Tracing Services
 
     cro trace <service-id-or-filter>
@@ -118,6 +124,10 @@ unimportant, so these are equivalent:
 
     cro trace :http flashcard-backend
     cro trace flashcard-backend :http
+
+The `--host` option may be specified as for `cro run`:
+
+    cro --host=dev-vm trace
 
 ## Serving Static Content
 
