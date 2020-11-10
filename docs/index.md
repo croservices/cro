@@ -35,7 +35,7 @@ The full details, organized by module:
 ### Cro::Core
 
 * [Cro::MediaType](docs/reference/cro-mediatype)
-* [Cro::UnhandledErrorReporter](docs/reference/cro-unhandlederrorreporter.md)
+* [Cro::UnhandledErrorReporter](docs/reference/cro-unhandlederrorreporter)
 * [Cro::Uri](docs/reference/cro-uri)
 
 ### Cro::TLS
