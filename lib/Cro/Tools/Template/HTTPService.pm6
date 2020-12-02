@@ -206,7 +206,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
     }
 
     method meta6-provides(%options) {
-        'Routes.pm6' => 'lib/Routes.pm6',
+        'Routes' => 'lib/Routes.pm6',
     }
 
     method docker-base-image(%options) {
