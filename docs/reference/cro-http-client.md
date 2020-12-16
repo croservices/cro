@@ -396,6 +396,25 @@ initial request with a 401 response, set the `if-asked` option to `True`.
         if-asked => True
     }
 
+## TLS configuration
+
+The `ca` argument, passed either at construction time or to a request method,
+is used to provide TLS configuration. Its primary use is for providing a
+custom CA certificate:
+
+    my $client = Cro::HTTP::Client.new:
+        ca => { ca-file => 't/certs-and-keys/ca-crt.pem' };
+
+However, the hash may contain any arguments that the `connect` method of
+[the TLS module](https://github.com/jnthn/p6-io-socket-async-ssl) accepts. Of
+note, one can disable certificate checking by passing the `insecure` option:
+
+    my $client = await Cro::HTTP::Client.get: 'https://badly-configur.ed/',
+        ca => { :insecure };
+
+As the name suggests, this is not a secure configuration; transmissions are
+encrypted, but there's no checking that the server is who it claims to be.
+
 ## Proxying
 
 By default, `Cro::HTTP::Client` will honor the `HTTP_PROXY`, `HTTPS_PROXY`
