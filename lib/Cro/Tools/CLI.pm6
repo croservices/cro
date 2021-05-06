@@ -24,7 +24,7 @@ multi MAIN('web', Str $host-port = '10203',
 
 multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
     my %options = parse-options($options);
-    my @option-links = %options.grep({ .key eq 'link' }).first.value.flat;
+    my @option-links = %options.first({ .key eq 'link' }).value.flat;
     %options .= grep({ not .key eq 'link' });
 
     my (@generated-links, @links);
@@ -77,6 +77,12 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
             my $default = $opt.default ~~ Callable
                 ?? $opt.default().(%got)
                 !! $opt.default;
+            with $opt.skip-condition -> &cond {
+                if &cond(%got) {
+                    %got{$id} = $default;
+                    next;
+                }
+            }
             print $opt.name;
             given $opt.type {
                 when Bool {

@@ -4,6 +4,7 @@ package Cro::Tools::Template {
         has Str $.name is required;
         has Any:U $.type is required where Bool|Int|Str;
         has $.default is required where Callable|Bool|Int|Str;
+        has $.skip-condition;
     }
 }
 
