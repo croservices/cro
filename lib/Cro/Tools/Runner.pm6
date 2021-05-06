@@ -39,7 +39,7 @@ class Cro::Tools::Runner {
         has Exception $.exception;
     }
     class PossiblyNoCroConfig does Message {
-        has Int $.timing;
+        has Str $.directory;
     }
 
     has Cro::Tools::Services $.services is required;
@@ -146,7 +146,7 @@ class Cro::Tools::Runner {
 
             whenever Promise.in(5) {
                 if %services.elems == 0 {
-                    emit PossiblyNoCroConfig.new(timing => 5);
+                    emit PossiblyNoCroConfig.new(directory => $!services.base-path.Str);
                 }
             }
 

@@ -297,7 +297,7 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters, :$host) {
                 }
             }
             when Cro::Tools::Runner::PossiblyNoCroConfig {
-                note colored("Did not encounter a single service whlie scanning the directory for $_.timing() seconds, could it be .cro.yml file is missing?", "bold");
+                note colored("Did not encounter any .cro.yml files whlie scanning the directory $_.directory(), could it be .cro.yml file is missing?", "bold");
             }
         }
 
