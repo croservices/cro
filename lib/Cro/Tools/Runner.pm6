@@ -38,6 +38,9 @@ class Cro::Tools::Runner {
         has IO::Path $.path;
         has Exception $.exception;
     }
+    class PossiblyNoCroConfig does Message {
+        has Int $.timing;
+    }
 
     has Cro::Tools::Services $.services is required;
     has $.service-id-filter = *;
@@ -138,6 +141,12 @@ class Cro::Tools::Runner {
                         emit UnableToStart.new(service-id => .value.cro-file.id,
                                                cro-file => .value.cro-file);
                     }
+                }
+            }
+
+            whenever Promise.in(5) {
+                if %services.elems == 0 {
+                    emit PossiblyNoCroConfig.new(timing => 5);
                 }
             }
 

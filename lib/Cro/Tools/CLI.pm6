@@ -237,7 +237,7 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters, :$host) {
             }
             when Cro::Tools::Runner::BadCroFile {
                 note color("red"),
-                    "\c[WARNING SIGN] Failed to load $_.path.add(".cro.yml").relative(): $_.exception()",
+                    "\c[WARNING SIGN] Failed to load $_.path().add(".cro.yml").relative(): $_.exception()",
                     RESET();
             }
             when Cro::Tools::Runner::Started {
@@ -295,6 +295,9 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters, :$host) {
                 with .data -> $data {
                     note $data.trim.indent($prefix.chars + 2);
                 }
+            }
+            when Cro::Tools::Runner::PossiblyNoCroConfig {
+                note colored("Did not encounter a single service whlie scanning the directory for $_.timing() seconds, could it be .cro.yml file is missing?", "bold");
             }
         }
 
