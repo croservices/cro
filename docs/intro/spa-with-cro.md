@@ -128,7 +128,7 @@ Next up, we'll get set up for the frontend. First of all, we'll stub a
 JavaScript dependencies. We use `npm init` and provide some answers:
 
 ```
-$ npm init .
+$ npm init
 This utility will walk you through creating a package.json file.
 It only covers the most common items, and tries to guess sensible defaults.
 
@@ -192,7 +192,8 @@ module.exports = {
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'static/js')
-    }
+    },
+    mode: 'development'
 };
 ```
 
@@ -502,7 +503,7 @@ an XML-like syntax embedded in JavaScript. First we need to set up compiling
 that. Here are the new development dependencies:
 
 ```
-$ npm install --save-dev babel-loader babel-core babel-preset-es2015 babel-preset-react
+$ npm install --save-dev babel-loader core-js @babel/core@^7 @babel/preset-react
 ```
 
 Next, we need to create a `.babelrc` file, saying to use this react preset
@@ -511,7 +512,7 @@ JavaScript). It should simply contain:
 
 ```
 {
-  "presets" : ["es2015","react"]
+  "presets" : ["@babel/preset-react"]
 }
 ```
 
@@ -527,6 +528,7 @@ module.exports = {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'static/js')
     },
+    mode: 'development',
     module : {
         rules : [
             {
