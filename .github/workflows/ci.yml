@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  raku:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+#          - macOS-latest
+#          - windows-latest
+        raku-version:
+          - "2021.03"
+          - "latest"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Raku/setup-raku@v1
+        with:
+          raku-version: ${{ matrix.raku-version }}
+      - run: zef install https://github.com/croservices/cro-core/archive/master.zip 
+      - run: zef install https://github.com/croservices/cro-tls/archive/master.zip
+      - run: zef install https://github.com/croservices/cro-http/archive/master.zip
+      - run: zef install https://github.com/croservices/cro-websocket/archive/master.zip
+      - name: Setup dependencies
+        run: raku -v && zef install --deps-only .
+      - name: Test code
+        run: zef test .

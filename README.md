@@ -1,4 +1,4 @@
-# Cro [![Build Status](https://travis-ci.org/croservices/cro.svg?branch=master)](https://travis-ci.org/croservices/cro)
+# Cro ![Build Status](https://github.com/croservices/cro/actions/workflows/ci.yml/badge.svg)
 
 This is part of the Cro libraries for implementing services and distributed
 systems in Raku. See the [Cro website](https://cro.services/) for further
