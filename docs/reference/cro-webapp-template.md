@@ -227,7 +227,7 @@ example, the earlier template could be written as:
 ```
 
 Which leaves the current default target in place. Should the current target
-itself be `Iterable`, it is permissible to write simply `<@_>...</@_>`.
+itself be `Iterable`, it is permissible to write simply `<@_>...</@>`.
 
 If the opening and closing iteration tags are the only thing on the line, then
 no output will be generated for those lines, making the output more pleasant.
@@ -346,7 +346,7 @@ Where `<:body>` marks the point for the body to be rendered. This macro could
 be used as:
 
 ```
-<|bs-card("My Stuff")>
+<|bs-card('My Stuff')>
   It's my stuff, in a BS card!
 </|>
 ```
