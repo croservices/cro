@@ -134,6 +134,10 @@ Taking care to use `is email` and `is telephone` is especially helpful for mobil
   as the topic of the block, so one can write a `method get-options() { ... }` and then
   do `will select { .get-options }`. Note that currently there is no assistance with
   handling situations where the options should depend on another form field.
+* `is file` - a file upload input; the attribute will be populated with an instance
+  of `Cro::HTTP::Body::MultiPartFormData::Part`, which has properties `filename`,
+  `body-blob` (binary upload) ond `body-text` (decodes the `body-blob` to a `Str`)
+* `is hidden` - a hidden input
 
 There is no trait for checkboxes; use the `Bool` type instead.
 
