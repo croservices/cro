@@ -1,5 +1,68 @@
 # Cro Release History
 
+## 0.8.5
+
+This release brings support for the `TCP_NODELAY` option and enables it by default
+for TCP and TLS connections, improving latency. Meanwhile, Cro templates will now
+be reloaded without a service restart if `CRO_DEV=1` is set in the environment, and
+template parse error reporting is significantly improved.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Add support for enabling `TCP_NODELAY` by providing a `nodelay` subroutine
+  updating the socket to enable the option, add a flag in `Cro::TCP` connector
+  to enable it.
+* Make media type parsing more lenient
+* Provide a proper error message on calling the `stop` method on
+  a `Cro::Service` before `start`
+
+The following changes were made to the `Cro::TLS` distribution:
+
+* Support `TCP_NODELAY` for TLS connections.
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Add `Log::Timeline` logging in `Cro::HTTP::Client`, so request processing
+  can be visualized
+* Enable `TCP_NODELAY` by default
+* Fix redirection to a relative URL when the initial request URL had no
+  trailing `/`
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Make `web-socket` routine a multi to allow overloading it
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* Allow hot reload of compiled templates when the `CRO_DEV` environment
+  variable is set
+* Add `Log::Timeline` logging for template compilation and rendering
+* Improve parse error in templates
+* Allow optional dot after an array sigil in iteration (e.g. `<@.foo>`)
+* Add the `:test` parameter to the `template-location` routine, allowing
+  one to setup filtering of files taken as templates
+* Provide a preliminary API for making a custom template repository. Expose
+  the `Cro::WebApp::Template::Repository` role to be implemented.
+
+The following changes were made to the `Cro::HTTP::Test` distribution:
+
+* Add semantic test subs `is-ok`, `is-no-content`, `is-bad-request`,
+  `is-unauthorized`, `is-forbidden`, `is-not-found`, `is-method-not-allowed`,
+  `is-conflict` and `is-unprocessible-entity`
+
+The following changes were made to the `Cro` distribution:
+
+* Change the order of questions asked during `cro stub` invocation,
+  making deciding on HTTPS usage optional depending on the HTTP versions
+  specified
+* Properly warn a user during a `cro run` invocation if no `.cro.yml` configuration
+  file was found in the current directory tree
+
+This release was contributed to by Alexander Kiryuhin, Jonathan Worthington,
+and vendethiel from [Edument](http://cro.services/training-support), together
+with the following community members: Geoffrey Broadwell, James Raspass, José
+Joaquín Atria, and Patrick Böker.
+
 ## 0.8.4
 
 This release brings lots of small improvements and plenty of bug fixes. Of
