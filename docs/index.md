@@ -25,7 +25,7 @@ as well as covering some more advanced topics:
 
 * Post your question on [Stack Overflow](https://stackoverflow.com/) (be sure
   to tag it `raku` and `cro`)
-* Visit the `#cro` IRC channel on freenode
+* Visit the `#cro` IRC channel on [irc.libera.chat](https://libera.chat/)
 * Get [commercial support and training](/training-support)
 
 ## Reference
