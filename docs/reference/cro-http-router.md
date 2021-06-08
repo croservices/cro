@@ -613,13 +613,13 @@ inserted to change what happens (for example, serving custom error pages).
 
 All other response codes are produced by explicitly setting `response.status`.
 
-## Serving static content
+## Serving static content from files
 
-The `static` routine is used to easily serve static content. It sets the
+The `static` routine is used to serve static content from a file. It sets the
 content of the request body to the content of the file being served, and the
 content type according to the extension of the file.
 
-In its simplest form, `static` simply serves an individual file:
+In its simplest form, `static` serves an individual file:
 
     get -> {
         static 'www/index.html';
@@ -646,7 +646,7 @@ served instead.
 The default set of file extension to MIME type mappings are derived from the
 list provided with the Apache web server. If no mapping is found, the content
 type will be set to `application/octet-stream`. To provide extras or to
-override the default, pass a hash of mappins to the `mime-types` named
+override the default, pass a hash of mappings to the `mime-types` named
 argument.
 
     get -> 'downloads', *@path {
@@ -663,6 +663,31 @@ request to `content/foo/` would serve `downloads/foo/index.html`), pass the
         static 'static-data/content', @path,
             :indexes<index.html index.htm>;
     }
+
+## Serving static content from resources
+
+Those who wish for their web applications to be installable using standard
+Raku installation tools, such as `zef`, should serve static content from the
+distribution resources instead of files. First, the `resources-from` routine
+must be used to associate the correct `%?RESOURCES` with the `route` block.
+Then, the `resource` routine can be used to serve resources.
+
+    my $app = route {
+        resources-from %?RESOURCES;
+
+        get -> {
+            # An exact resource
+            resource 'static/index.html';
+        }
+
+        get -> 'css', *@path {
+            # Concatenate the css prefix with the other path parts to form
+            # the resource path
+            resource 'css', @path;
+        }
+    }
+
+The `mime-types` and `indexes` options work as for `static`.
 
 ## Adding custom response body serializers
 
