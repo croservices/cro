@@ -45,24 +45,80 @@ route -> 'product', Int $id {
 The `$product` will become the topic of the template to render (see below for
 more on the template language).
 
-## Template locations and compilation
+## Template locations
 
-By default, templates will be looked for in the current working directory, and
-`<:use '...'>` directives in templates do the same. Templates will also be
-compiled lazily on first use.
+Templates may be served from files on disk or from distribution resources (the
+`%?RESOURCES` hash). Search locations for templates may be configured either
+at a `route` block level or globally (resources only at `route`-block level).
 
-Call the `template-location` function in order to specify a directory where
-templates can be located. These calls prepend to the search path, so the latest
-call to `template-location` will take precedence. Doing:
+The global search location list starts out containing the current working
+directory. To add further template search locations using files, call the
+`template-location` function.
 
 ```
-template-location 'templates/';
+my $app = route {
+    template-location 'templates/';
+
+    get -> {
+        # Will look for templates/index.crotmp first
+        template 'index.crotmp';
+    }
+}
 ```
 
-Means that templates underneath the `templates/` directory will be found without
-needing to be qualified with that path. Optionally passing `:compile-all` will
-immediately compile all of the templates and die if there are any errors. This
-could be put into a test case:
+When `template-location` is called in a `route` block, it is scoped to the
+route handlers within that block and will also be considered by any `route`
+blocks that we `include` into this one (but *not* those we `delegate` to).
+When `template-location` is called outside of a `route` block, it adds to
+the global search paths. The search order is:
+
+1. Any `tempalate-location`s in the current `route` block, tried in the
+   order they were added
+2. Any `template-location`s in `route` blocks that `include` us, transitively,
+   innermost first
+3. Any global `template-location`s
+
+To serve templates from resources, first the resources should be associated
+with the enclosing `route` block using `resources-from %?RESOURCES` (this is
+not part of the template system, but rather a general mechanism of `route`
+blocks). Then, `templates-from-resources` should be called to indicate that
+the resources should be considered when searching for templates.
+
+```
+my $app = route {
+    resources-from %?RESOURCES;
+    templates-from-resources;
+    get -> {
+        template 'templates/index.crotmp'
+    }
+}
+```
+
+Applications using resources will often have many kinds of resource, and are
+likely to put templates in a directory within the resources. One can avoid having
+to write the `templates/` prefix repeatedly by specifying it when calling the
+`templates-from-resources` function:
+
+```
+my $app = route {
+    resources-from %?RESOURCES;
+    templates-from-resources prefix => 'templates';
+    get -> {
+        template 'index.crotmp'
+    }
+}
+```
+
+## Template compilation and auto-reload
+
+Templates are compiled on first use and cached for the rest of the process
+lifetime. To have them recompiled automatically on changes, set `CRO_DEV=1`
+in the environment.
+
+Sometimes it may be desirable to compile all templates in advance. Passing
+`:compile-all` to the `template-location` function will immediately compile
+all of the templates and die if there are any errors. This could be put into
+a test case:
 
 ```
 use Cro::WebApp::Template;
