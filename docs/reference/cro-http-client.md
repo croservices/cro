@@ -454,7 +454,7 @@ is the only supported mechanism for deciding which protocol to use.
 
 ## Push promises
 
-HTTP/2.0 proides push promises, which allow the server to push extra resources
+HTTP/2.0 provides push promises, which allow the server to push extra resources
 to the client as part of the response. By default, `Cro::HTTP::Client` will
 instruct the remote server to **not** send push promises. To opt in to this
 feature, either:
