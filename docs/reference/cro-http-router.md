@@ -935,15 +935,31 @@ impact the return values of `path` and `path-segments`. The `original-target`,
 `original-path`, and `original-path-segments` methods return the original
 paths.
 
+Since a `route { }` block makes an object that does `Cro::Transform`, it is
+possible to use it with `delegate` too. This has slightly different semantics
+from `include`: the request will first be routed based upon the prefix by the
+`delegate`, and then the `route` block that is delegated to will processs the
+request using the adjusted target:
+
+```
+my $app = route {
+    delegate <first *> => route {
+        get -> 'second' {
+            note request.target;            # /second
+            note request.original-target;   # /first/second
+        }
+    }
+}
+```
+
+The main reason to use `delegate` over `include` for composing `route` blocks
+is when wishing to only have authorization or session middleware act on some
+URLs.
+
 Body parsers declared in the `route` block will be prefixed to the request's
 body parser selector before it is passed to the transform. Any body
 serializers declared in the `route` block will be prefixed to the body
 serializer selector of the response produced by the transform.
-
-Since a `route { }` block makes an object that does `Cro::Transform`, it is
-possible to use it with `delegate` too. This has slightly different semantics
-from `include`, and due to the need to do two route dispatches will perform a
-bit worse.
 
 ## Applying middleware in a route block
 
