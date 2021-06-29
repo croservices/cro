@@ -143,10 +143,10 @@ The `openapi` sub may be passed the following options:
   It defaults to `{ '/openapi.json' => 'json', '/openapi.yaml' => 'yaml' }`,
   which means that the OpenAPI specification will be served as both JSON and
   YAML on requests to `/openapi.json` and `/openapi.yaml` respectively. To
-  serve a format at the root of the API, pass `:document{ json => '/' }` (this
+  serve a format at the root of the API, pass `:document{ '/' => json }` (this
   also means it will not be served at `/openapi.json` and `/openapi.yaml` any
-  longer). It is fine to register multiple paths to serve the document for a
-  given format at.
+  longer). It is fine to register multiple paths to serve document for a given
+  format.
 
 All operations in the OpenAPI document should have an `operationId`, otherwise
 it is not possible to implement a Cro route handler for them.
