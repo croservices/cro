@@ -11,8 +11,8 @@ chdir 't/tools-services-test-dir';
 lives-ok { add-link('service1', 'service2', 'http') }, 'Can add link';
 $current = slurp $service1;
 like $current,   /'"'? 'links'    '"'? ':' ' '* \n/, 'Links section is filled';
-like ($current), /'"'? 'host-env' '"'? ':' ' '* 'SERVICE2_HTTP_HOST'/, 'Host is added';
-like ($current), /'"'? 'port-env' '"'? ':' ' '* 'SERVICE2_HTTP_PORT'/, 'Port is added';
+like ($current), /'"'? 'host-env' '"'? ':' ' '* '"'? 'SERVICE2_HTTP_HOST' '"'?/, 'Host is added';
+like ($current), /'"'? 'port-env' '"'? ':' ' '* '"'? 'SERVICE2_HTTP_PORT' '"'?/, 'Port is added';
 
 lives-ok { rm-link('service1', 'service2', 'http') }, 'Can remove link';
 $current = slurp $service1;
