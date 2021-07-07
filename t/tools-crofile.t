@@ -345,7 +345,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 
     my $yaml;
     lives-ok { $yaml = $try-serialize.to-yaml() }, 'Serializing to YAML lives';
-    like $yaml, /'cro' \s* ':' \s* 1/, 'Has cro version identifier';
+    like $yaml, /'"'? 'cro' '"'? \s* ':' \s* 1/, 'Has cro version identifier';
 
     my $parsed;
     lives-ok { $parsed = Cro::Tools::CroFile.parse($yaml) }, 'Could parse output';
