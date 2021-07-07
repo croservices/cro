@@ -18,7 +18,7 @@ lives-ok { rm-link('service1', 'service2', 'http') }, 'Can remove link';
 $current = slurp $service1;
 like   ($current), /'links:  []'/, 'Links section is empty';
 unlike ($current), /'SERVICE2_HTTP_HOST'/, 'Host is removed';
-unlike ($current), /'SERVICE2_HTTP_PORt'/, 'Port is removed';
+unlike ($current), /'SERVICE2_HTTP_PORT'/, 'Port is removed';
 
 # Restore state
 spurt $service1, $content1;
