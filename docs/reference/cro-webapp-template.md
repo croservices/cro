@@ -2,16 +2,26 @@
 
 Templates are typically used to render some data into HTML. The template engine
 is designed with HTML in mind, and takes care to escape data as it should be
-escaped in HTML. A template is compiled once into Raku code, and then may be
-used many times by passing it different input. The input data can be any Raku
-object, including a `Hash` or `Array`.
+escaped in HTML. Templates are compiled, typically on first use, for efficient
+production of data. The template language includes conditionals, iteration,
+subroutines, modules, and a number of other features.
 
-## Using a template
+Templates are typically stored either as files and reference by path, or as
+resources (the latter being useful if the web application should be possible
+to install as a Raku distribution, for example using `zef`).
 
-To use templates, add a `use Cro::WebApp::Template;` at the top of the file
-containing the routes where they are to be used.
+## Basic usage from a Cro route block
 
-To render a template as the result of a route, use `template`:
+First, add the following `use` statement to the module containing the `route`
+block that you wish to use templates in:
+
+```
+use Cro::WebApp::Template;
+```
+
+Then, to produce a rendered template as the HTTP response, call `template`,
+passing the path to the template and, optionally, the data that the template
+should render:
 
 ```
 route -> 'product', Int $id {
@@ -31,8 +41,10 @@ route -> 'product', Int $id {
 
 Where `render-template` renders the template and returns the result of doing
 so, and `content` is from `Cro::HTTP::Router` and sets the content type of the
-response along with the body. Note that by default `template` is setting a
-content type of `text/html`; to have it not do so, pass `content-type`:
+response along with the body. 
+
+While by default `template` sets a content type of `text/html`; this can be
+changed by passing the `content-type` named argument:
 
 ```
 route -> 'product', Int $id {
@@ -41,9 +53,6 @@ route -> 'product', Int $id {
         content-type => 'text/plain';
 }
 ```
-
-The `$product` will become the topic of the template to render (see below for
-more on the template language).
 
 ## Template locations
 
@@ -135,7 +144,7 @@ done-testing;
 The template language is designed to feel natural to Raku developers, taking
 syntactic and semantic inspiration from Raku.
 
-## Generalities
+### Generalities
 
 A template starts out in content mode, meaning that a template file consisting
 of plain HTML:
@@ -154,9 +163,14 @@ require one to write out the full opener again, just to match the "sigil". One
 may repeat the opening alphabetic characters of an opener in the closer if
 desired, however (so `<@foo>` could be closed with `</@foo>`).
 
-As with Raku, there is a notion of current topic, like the Raku `$_`.
+### The topic variable
 
-## Unpacking hash and object properties
+As with Raku, there is a notion of current topic, like the Raku `$_`. The data
+that is passed to the template to render is placed into the topic, and for
+simple templates one can access properties from that. More complex templates
+can instead use the parts mechanism, described later.
+
+### Unpacking hash and object properties
 
 The `<.name>` form can be used to access object properties of the current topic.
 If the current topic does the `Associative` role, then this form will prefer to
@@ -165,7 +179,7 @@ take the value under the `name` hash key, falling back to looking for a method
 the case of an `Associative` (e.g. it just produces `Nil`), and an exception
 otherwise.
 
-For example, given a template:
+For example, given a template `greet.crotmp`:
 
 ```
 <p>Hello, <.name>. The weather today is <.weather>.</p>
@@ -174,7 +188,7 @@ For example, given a template:
 Rendered with a hash:
 
 ```
-{
+template 'greet.crotmp', {
     name => 'Dave',
     weather => 'rain'
 }
@@ -200,21 +214,30 @@ Various other forms are available:
 
 These can all be chained, thus allowing for things like `<.foo.bar.baz>` for
 digging into objects/hashes. When using the indexer forms, then only the
-leading `.` is required, thus `<.<foo>.<bar>>` could be just `<.<foo><bar>>`.
+leading `.` is required, thus `<.<foo>.<bar>>` could be written instead as
+`<.<foo><bar>>`.
 
 The result of the indexing or method call will be strigified, and then HTML
 encoded for insertion into the document.
 
-## Variables
+### Variables
 
-The `<$...>` syntax can be used to refer to a variable. It will be stringified,
+Various Cro template constructs introduce variables. These include iteration,
+subroutines, macros, and parts. Note that variables that are in scope in the
+`route` block at the location `template` is called are *not* in scope in the
+template; only variables explicitly introduced inside of the template can be
+referenced.
+
+The `<$...>` syntax is used to refer to a variable. It will be stringified,
 HTML encoded, and inserted into the document. It is a template compilation time
 error to refer to a variable that does not exist. The current topic can be
-accessed as `<$_>`.
+accessed as `<$_>`, and this is the only variable that is in scope at the start
+of a template.
 
 It is allowed to follow the variable with any of the syntax allowed in a
 `<.foo>` tag, for example `<$product.name>` or `<$product<name>>`. For
-example assuming the variables `$person` and `$weather` are defined, then:
+example, assuming we were inside a construct that defined the variables
+`$person` and `$weather`, then:
 
 ```
 <p>Hello, <$person.name>. The weather is <$weather.description>, with a low of
@@ -228,7 +251,7 @@ Would render something like:
   14C and a high of 25C.</p>
 ```
 
-## Iteration
+### Iteration
 
 The `@` tag sigil is used for iteration. It may be used with any `Iterable`
 source of data, and must have a closing tag `</@>`. The region between the
@@ -288,17 +311,17 @@ itself be `Iterable`, it is permissible to write simply `<@_>...</@>`.
 If the opening and closing iteration tags are the only thing on the line, then
 no output will be generated for those lines, making the output more pleasant.
 
-## Conditionals
+### Conditionals
 
-The `<?$foo>...</?>` ("if") and `<!$foo>...</!>` ("unless") may be used for
-conditional execution. These perform a boolean test on the specified variable.
-It is also allowed to use them with the topic deference syntax, such as
-`<?.is-admin>...</?>`, or variables and dereferences together, such as
-`<?$user.is-admin>...</?>`. For more complex conditions, a subset of Raku
-expressions is accepted, using the syntax `<?{ $a eq $b }>...</?>`. The only
-thing notably different from Raku is that `<?{ .answer == 42 }>...</?>` will
-have the same hash/object semantics as in `<.answer>`, for consistency with the
-rest of the templating language.
+The `?` and `!` tag sigils are used for conditionals. They may be followed by
+either a `.` and then a topic access (for example, `<?.is-admin>...</?>`) or
+by a variable (`<!$user.is-admin>...</!>`).
+
+For more complex conditions, a subset of Raku expressions is accepted, using
+the syntax `<?{ $a eq $b }>...</?>`. The only thing notably different from
+Raku is that `<?{ .answer == 42 }>...</?>` will have the same hash/object
+semantics as in `<.answer>`, for consistency with the rest of the templating
+language.
 
 The following constructs are allowed:
 
@@ -320,7 +343,7 @@ the template.
 If the opening and closing condition tags are the only thing on the line, then
 no output will be generated for those lines, making the output more pleasant.
 
-## Subroutines and macros
+### Subroutines
 
 It is possible to declare template subroutines that may be re-used, in order to
 factor out common elements.
@@ -382,6 +405,8 @@ Defaults can also be set (and implicitly make positional parameters optional too
 </:>
 ```
 
+### Macros
+
 A template macro works somewhat like a template subroutine, except that the usage
 of it has a body. This body is passed as a thunk, meaning that the macro can choose
 to render it 0 or more times), optionally setting a new default target. For example,
@@ -409,7 +434,26 @@ be used as:
 
 To set the current target for the body in a macro, use `<:body $target>`.
 
-## Factoring out subs and macros within an application
+### Inserting HTML and JavaScript
+
+Everything is HTML escaped by default. However, sometimes it is required to
+place a blob of pre-rendered HTML into the template output. There are two
+ways to achieve this.
+
+* The `HTML` built-in function, called as `<&HTML(.stuff)>`, first checks
+  that there is no `script` tag or attribute starting with `javascript:`;
+  if there are any, it will consider this as an XSS attack attempt and
+  throw an exception.
+* The `HTML-AND-JAVASCRIPT` built-in function does not attempt any XSS
+  protection, and simply inserts whatever it is given without any kind of
+  escaping.
+
+Note that the `HTML` function does not promise completely foolproof
+XSS protection. **Use both of these functions very carefully.**
+
+## Template modules
+
+### Within the application
 
 Template subs and macros can be factored out into other template files, and
 then imported with `<:use ...>`, passing the filename as a string literal:
@@ -418,7 +462,7 @@ then imported with `<:use ...>`, passing the filename as a string literal:
 <:use 'common.crotmp'>
 ```
 
-## Providing modules that export template subs and macros
+### In the module ecosystem
 
 It is also possible to create libraries of Cro template subs and macros, for
 reuse across multiple applications and potentially for publication in the Raku
@@ -446,19 +490,67 @@ then be imported into another Cro template as:
 <:use Some::Template::Library>
 ```
 
-## Inserting HTML and JavaScript
+## Template parts
 
-Everything is HTML escaped by default. However, sometimes it is required to
-place a blob of pre-rendered HTML into the template output. There are two
-ways to achieve this.
+Often web applications will have common elements that appear on every page
+(for example, showing the name of the currently logged in user, or showing
+a summary of shopping basket contents). While the template to render these
+ can be extracted using template subs and macros placed in a separate file
+and imported with use`, one would still need to have every call to the
+`template` sub provide the data they need to be rendered.
 
-* The `HTML` built-in function, called as `<&HTML(.stuff)>`, first checks
-  that there is no `script` tag or attribute starting with `javascript:`;
-  if there are any, it will consider this as an XSS attack attempt and
-  throw an exception.
-* The `HTML-AND-JAVASCRIPT` built-in function does not attempt any XSS
-  protection, and simply inserts whatever it is given without any kind of
-  escaping.
+Template parts resolve this problem. In the `route` block, one can write a
+template part data provider, optionally taking the current user/session
+object. A template part can return a single object or a `Capture`:
 
-Note that the `HTML` function does not promise completely foolproof
-XSS protection. **Use both of these functions very carefully.**
+```
+template-part 'basket', -> MySession $user {
+    given $user.basket {
+        \( :items(.items), :value(.total-value) )
+    }
+}
+```
+
+Meanwhile, in the template, one can write a `part` implementation that
+receives the data:
+
+```
+<:part basket(:$items, :$value)>
+  <?$items>
+    <$items> items worth <$value> EUR
+  </?>
+</:>
+```
+
+Additionally, the part name `MAIN` can be used to provide access to the main
+data the template was given to render. For example, instead of using the
+topic:
+
+```
+<p>Hello, <.name>. The weather today is <.weather>.</p>
+```
+
+One could instead do:
+
+```
+<:part MAIN($data)>
+  <p>Hello, <$data.name>. The weather today is <$data.weather>.</p>
+</:part>
+```
+
+Further, one can pass a capture to the `template` function:
+
+```
+template 'overview.crotmp', \($db.get-sales(), $db.get-traffic());
+```
+
+And bind the values into variables in the template:
+
+```
+<:part MAIN($sales, $traffic)>
+  ...
+</:>
+```
+
+Which will be easier to handle in more complex templates than having all data
+accessed using the topic.
