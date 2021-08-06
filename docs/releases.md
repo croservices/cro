@@ -1,5 +1,89 @@
 # Cro Release History
 
+## 0.8.6
+
+This release brings a number of significant improvements.
+
+Cro templates gain a major new feature: template parts, which are primarily useful
+for factoring out provision of data for common page elements, such as indicating
+the currently logged in user or showing shopping basket size. They also offer an
+alternative way to write templates: the `MAIN` part receives the top-level
+template data, giving an alternative to accessing everything via the topic
+variable.
+
+While it has long been easy to serve static content from files in Cro, it's now
+also straightforward to serve them from resources; Cro templates can also be
+stored as resources. This makes it far easier to distribute Cro applications via
+the module ecosystem.
+
+The `Cro::HTTP::Client` now handles IRIs (International Resource Identifiers),
+along with having convenience methods for when one only wants the body of a
+response, rather than having to get the response object and then obtain the
+body from that. Instead of `get`, call `get-body` (and the same for the
+other request methods).
+
+Last but not least, profiling led to the identification of a number of
+straightforward performance improvements, and we've measured upto 50% more
+requests per second being processed in a simple Cro HTTP application.
+
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Improve support of IRI and URI, introduce a common role `Cro::ResourceIdentifier`
+  as well as a package named the same way containing the `decode-percents`,
+  `encode-percents` and `encode-percents-excvept-ASCII` subroutines
+* Add methods `parse-relative` and `parse-ref` to `Cro::Iri`
+* The IRI parser now handles URI and both IRI and URI now support URI with
+  forbidden characters such as `[` and automatically encodes them as RFC 3986 suggests
+* Fix a bug with padding in the `encode-percents` subroutine
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Improve the performance of a Cro HTTP application up to 50%
+  more requests per second
+* Add a router plugin mechanism which is used to make `template-resources`
+  serve templates from the distribution resources, allow the `template-location`
+  subroutine to respect the route block structure and configure a resource
+  hash that will will be used for serving static content.
+  Its API is documented and can be utilized for writing extensions
+  for the Cro HTTP router.
+* The `Cro::HTTP::Client` now accepts IRI, a Unicode superset of
+  URI, and automatically encodes the given IRI so that it will
+  be understood by the server
+* Add a family of `*-body` methods to `Cro::HTTP::Client`
+  which are shortcuts for an await for the response and an
+  await for the body, corresponding to HTTP methods (such as
+  `get-body`, `post-body`, `put-body`, `delete-body`, `path-body`
+  and generic `request-body`)
+* Add a `quality-header` for the `Cro::HTTP::Message`
+* Warn if a `route` block is sunk (most likely a forgotten
+  `include` or `delegate` call)
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Fix a flapper test
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* The `template-location` subroutine now works in a lexical fashion
+  instead of being global, this is a breaking change
+* Introduce the template parts mechanism to factor out data obtaining for
+  common parts in templates
+* Implement getting templates from the distribution resources
+* Add a `parse-template` subroutine allowing to parse and compile
+  a template from a `Str`
+* Suppress a misleading warning during the test run
+Fix parsing of HTML comments that contain `<` within the comment
+
+The following changes were made to the `Cro` distribution:
+
+* Make tests a bit more robust
+* Improve documentation
+
+This release was contributed to by Alexander Kiryuhin, Jonathan Worthington,
+and vendethiel from [Edument](http://cro.services/training-support), together
+with the following community members: Vadim Belman, Geoffrey Broadwell.
+
 ## 0.8.5
 
 This release brings support for the `TCP_NODELAY` option and enables it by default
@@ -58,10 +142,7 @@ The following changes were made to the `Cro` distribution:
 * Properly warn a user during a `cro run` invocation if no `.cro.yml` configuration
   file was found in the current directory tree
 
-This release was contributed to by Alexander Kiryuhin, Jonathan Worthington,
-and vendethiel from [Edument](http://cro.services/training-support), together
-with the following community members: Geoffrey Broadwell, James Raspass, José
-Joaquín Atria, and Patrick Böker.
+
 
 ## 0.8.4
 
