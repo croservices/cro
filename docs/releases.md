@@ -447,7 +447,7 @@ authentication and authorization is handled as part of route matching.
 
 The previous behavior (applying middleware only to a route that has been
 matched) is preserved and renamed to `before-matched` and `after-matched`.
-Therefore, any code can be adapated by replacing calls to `before` to
+Therefore, any code can be adapted by replacing calls to `before` to
 use `before-matched`, and replacing calls to `after` to `after-matched`.
 
 The new `before` and `after`-applied middleware semantics result in a
@@ -491,7 +491,7 @@ The following changes were made to the `Cro::HTTP` distribution:
   various ways that it might end up working slowly due to eating too
   many real threads.
 * When a route fails to match with 400 or 401, and another route fails
-  to match with a 405, perfer the 400 or 401 error.
+  to match with a 405, prefer the 400 or 401 error.
 
 The following changes were made to the `Cro::WebSocket` distribution:
 

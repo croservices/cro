@@ -55,7 +55,7 @@ with-test-dir -> $test-dir {
     is $started.service-id, 'service1', 'Correct service ID was started';
     isa-ok $started.cro-file, Cro::Tools::CroFile, 'Have the Cro file object';
     is $started.endpoint-ports.elems, 1, 'Endpoint was assigned a port';
-    ok $started.endpoint-ports<http>:exists, 'HTTP endpoing exists in ports';
+    ok $started.endpoint-ports<http>:exists, 'HTTP endpoint exists in ports';
     my $port = $started.endpoint-ports<http>;
     isa-ok $port, Int, 'Port number available as an Int';
 
