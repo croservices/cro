@@ -132,7 +132,7 @@ The following changes were made to the `Cro::HTTP::Test` distribution:
 
 * Add semantic test subs `is-ok`, `is-no-content`, `is-bad-request`,
   `is-unauthorized`, `is-forbidden`, `is-not-found`, `is-method-not-allowed`,
-  `is-conflict` and `is-unprocessible-entity`
+  `is-conflict` and `is-unprocessable-entity`
 
 The following changes were made to the `Cro` distribution:
 
