@@ -83,7 +83,7 @@ subdirectories):
 
 It's also possible to list multiple services:
 
-    cro run flashbard-backend users frontend
+    cro run flashcard-backend users frontend
 
 The output of the services will be displayed, prefixed with the `service-name`.
 Sending SIGINT (hitting Ctrl+C) will kill all of the services.

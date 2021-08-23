@@ -26,7 +26,7 @@ For example:
   can be verified.
 * With a web-based login (login form on a page), typically there will be a
   session object with fields indicating if there is currently a logged in
-  user. The login process would update the sesion object with that information
+  user. The login process would update the session object with that information
   at the time of login, and clear it at the time of logout.
 * For a system without any kind of login, but that simply wishes to hold some
   information about a particular session, then the object would just represent
@@ -248,14 +248,14 @@ The `Cro::HTTP::Auth::WebToken::Bearer` is a role that does
 take the token from `Auth` header of the request object. `set-auth` method
 may be overridden by the user to set a custom object that does
 `Cro::HTTP::Auth` role to `auth` attribute. It is installed as
-middlewere, either at route block or server level.
+middleware, either at route block or server level.
 
 The `Cro::HTTP::Auth::WebToken::FromCookie[Str $cookie-name]` is a
 role that does `Cro::HTTP::Auth::WebToken`. Its `get-token` method is
 overridden to take the token from the request's cookie with given name
 `$cookie-name`. `set-auth` method may be overridden by the user to set
 a custom object that does `Cro::HTTP::Auth` role to `auth`
-attribute. It is installed as middlewere, either at route block or
+attribute. It is installed as middleware, either at route block or
 server level. Additionally, this role checks `exp` claim of parsed
 token. In case it is invalid, the cookie will be removed from the
 request.
