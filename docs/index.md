@@ -55,6 +55,7 @@ Server side:
 * [Cro::HTTP::Server](docs/reference/cro-http-server)
 * [Cro::HTTP::Middleware](docs/reference/cro-http-middleware)
 * [HTTP Sessions and Authentication](docs/http-auth-and-sessions)
+* [Cro::HTTP::ReverseProxy](docs/reference/cro-http-reverseproxy)
 
 Requests, responses, and related types:
 
