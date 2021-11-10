@@ -311,6 +311,20 @@ itself be `Iterable`, it is permissible to write simply `<@_>...</@>`.
 If the opening and closing iteration tags are the only thing on the line, then
 no output will be generated for those lines, making the output more pleasant.
 
+Sometimes one wants to emit a separator between values (but that should not
+be repeated after the final value). Such a separator can be specified using the
+`<:separator>...</:>` tag directly within the body of the iteration:
+
+```
+<@news>
+  <h3><.headline></h3>
+  <p><.body></p>
+  <:separator>
+    <hr/>
+  </:>
+</@>
+```
+
 ### Conditionals
 
 The `?` and `!` tag sigils are used for conditionals. They may be followed by
