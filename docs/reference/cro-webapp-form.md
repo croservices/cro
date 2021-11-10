@@ -263,6 +263,8 @@ It also takes a wide range of named arguments. Some control form behavior:
 
 * `action` sets the `action` attribute of the form (where it submits to); by default
   it is not set, so the form submits back to the current URL
+* `method` sets the HTTP method for submitting the form. It defaults to `post`, and
+  may be set to `get` or `post`
 * `novalidate` sets the `novalidate` attribute of the form, disabling the browser's
   built-in client side validation
 
