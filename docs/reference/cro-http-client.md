@@ -437,6 +437,35 @@ not use persisted connections, pass `:!persistent` to the constructor. When
 using the type object (for example, `Cro::HTTP::Client.get($url)`, then no
 persistent connection cache will be used.
 
+## Timeouts
+
+By default, `Cro::HTTP::Client` enforces:
+
+* A 60s timeout on establishing a connection to the target server
+* A 60s timeout on receiving the response headers once a connection has been
+  established and the request sent
+* No timeout on receiving the entire response body
+* No overall bounding timeout for the entire HTTP request/response
+
+These can be configured by passing the `timeout` setting, either at an instance
+or per-request level. One may pass:
+
+* A `Real` value, which will be interpreted as the total number of seconds for
+  the entire HTTP request/response (including the body being downloaded). This
+  will not increase the default connection and headers timeouts, however they
+  will be clipped to the total time budget if it is smaller.
+* A hash with the keys `connection`, `headers`, `body`, and `total` (any not
+  provided will have the default values of 60, 60, `Inf`, and `Inf`)
+  respectively.
+* An object that does the `Cro::Policy::Timeout` role, should one wish to
+  implement a more complex scheme.
+
+In the case persistent connections are being used:
+
+* For HTTP/1.1, the connection will be closed in the event of any timeout
+* For HTTP/2.0, in the event of a body timeout, only the individual stream
+  will be reset, and the connection left intact
+
 ## HTTP version
 
 The `:http` option can be passed, either at construction or per request, to
