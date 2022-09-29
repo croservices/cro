@@ -12,9 +12,9 @@
     "dependencies": {
         "d3": "^7.6.1",
         "jquery": "^3.5.0",
-        "react": "^15.6.2",
+        "react": "^18.2.0",
         "react-bootstrap": "^0.31.3",
-        "react-dom": "^15.6.2",
+        "react-dom": "^18.2.0",
         "react-redux": "^5.0.6",
         "react-router": "^3.2.0",
         "react-router-redux": "^4.0.8",
