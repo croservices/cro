@@ -10,7 +10,7 @@
     "author": "Edument Central Europe sro.",
     "license": "Artistic-2.0",
     "dependencies": {
-        "d3": "^4.11.0",
+        "d3": "^7.6.1",
         "jquery": "^3.5.0",
         "react": "^15.6.2",
         "react-bootstrap": "^0.31.3",
