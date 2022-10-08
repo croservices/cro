@@ -1,5 +1,293 @@
 # Cro Release History
 
+## 0.8.7
+
+This release brings a number of bug fixes and new features, the most significant being
+an easy way to set up reverse proxying (where HTTP requests are forwarded to another
+server for processing, perhaps with modifications), configurable timeouts in the Cro
+HTTP client, and support for separators in Cro template iteration. Those using Cro
+templates will also enjoy file/line information from the template file when undefined
+values are encountered during template rendering.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Add a role for timeout policies, along with a default concrete
+  timeout policy implementation for staged operations
+
+The following changes were made to the `Cro::TLS` distribution:
+
+* Set minimum version of IO::Socket::Async::SSL module
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Add `Cro::HTTP::ReverseProxy`, a reverse proxy transform. Reverse proxies forward requests
+  to other HTTP servers. The headers and body can be manipulated in either direction, and
+  the target URL selected dynamically based on the request if needed
+* Implement support for timeouts in `Cro::HTTP::Client`. Timeouts can be set individually
+  for establishing a connection to the server, receiving the response headers, and
+  receiving the response body; an overall time budget for the total process can also be
+  set
+* Fix a memory leak on every connection when middleware was used
+* Fix parsing of cookie values wrapped in double quotes
+* Report an error on no matching body serializer (using the unhandled error reporter, which
+  by default notes in on `$*ERR`)
+* Ensure `content` overrides any existing content type header of the response
+* Report a likely wrong router implementation case where a signature capture is specified
+  instead of a signature
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* Add a way to render a separator between items in an iteration tag
+* Give a better warning when data passed to a template contains a `Nil` or a type object,
+  specifying the exact template file and line where the undefined value was encountered
+* Allow forms to be rendered with non-POST methods
+* Properly display `DateTime` fields in Cro::WebApp::Forms
+
+The following changes were made to the `Cro` distribution:
+
+* Fix some typos in the documentation
+* Document new features
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington from
+[Edument](http://cro.services/training-support), together with the following community
+members: Stefan Seifert, Will "Coke" Coleda, Clifton Wood, James Raspass.
+
+## 0.8.6
+
+This release brings a number of significant improvements.
+
+Cro templates gain a major new feature: template parts, which are primarily useful
+for factoring out provision of data for common page elements, such as indicating
+the currently logged in user or showing shopping basket size. They also offer an
+alternative way to write templates: the `MAIN` part receives the top-level
+template data, giving an alternative to accessing everything via the topic
+variable.
+
+While it has long been easy to serve static content from files in Cro, it's now
+also straightforward to serve them from resources; Cro templates can also be
+stored as resources. This makes it far easier to distribute Cro applications via
+the module ecosystem.
+
+The `Cro::HTTP::Client` now handles IRIs (International Resource Identifiers),
+along with having convenience methods for when one only wants the body of a
+response, rather than having to get the response object and then obtain the
+body from that. Instead of `get`, call `get-body` (and the same for the
+other request methods).
+
+Last but not least, profiling led to the identification of a number of
+straightforward performance improvements, and we've measured upto 50% more
+requests per second being processed in a simple Cro HTTP application.
+
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Improve support of IRI and URI, introduce a common role `Cro::ResourceIdentifier`
+  as well as a package named the same way containing the `decode-percents`,
+  `encode-percents` and `encode-percents-excvept-ASCII` subroutines
+* Add methods `parse-relative` and `parse-ref` to `Cro::Iri`
+* The IRI parser now handles URI and both IRI and URI now support URI with
+  forbidden characters such as `[` and automatically encodes them as RFC 3986 suggests
+* Fix a bug with padding in the `encode-percents` subroutine
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Improve the performance of a Cro HTTP application up to 50%
+  more requests per second
+* Add a router plugin mechanism which is used to make `template-resources`
+  serve templates from the distribution resources, allow the `template-location`
+  subroutine to respect the route block structure and configure a resource
+  hash that will will be used for serving static content.
+  Its API is documented and can be utilized for writing extensions
+  for the Cro HTTP router.
+* The `Cro::HTTP::Client` now accepts IRI, a Unicode superset of
+  URI, and automatically encodes the given IRI so that it will
+  be understood by the server
+* Add a family of `*-body` methods to `Cro::HTTP::Client`
+  which are shortcuts for an await for the response and an
+  await for the body, corresponding to HTTP methods (such as
+  `get-body`, `post-body`, `put-body`, `delete-body`, `path-body`
+  and generic `request-body`)
+* Add a `quality-header` for the `Cro::HTTP::Message`
+* Warn if a `route` block is sunk (most likely a forgotten
+  `include` or `delegate` call)
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Fix a flapper test
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* The `template-location` subroutine now works in a lexical fashion
+  instead of being global, this is a breaking change
+* Introduce the template parts mechanism to factor out data obtaining for
+  common parts in templates
+* Implement getting templates from the distribution resources
+* Add a `parse-template` subroutine allowing to parse and compile
+  a template from a `Str`
+* Suppress a misleading warning during the test run
+Fix parsing of HTML comments that contain `<` within the comment
+
+The following changes were made to the `Cro` distribution:
+
+* Make tests a bit more robust
+* Improve documentation
+
+This release was contributed to by Alexander Kiryuhin, Jonathan Worthington,
+and vendethiel from [Edument](http://cro.services/training-support), together
+with the following community members: Vadim Belman, Geoffrey Broadwell.
+
+## 0.8.5
+
+This release brings support for the `TCP_NODELAY` option and enables it by default
+for TCP and TLS connections, improving latency. Meanwhile, Cro templates will now
+be reloaded without a service restart if `CRO_DEV=1` is set in the environment, and
+template parse error reporting is significantly improved.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Add support for enabling `TCP_NODELAY` by providing a `nodelay` subroutine
+  updating the socket to enable the option, add a flag in `Cro::TCP` connector
+  to enable it.
+* Make media type parsing more lenient
+* Provide a proper error message on calling the `stop` method on
+  a `Cro::Service` before `start`
+
+The following changes were made to the `Cro::TLS` distribution:
+
+* Support `TCP_NODELAY` for TLS connections.
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Add `Log::Timeline` logging in `Cro::HTTP::Client`, so request processing
+  can be visualized
+* Enable `TCP_NODELAY` by default
+* Fix redirection to a relative URL when the initial request URL had no
+  trailing `/`
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Make `web-socket` routine a multi to allow overloading it
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* Allow hot reload of compiled templates when the `CRO_DEV` environment
+  variable is set
+* Add `Log::Timeline` logging for template compilation and rendering
+* Improve parse error in templates
+* Allow optional dot after an array sigil in iteration (e.g. `<@.foo>`)
+* Add the `:test` parameter to the `template-location` routine, allowing
+  one to setup filtering of files taken as templates
+* Provide a preliminary API for making a custom template repository. Expose
+  the `Cro::WebApp::Template::Repository` role to be implemented.
+
+The following changes were made to the `Cro::HTTP::Test` distribution:
+
+* Add semantic test subs `is-ok`, `is-no-content`, `is-bad-request`,
+  `is-unauthorized`, `is-forbidden`, `is-not-found`, `is-method-not-allowed`,
+  `is-conflict` and `is-unprocessable-entity`
+
+The following changes were made to the `Cro` distribution:
+
+* Change the order of questions asked during `cro stub` invocation,
+  making deciding on HTTPS usage optional depending on the HTTP versions
+  specified
+* Properly warn a user during a `cro run` invocation if no `.cro.yml` configuration
+  file was found in the current directory tree
+
+
+
+## 0.8.4
+
+This release brings lots of small improvements and plenty of bug fixes. Of
+note, the WebSocket client received a lot of reliability fixes, and the HTTP
+client gained support for proxies, automatically honoring the `HTTP_PROXY` and
+`HTTPS_PROXY` environment variables. For those building HTTP services, a new
+`around` feature in the router allows for easier lifting out of error handling
+across all request handlers (and probably a few more interesting things that
+we didn't think of yet). No compatibility issues are foreseen.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Add `Cro::UnhandledErrorReporter` to provide user control over the reporting
+  of unhandled errors
+* Provide a means to give more context when there is a problem serializing a
+  message body
+* Remove a workaround for a long-fixed Rakudo bug with the `CLOSE` phaser
+
+The following changes were made to the `Cro::TLS` distribution:
+
+* Add a certificate regeneration script and update the certificates used by
+  the tests
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* `Cro::HTTP::Client` now has a `user-agent` option for specifying the user
+  agent, which is more convenient than setting it via the headers mechanism.
+  Furthermore, a default `User-agent` header with the value `Cro` is now set.
+* Decode `+` characters in query strings to spaces. This isn't part of the URI spec,
+  but is a widely supported extension for query strings.
+* Support the `identity` transfer encoding
+* Handle the `:authority` pseudo-header in HTTP/2, mapping it to the `Host`
+  header
+* Simplify the `SameSite` cookie processing code
+* Introduce the `around` router function, which enables installation of a
+  wrapper around all of a `route` block's handlers
+* Give `Cro::HTTP::Body::WWWFormUrlEncoded` `keys` and `values` methods to
+  make it behave a bit more like a standard hash, as well as a rather more
+  useful `gist` output
+* Make `Cro::HTTP::Client` honor the `HTTP_PROXY` and `HTTPS_PROXY` environment
+  variables, as well as providing a means to set proxy servers to use at the
+  time the client is constructed
+* Improve error reporting then a response body cannot be serialized; the type
+  of the body and the request URI that was being processed are now reported
+* Fix upgraded connections sometimes not being closed when the body ends
+* Ensure body streams are terminated on all kinds of connection termination
+  (this issue was most commonly observed with WebSocket connections)
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Honor override of `Sec-WebSocket-Protocol` header
+* Fix a deadlock that could occur in the client when a ping was received
+  while a message was being sent
+* Avoid a possible race and exception when a ping times out in the client
+* Ensure all outstanding client-sent pings fail upon connection close, to
+  avoid a hang in any code awaiting them
+* Make handling of unexpected connection close more consistent in the client
+* Make sure the close message is consistently set correctly in the client
+* Ensure that all kinds of serialization failure are conveyed back to the
+  client `send` caller, fixing a potential hang when serialization failed in
+  certain ways
+* Make sure tests can run reliably in parallel
+* Assorted small code quality improvements
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* The `Date` and `DateTime` types may now be used on form field attributes,
+  and imply the `date` and `datetime-local` control types respectively
+* Give generated forms a name, otherwise multi-select lists refuse to display
+  the selected items in Firefox
+* Fix loss of current value with some control types in forms
+* In templates, support `<@$foo>` and `<@$foo.bar>` for iterating the
+  contents of a variable
+* Add a direct dependency on `OO::Monitors`
+
+The following changes were made to the `Cro` distribution:
+
+* Allow specification of the host for `cro run` and `cro trace` through a
+  `--host` option
+* Handle IPv6 literals in the URL format to `cro web`
+* Add documentation for all new features
+* Clarify how base-uri is used in the HTTP client documentation
+* Fix assorted errors in the `Cro::WebApp::Form` documentation
+* Fix an example in the SPA tutorial so that it doesn't hang
+* Fix link to the Cro site in the README
+
+This release was contributed to by Alexander Kiryuhin, Jonathan Worthington,
+and vendethiel from [Edument](http://cro.services/training-support), together
+with the following community members: Alastair Douglas, Elizabeth Mattijsen,
+Geoffrey Broadwell, Jeremy Studer, Joelle Maslak, Jonathan Stowe, Lukas Valle,
+Patrick Böker, and Stefan Seifert.
+
 ## 0.8.3
 
 This release brings a major new feature in `Cro::WebApp`: forms, which takes
@@ -211,7 +499,7 @@ authentication and authorization is handled as part of route matching.
 
 The previous behavior (applying middleware only to a route that has been
 matched) is preserved and renamed to `before-matched` and `after-matched`.
-Therefore, any code can be adapated by replacing calls to `before` to
+Therefore, any code can be adapted by replacing calls to `before` to
 use `before-matched`, and replacing calls to `after` to `after-matched`.
 
 The new `before` and `after`-applied middleware semantics result in a
@@ -255,7 +543,7 @@ The following changes were made to the `Cro::HTTP` distribution:
   various ways that it might end up working slowly due to eating too
   many real threads.
 * When a route fails to match with 400 or 401, and another route fails
-  to match with a 405, perfer the 400 or 401 error.
+  to match with a 405, prefer the 400 or 401 error.
 
 The following changes were made to the `Cro::WebSocket` distribution:
 

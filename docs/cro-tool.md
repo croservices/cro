@@ -24,7 +24,7 @@ Where
   to the stub, together with options specific to the service type
 
 If the links and options are not specified, then they will be requested
-interactively. To provide the options, place them in quotes using Perl 6
+interactively. To provide the options, place them in quotes using Raku
 colonpair-like syntax, where `:foo` enables an option, `:!foo` disables an
 option, and `:foo<bar>` is the option `foo` with the value `bar`. For example:
 
@@ -83,10 +83,16 @@ subdirectories):
 
 It's also possible to list multiple services:
 
-    cro run flashbard-backend users frontend
+    cro run flashcard-backend users frontend
 
 The output of the services will be displayed, prefixed with the `service-name`.
 Sending SIGINT (hitting Ctrl+C) will kill all of the services.
+
+Ports are automatically allocated and the environment variable set per the
+`.cro.yml` for the service. The host environment variable will be set to
+`localhost` by default, however can be specified with the `--host` option:
+
+    cro --host=dev-vm run
 
 ## Tracing Services
 
@@ -118,6 +124,10 @@ unimportant, so these are equivalent:
 
     cro trace :http flashcard-backend
     cro trace flashcard-backend :http
+
+The `--host` option may be specified as for `cro run`:
+
+    cro --host=dev-vm trace
 
 ## Serving Static Content
 

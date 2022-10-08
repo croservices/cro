@@ -9,12 +9,6 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
 
     method options(--> List) {
         Option.new(
-            id => 'secure',
-            name => 'Secure (HTTPS)',
-            type => Bool,
-            default => False
-        ),
-        Option.new(
             id => 'http1',
             name => 'Support HTTP/1.1',
             type => Bool,
@@ -24,7 +18,14 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
             id => 'http2',
             name => 'Support HTTP/2.0',
             type => Bool,
-            default => { .<secure> || !.<http1> }
+            default => { !.<http1> }
+        ),
+        Option.new(
+            id => 'secure',
+            name => 'Secure (HTTPS)',
+            type => Bool,
+            default => { .<http2> },
+            skip-condition => { .<http2> }
         ),
         Option.new(
             id => 'websocket',
@@ -206,7 +207,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
     }
 
     method meta6-provides(%options) {
-        'Routes.pm6' => 'lib/Routes.pm6',
+        'Routes' => 'lib/Routes.pm6',
     }
 
     method docker-base-image(%options) {

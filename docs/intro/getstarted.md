@@ -2,14 +2,10 @@
 
 Here's a list of things to do to get Cro running on your machine.
 
-## Install Perl 6
+## Install Raku
 
-Cro services are written in Perl 6; if you have not yet installed that,
-[see these instructions](https://perl6.org/downloads/). Note that you will
-need a fairly modern Perl 6; the ones included in packages can be very old.
-
-Provided you install Perl 6 using Rakudo Star, the `zef` module manager will
-also be installed.
+Cro services are written in Raku; if you have not yet installed a Raku
+compiler, [see these instructions](https://raku.org/downloads/).
 
 ## Install Cro
 
@@ -52,7 +48,7 @@ react whenever signal(SIGINT) {
 To start the service, just run the script from the command line:
 
 ```
-perl6 hello.p6
+raku hello.p6
 ```
 
 ## Check that the service runs ok

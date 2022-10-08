@@ -29,18 +29,20 @@ the type object or an instance of `Cro::HTTP::Client`. They will all return a
 `Promise`, which will be kept if the request is successful or broken if an
 error occurs.
 
-    my $resp = await Cro::HTTP::Client.get('https://www.perl6.org/');
+    my $resp = await Cro::HTTP::Client.get('https://www.raku.org/');
 
 The response will be provided as a `Cro::HTTP::Response` object. It will be
 produced as soon as the request headers are available; the body may not yet
 have been received.
 
-To set a base URL for every client's request, base URL can be passed
-to `Cro::HTTP::Client` instance as `base-uri` argument.
+If making an instance of `Cro::HTTP::Client`, a base URI may be specified.
+The URI passed to request methods will be appended to the base URI using
+the relative URI resolution algorithm.
 
-    my $client = Cro::HTTP::Client.new(base-uri => "http://persistent.url.com");
-    await $client.get('/first');   # http://persistent.url.com/first
-    await $client.get('/another'); # http://persistent.url.com/another
+    my $client = Cro::HTTP::Client.new(base-uri => "http://foo.com/some/path/");
+    await $client.get('added');             # http://foo.com/some/path/added
+    await $client.get('/rooted');           # http://foo.com/rooted
+    await $client.get('http://bar.com/');   # http://bar.com
 
 ## Error handling
 
@@ -80,6 +82,23 @@ object has the request that was sent attached to it. In the event of a
 redirect, the request object will be that of the redirected request, not the
 originally sent request.
 
+## Setting the user agent
+
+By default, `Cro::HTTP::Client` sends a `User-agent` header with the value `Cro`.
+This can be done at the request level:
+
+    my $resp = await Cro::HTTP::Client.get: 'example.com',
+        user-agent => 'MyCrawler v42';
+
+Or set at construction time when making an instance of the client, in which case
+it will be used for all requests (unless overridden in a specific request):
+
+    my $client = Cro::HTTP::Client.new:
+        user-agent => 'MyCrawler v42';
+
+To suppress sending a `User-agent` header, pass either `False`, `Nil`, or the
+empty string.
+
 ## Adding extra request headers
 
 One or more headers can be set for a request by passing an array to the
@@ -90,8 +109,8 @@ of `Cro::HTTP::Header`, or a mix of the two.
         headers => [
             referer => 'http://anotherexample.com',
             Cro::HTTP::Header.new(
-                name => 'User-agent',
-                value => 'Cro'
+                name => 'X-MyCustomHeader',
+                value => 'pancake'
             )
         ];
 
@@ -100,7 +119,7 @@ construction time:
 
     my $client = Cro::HTTP::Client.new:
         headers => [
-            User-agent => 'Cro'
+            X-MyCustomHeader => 'strudel'
         ];
 
 ## Adding query string parameters
@@ -377,6 +396,38 @@ initial request with a 401 response, set the `if-asked` option to `True`.
         if-asked => True
     }
 
+## TLS configuration
+
+The `ca` argument, passed either at construction time or to a request method,
+is used to provide TLS configuration. Its primary use is for providing a
+custom CA certificate:
+
+    my $client = Cro::HTTP::Client.new:
+        ca => { ca-file => 't/certs-and-keys/ca-crt.pem' };
+
+However, the hash may contain any arguments that the `connect` method of
+[the TLS module](https://github.com/jnthn/p6-io-socket-async-ssl) accepts. Of
+note, one can disable certificate checking by passing the `insecure` option:
+
+    my $client = await Cro::HTTP::Client.get: 'https://badly-configur.ed/',
+        ca => { :insecure };
+
+As the name suggests, this is not a secure configuration; transmissions are
+encrypted, but there's no checking that the server is who it claims to be.
+
+## Proxying
+
+By default, `Cro::HTTP::Client` will honor the `HTTP_PROXY`, `HTTPS_PROXY`
+and `NO_PROXY` enrivonment variables. It is also possible to pass the
+`http-proxy` and/or `https-proxy` named arguments when constructing
+`Cro::HTTP::Client`; these will be used for all requests made with that
+instance (and take preference over any proxy found via the environment,
+and furthermore cause `NO_PROXY` to be disregarded).
+
+It is not possible to override the proxy at a per-request level. There is no
+mechanism to ignore the `HTTP_PROXY` or `HTTPS_PROXY` environment variables,
+however one could delete them from `%*ENV` if needed.
+
 ## Persistent connections
 
 An instance of `Cro::HTTP::Client` will use persistent connections by default.
@@ -385,6 +436,35 @@ throughput by not requiring a new connection to be established each time. To
 not use persisted connections, pass `:!persistent` to the constructor. When
 using the type object (for example, `Cro::HTTP::Client.get($url)`, then no
 persistent connection cache will be used.
+
+## Timeouts
+
+By default, `Cro::HTTP::Client` enforces:
+
+* A 60s timeout on establishing a connection to the target server
+* A 60s timeout on receiving the response headers once a connection has been
+  established and the request sent
+* No timeout on receiving the entire response body
+* No overall bounding timeout for the entire HTTP request/response
+
+These can be configured by passing the `timeout` setting, either at an instance
+or per-request level. One may pass:
+
+* A `Real` value, which will be interpreted as the total number of seconds for
+  the entire HTTP request/response (including the body being downloaded). This
+  will not increase the default connection and headers timeouts, however they
+  will be clipped to the total time budget if it is smaller.
+* A hash with the keys `connection`, `headers`, `body`, and `total` (any not
+  provided will have the default values of 60, 60, `Inf`, and `Inf`)
+  respectively.
+* An object that does the `Cro::Policy::Timeout` role, should one wish to
+  implement a more complex scheme.
+
+In the case persistent connections are being used:
+
+* For HTTP/1.1, the connection will be closed in the event of any timeout
+* For HTTP/2.0, in the event of a body timeout, only the individual stream
+  will be reset, and the connection left intact
 
 ## HTTP version
 
@@ -403,7 +483,7 @@ is the only supported mechanism for deciding which protocol to use.
 
 ## Push promises
 
-HTTP/2.0 proides push promises, which allow the server to push extra resources
+HTTP/2.0 provides push promises, which allow the server to push extra resources
 to the client as part of the response. By default, `Cro::HTTP::Client` will
 instruct the remote server to **not** send push promises. To opt in to this
 feature, either:

@@ -17,13 +17,14 @@ multi MAIN('web', Str $host-port = '10203',
         :$filter, :$trace, :@trace-filters
     );
     my $service = web $host, $port, $runner;
+    $host = "[" ~ $host ~ "]" if $host.contains(":"); # Handle IPv6 literals
     say "Cro web interface running at http://$host:$port/";
     stop-on-sigint($service);
 }
 
 multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
     my %options = parse-options($options);
-    my @option-links = %options.grep({ .key eq 'link' }).first.value.flat;
+    my @option-links = %options.first({ .key eq 'link' }).value.flat;
     %options .= grep({ not .key eq 'link' });
 
     my (@generated-links, @links);
@@ -76,6 +77,12 @@ multi MAIN('stub', Str $service-type, Str $id, Str $path, $options = '') {
             my $default = $opt.default ~~ Callable
                 ?? $opt.default().(%got)
                 !! $opt.default;
+            with $opt.skip-condition -> &cond {
+                if &cond(%got) {
+                    %got{$id} = $default;
+                    next;
+                }
+            }
             print $opt.name;
             given $opt.type {
                 when Bool {
@@ -195,15 +202,15 @@ multi MAIN('link', 'rm', $from-service-id, $to-service-id, $to-endpoint-id?) {
     rm-link($from-service-id, $to-service-id, $to-endpoint-id);
 }
 
-multi MAIN('run') {
-    run-services();
+multi MAIN('run', Str:D :$host = 'localhost') {
+    run-services(:$host);
 }
 
-multi MAIN('run', *@service-name) {
-    run-services(filter => any(@service-name));
+multi MAIN('run', *@service-name, Str:D :$host = 'localhost') {
+    run-services(filter => any(@service-name), :$host);
 }
 
-multi MAIN('trace', *@service-name-or-filter) {
+multi MAIN('trace', *@service-name-or-filter, Str:D :$host = 'localhost') {
     my @service-name;
     my @trace-filters;
     for @service-name-or-filter {
@@ -216,13 +223,13 @@ multi MAIN('trace', *@service-name-or-filter) {
     }
     run-services
         filter => @service-name ?? any(@service-name) !! *,
-        :trace, :@trace-filters;
+        :trace, :@trace-filters, :$host;
 }
 
-sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
+sub run-services(:$filter = *, :$trace = False, :@trace-filters, :$host) {
     my $runner = Cro::Tools::Runner.new(
         services => Cro::Tools::Services.new(base-path => $*CWD),
-        :$filter, :$trace, :@trace-filters
+        :$filter, :$trace, :@trace-filters, :$host
     );
     react {
         my %service-id-colors;
@@ -236,7 +243,7 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
             }
             when Cro::Tools::Runner::BadCroFile {
                 note color("red"),
-                    "\c[WARNING SIGN] Failed to load $_.path.add(".cro.yml").relative(): $_.exception()",
+                    "\c[WARNING SIGN] Failed to load $_.path().add(".cro.yml").relative(): $_.exception()",
                     RESET();
             }
             when Cro::Tools::Runner::Started {
@@ -247,16 +254,17 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
                 my %endpoint-ports = .endpoint-ports;
                 for .cro-file.endpoints -> $endpoint {
                     my $port = %endpoint-ports{$endpoint.id};
+                    my $url-host = $host.contains(':') ?? "[" ~ $host ~ "]" !! $host;
                     print color($color) ~ "\c[ELECTRIC PLUG] Endpoint $endpoint.name() will be ";
                     given $endpoint.protocol {
                         when 'http' {
-                            say "at http://localhost:$port/" ~ RESET();
+                            say "at http://$url-host:$port/" ~ RESET();
                         }
                         when 'https' {
-                            say "at https://localhost:$port/" ~ RESET();
+                            say "at https://$url-host:$port/" ~ RESET();
                         }
                         default {
-                            say "on port $port" ~ RESET();
+                            say "on host $host port $port" ~ RESET();
                         }
                     }
                 }
@@ -294,6 +302,9 @@ sub run-services(:$filter = *, :$trace = False, :@trace-filters) {
                     note $data.trim.indent($prefix.chars + 2);
                 }
             }
+            when Cro::Tools::Runner::PossiblyNoCroConfig {
+                note colored("Did not encounter any .cro.yml files whlie scanning the directory $_.directory(), could it be .cro.yml file is missing?", "bold");
+            }
         }
 
         whenever signal(SIGINT) {
@@ -324,10 +335,17 @@ sub parse-host-port($host-port) {
     my ($host, $port);
     given $host-port {
         when /^(\d+)$/ {
+            # Just a port number
             $host = 'localhost';
             $port = +$host-port;
         }
+        when /^ '[' (.+) ']:' (\d+) $/ {
+            # IPv6 literal in URL format with port
+            $host = ~$0;
+            $port = +$1;
+        }
         when /^ (.+) ':' (\d+) $/ {
+            # Hostname followed by port
             $host = ~$0;
             $port = +$1;
         }

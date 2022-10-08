@@ -100,7 +100,11 @@ to use the numeric types `Int`, `Rat`, and `Num`. The values will be parsed into
 these types, and a validation error produced if they are malformed. This will also
 cause the generation of a `number` input type in the rendered HTML.
 
-Finally, use of `Bool` will result in a checkbox.
+Some further attribute types come with control type defaults too:
+
+* `Bool` will result in a `checkbox` control
+* `Date` will result in a `date` control
+* `DateTime` will result in a `datetime-local` control
  
 ### Form controls
 
@@ -130,6 +134,10 @@ Taking care to use `is email` and `is telephone` is especially helpful for mobil
   as the topic of the block, so one can write a `method get-options() { ... }` and then
   do `will select { .get-options }`. Note that currently there is no assistance with
   handling situations where the options should depend on another form field.
+* `is file` - a file upload input; the attribute will be populated with an instance
+  of `Cro::HTTP::Body::MultiPartFormData::Part`, which has properties `filename`,
+  `body-blob` (binary upload) ond `body-text` (decodes the `body-blob` to a `Str`)
+* `is hidden` - a hidden input
 
 There is no trait for checkboxes; use the `Bool` type instead.
 
@@ -255,6 +263,8 @@ It also takes a wide range of named arguments. Some control form behavior:
 
 * `action` sets the `action` attribute of the form (where it submits to); by default
   it is not set, so the form submits back to the current URL
+* `method` sets the HTTP method for submitting the form. It defaults to `post`, and
+  may be set to `get` or `post`
 * `novalidate` sets the `novalidate` attribute of the form, disabling the browser's
   built-in client side validation
 

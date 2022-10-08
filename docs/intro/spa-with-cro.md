@@ -70,7 +70,7 @@ $ curl http://localhost:20000
 ```
 
 I like to regularly commit as I work. So, I'll create a git repository, add
-a `.gitignore` file (to ignore Perl 6 precompilation output), and commit the
+a `.gitignore` file (to ignore Raku precompilation output), and commit the
 stub.
 
 ```
@@ -128,7 +128,7 @@ Next up, we'll get set up for the frontend. First of all, we'll stub a
 JavaScript dependencies. We use `npm init` and provide some answers:
 
 ```
-$ npm init .
+$ npm init
 This utility will walk you through creating a package.json file.
 It only covers the most common items, and tries to guess sensible defaults.
 
@@ -192,7 +192,8 @@ module.exports = {
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'static/js')
-    }
+    },
+    mode: 'development'
 };
 ```
 
@@ -420,7 +421,7 @@ given $tipsy.latest-tips.head(2).list -> @tips {
 }
 
 react {
-    whenever $tipsy.latest-tips.skip(2).head(1) {
+    whenever $tipsy.latest-tips.skip(2).head {
         is .tip, 'Try the vanilla stout for sure',
             'Get new tips emitted live';
     }
@@ -502,7 +503,7 @@ an XML-like syntax embedded in JavaScript. First we need to set up compiling
 that. Here are the new development dependencies:
 
 ```
-$ npm install --save-dev babel-loader babel-core babel-preset-es2015 babel-preset-react
+$ npm install --save-dev babel-loader core-js @babel/core@^7 @babel/preset-react
 ```
 
 Next, we need to create a `.babelrc` file, saying to use this react preset
@@ -511,7 +512,7 @@ JavaScript). It should simply contain:
 
 ```
 {
-  "presets" : ["es2015","react"]
+  "presets" : ["@babel/preset-react"]
 }
 ```
 
@@ -527,6 +528,7 @@ module.exports = {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'static/js')
     },
+    mode: 'development',
     module : {
         rules : [
             {
@@ -667,7 +669,7 @@ as network I/O). They are pure calculation. Our state will, for now, be very
 simple: just the content of the text box.
 
 Writing reducers is much more convenient when we have the upcoming spread
-operator in JavaScript; it's a prefix `...`, and works much like Perl 6's
+operator in JavaScript; it's a prefix `...`, and works much like Raku's
 prefix `|` operator for flattening. Since we already have a build toolchain,
 we can add it by installing another syntax transform:
 
@@ -1506,7 +1508,7 @@ $ git commit -m "Add agree/disagree feature" .
 
 In this tutorial we've gone from zero to reactive single page application. The
 frontend is written in modern ES6 using React and Redux. The backend is in
-Perl 6, using Cro. They communicate using both HTTP and web sockets. And both
+Raku, using Cro. They communicate using both HTTP and web sockets. And both
 declare their dependencies, so getting started for a new developer is just a
 case of:
 

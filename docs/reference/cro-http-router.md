@@ -7,7 +7,7 @@ in turn produce responses.
 
 ## URI segment matching
 
-The router uses Perl 6 signatures to match URLs and extract segments from them.
+The router uses Raku signatures to match URLs and extract segments from them.
 A set of routes are placed in a `route` block. The empty signature corresponds
 to `/`.
 
@@ -197,7 +197,7 @@ the result will be a HTTP 405 Method Not Allowed response.
 Named parameters in a route signature can be used to unpack and constrain the
 route match on additional aspects of the request. By default, values are taken
 from the query string, however traits can be applied to have them use data
-from other sources. Note that named parameters in Perl 6 are optional by default;
+from other sources. Note that named parameters in Raku are optional by default;
 if the query string parameter is required, then it should be marked as such.
 
 ```
@@ -382,7 +382,7 @@ put -> 'product', $id, 'image', $filename {
 }
 ```
 
-The block signature may use Perl 6 signatures in order to unpack the data that
+The block signature may use Raku signatures in order to unpack the data that
 was submitted. This is useful to, for example, unpack a JSON object:
 
 ```
@@ -604,7 +604,7 @@ arguments on to `content` after setting the status code. They are:
 * `forbidden`, for HTTP 403 Forbidden
 * `conflict`, for HTTP 409 Conflict
 
-If the request handler evaluates to `...` (that is, the Perl 6 syntax for stub
+If the request handler evaluates to `...` (that is, the Raku syntax for stub
 code), then a HTTP 510 Not Implemented response will be produced. If evaluating
 the route handler produces an exception, then the exception will be passed on.
 It will then typically be handled by the response serializer, which will produce
@@ -613,13 +613,13 @@ inserted to change what happens (for example, serving custom error pages).
 
 All other response codes are produced by explicitly setting `response.status`.
 
-## Serving static content
+## Serving static content from files
 
-The `static` routine is used to easily serve static content. It sets the
+The `static` routine is used to serve static content from a file. It sets the
 content of the request body to the content of the file being served, and the
 content type according to the extension of the file.
 
-In its simplest form, `static` simply serves an individual file:
+In its simplest form, `static` serves an individual file:
 
     get -> {
         static 'www/index.html';
@@ -646,7 +646,7 @@ served instead.
 The default set of file extension to MIME type mappings are derived from the
 list provided with the Apache web server. If no mapping is found, the content
 type will be set to `application/octet-stream`. To provide extras or to
-override the default, pass a hash of mappins to the `mime-types` named
+override the default, pass a hash of mappings to the `mime-types` named
 argument.
 
     get -> 'downloads', *@path {
@@ -663,6 +663,31 @@ request to `content/foo/` would serve `downloads/foo/index.html`), pass the
         static 'static-data/content', @path,
             :indexes<index.html index.htm>;
     }
+
+## Serving static content from resources
+
+Those who wish for their web applications to be installable using standard
+Raku installation tools, such as `zef`, should serve static content from the
+distribution resources instead of files. First, the `resources-from` routine
+must be used to associate the correct `%?RESOURCES` with the `route` block.
+Then, the `resource` routine can be used to serve resources.
+
+    my $app = route {
+        resources-from %?RESOURCES;
+
+        get -> {
+            # An exact resource
+            resource 'static/index.html';
+        }
+
+        get -> 'css', *@path {
+            # Concatenate the css prefix with the other path parts to form
+            # the resource path
+            resource 'css', @path;
+        }
+    }
+
+The `mime-types` and `indexes` options work as for `static`.
 
 ## Adding custom response body serializers
 
@@ -910,15 +935,31 @@ impact the return values of `path` and `path-segments`. The `original-target`,
 `original-path`, and `original-path-segments` methods return the original
 paths.
 
+Since a `route { }` block makes an object that does `Cro::Transform`, it is
+possible to use it with `delegate` too. This has slightly different semantics
+from `include`: the request will first be routed based upon the prefix by the
+`delegate`, and then the `route` block that is delegated to will processs the
+request using the adjusted target:
+
+```
+my $app = route {
+    delegate <first *> => route {
+        get -> 'second' {
+            note request.target;            # /second
+            note request.original-target;   # /first/second
+        }
+    }
+}
+```
+
+The main reason to use `delegate` over `include` for composing `route` blocks
+is when wishing to only have authorization or session middleware act on some
+URLs.
+
 Body parsers declared in the `route` block will be prefixed to the request's
 body parser selector before it is passed to the transform. Any body
 serializers declared in the `route` block will be prefixed to the body
 serializer selector of the response produced by the transform.
-
-Since a `route { }` block makes an object that does `Cro::Transform`, it is
-possible to use it with `delegate` too. This has slightly different semantics
-from `include`, and due to the need to do two route dispatches will perform a
-bit worse.
 
 ## Applying middleware in a route block
 
@@ -931,7 +972,7 @@ In Cro, middleware is a component in the request processing pipeline. It may
 be installed at the server level (see `Cro::HTTP::Server` for more), but also
 per `route` block using the `before`, `before-matched`, `after`, and
 `after-matched` functions. For readers new to middleware in Cro, the
-[HTTP middleware guide](docs/reference/cro-http-middleware) gives an overview
+[HTTP middleware guide](/docs/reference/cro-http-middleware) gives an overview
 of what middleware is, and the trade-offs between the different ways of
 writing and using HTTP middleware in Cro.
 
@@ -1058,3 +1099,38 @@ When `include` is used, the `before-matched` middleware of the including
 `include`, and the `after-matched` middleware of the including `route` block
 will be applied after the target of the include. Effectively, the middleware
 of the including route block wraps around those of the included.
+
+## Wrapping route handlers
+
+The `around` function can be used at `route`-block level to wrap all handlers
+within that `route` block. This could be used to provide uniform exception
+handling across a set of request handlers.
+
+```
+my $application = route {
+    around -> &handler {
+        # Invoke the route handler
+        handler();
+        CATCH {
+            # If any handler produces this exception...
+            when Some::Domain::Exception::UpdatingOldVersion {
+                # ...return a HTTP 409 Conflict response.
+                conflict;
+            }
+        }
+    }
+}
+```
+
+Both `request` and `response` are available inside of an `around` handler. At
+the point it is called, the handler to call and its arguments will already
+have been determined. The most you can do is choose not to invoke the handler.
+Unlike with `after-matched` middleware, the default mapping of unhandled
+exceptions to a `500` status code will not have been performed yet, making it
+a good place to factor out mapping of domain exceptions into HTTP errors.
+
+The first `around` call will be the innermost wrapping. Wrappings from an
+`include`d `route` block will be considered inner to those in the `route`
+block doing the `include`. If one `around` handler throws an exception,
+another handler outer to it may catch it. Unlike with middleware, `around`
+handlers are not considered pipeline components.

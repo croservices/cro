@@ -24,8 +24,8 @@ as well as covering some more advanced topics:
 ## Getting Help
 
 * Post your question on [Stack Overflow](https://stackoverflow.com/) (be sure
-  to tag it `perl6` and `cro`)
-* Visit the `#cro` IRC channel on freenode
+  to tag it `raku` and `cro`)
+* Visit the `#cro` IRC channel on [irc.libera.chat](https://libera.chat/)
 * Get [commercial support and training](/training-support)
 
 ## Reference
@@ -35,6 +35,7 @@ The full details, organized by module:
 ### Cro::Core
 
 * [Cro::MediaType](docs/reference/cro-mediatype)
+* [Cro::UnhandledErrorReporter](docs/reference/cro-unhandlederrorreporter)
 * [Cro::Uri](docs/reference/cro-uri)
 
 ### Cro::TLS
@@ -54,6 +55,8 @@ Server side:
 * [Cro::HTTP::Server](docs/reference/cro-http-server)
 * [Cro::HTTP::Middleware](docs/reference/cro-http-middleware)
 * [HTTP Sessions and Authentication](docs/http-auth-and-sessions)
+* [Cro::HTTP::ReverseProxy](docs/reference/cro-http-reverseproxy)
+* [Cro::HTTP::Log::File](docs/reference/cro-http-log-file)
 
 Requests, responses, and related types:
 

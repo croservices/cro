@@ -63,7 +63,7 @@ from this example to write a `Dockerfile`.
 
 ```
 # Depend on the cro-http-websocket base image; pick a version
-FROM croservices/cro-http-websocket:0.7.3
+FROM croservices/cro-http-websocket:0.8.3
 
 # Copy the application so it lives under /app
 RUN mkdir /app
@@ -74,7 +74,7 @@ WORKDIR /app
 # the entrypoint. This in turn loads and pre-compiles the application, making
 # sure any compilation errors will make the container build fail, and allowing
 # for faster container startup.
-RUN zef install --deps-only . && perl6 -c -Ilib service.p6
+RUN zef install --deps-only . && raku -c -Ilib service.p6
 
 # Be sure to update the environment variable names to match those in the
 # entrypoint script!
@@ -84,7 +84,7 @@ ENV MY_SERVICE_PORT="10000" MY_SERVICE_HOST="0.0.0.0"
 EXPOSE 10000
 
 # Run the service when the container is run
-CMD perl6 -Ilib service.p6
+CMD raku -Ilib service.p6
 ```
 
 Also consider having a `.dockerignore` file containing:
