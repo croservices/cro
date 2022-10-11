@@ -373,3 +373,29 @@ ways to achieve this.
 
 Note that the `HTML` function does not promise completely foolproof
 XSS protection. **Use both of these functions very carefully.**
+
+## Comments
+
+While standard HTML comment syntax may be used inside of templates, they will
+be passed straight along into the rendered output. An alternative syntax is
+available for template comments, which are discarded at the point the template
+is being parsed, and so never make it into the output.
+
+```
+<p>This is rendered!</p>
+<!-- And this comment goes to the client too -->
+<#>But this is not</#>
+```
+
+Template comments may span multiple lines and contain tags (both HTML ones and
+template syntax):
+
+```
+<h2>Offers</h2>
+<p>All of our offers are currently unavailable!</p>
+<#>
+<ul>
+  <@offers li><$_></@>
+</ul>
+</#>
+```
