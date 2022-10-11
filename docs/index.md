@@ -89,8 +89,12 @@ Pipeline components:
 
 ### Cro::WebApp
 
+* Cro::WebApp::Template
+    * [Using templates to produce responses](docs/reference/cro-webapp-template)
+    * [Template language syntax](docs/reference/cro-webapp-template-syntax)
+    * [Template modules](docs/reference/cro-webapp-template-modules)
+    * [Template parts](docs/reference/cro-webapp-template-parts)
 * [Cro::WebApp::Form](docs/reference/cro-webapp-form)
-* [Cro::WebApp::Template](docs/reference/cro-webapp-template)
 
 ### Cro::OpenAPI::RoutesFromDefinition
 
