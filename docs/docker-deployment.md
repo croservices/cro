@@ -74,7 +74,7 @@ WORKDIR /app
 # the entrypoint. This in turn loads and pre-compiles the application, making
 # sure any compilation errors will make the container build fail, and allowing
 # for faster container startup.
-RUN zef install --deps-only . && raku -c -Ilib service.p6
+RUN zef install --deps-only . && raku -c -Ilib service.raku
 
 # Be sure to update the environment variable names to match those in the
 # entrypoint script!
@@ -84,7 +84,7 @@ ENV MY_SERVICE_PORT="10000" MY_SERVICE_HOST="0.0.0.0"
 EXPOSE 10000
 
 # Run the service when the container is run
-CMD raku -Ilib service.p6
+CMD raku -Ilib service.raku
 ```
 
 Also consider having a `.dockerignore` file containing:

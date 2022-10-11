@@ -3,7 +3,7 @@
 Setting up a simple Cro service serving a handful of routes is pretty easy:
 stick them into a `route` block, pass it to the HTTP server, and that's it.
 The `cro stub` HTTP templates place that `route` block in a module, leaving
-the server setup to be done in a `service.p6` script. This means that unit
+the server setup to be done in a `service.raku` script. This means that unit
 tests can `use` the module with the `route` block, and tests can be written
 using `Cro::HTTP::Test`.
 

@@ -3,12 +3,14 @@
 Templates are typically used to render some data into HTML. The template engine
 is designed with HTML in mind, and takes care to escape data as it should be
 escaped in HTML. Templates are compiled, typically on first use, for efficient
-production of data. The template language includes conditionals, iteration,
-subroutines, modules, and a number of other features.
+rendering. The template language includes conditionals, iteration, subroutines,
+modules, and a number of other features.
 
-Templates are typically stored either as files and reference by path, or as
+Templates are typically stored either as files and referenced by path, or as
 resources (the latter being useful if the web application should be possible
 to install as a Raku distribution, for example using `zef`).
+
+This document covers the 
 
 ## Basic usage from a Cro route block
 

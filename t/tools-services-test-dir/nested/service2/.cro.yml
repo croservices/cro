@@ -1,7 +1,7 @@
 cro: 1
 id: service2
 name: Service 2
-entrypoint: service.p6
+entrypoint: service.raku
 endpoints:
     - id: http
       name: HTTP (Insecure)

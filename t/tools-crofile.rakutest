@@ -7,11 +7,11 @@ use Test;
         cro: 1
         id: flashcard-backend
         name: Flashcards Backend
-        entrypoint: service.p6
+        entrypoint: service.raku
         YAML
     is $parsed.id, 'flashcard-backend', 'Correct id';
     is $parsed.name, 'Flashcards Backend', 'Correct name';
-    is $parsed.entrypoint, 'service.p6', 'Correct entrypoint';
+    is $parsed.entrypoint, 'service.raku', 'Correct entrypoint';
 }
 
 {
@@ -19,17 +19,17 @@ use Test;
     lives-ok { $parsed = Cro::Tools::CroFile.parse: q:to/YAML/ }, 'File without name parses';
         cro: 1
         id: flashcard-backend
-        entrypoint: service.p6
+        entrypoint: service.raku
         YAML
     is $parsed.id, 'flashcard-backend', 'Correct id';
     is $parsed.name, 'flashcard-backend', 'Correct name (defaulted to id)';
-    is $parsed.entrypoint, 'service.p6', 'Correct entrypoint';
+    is $parsed.entrypoint, 'service.raku', 'Correct entrypoint';
 }
 
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     name: Flashcards Backend
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     YAML
     X::Cro::Tools::CroFile::Missing, field => 'cro',
    'Cannot cope with missing cro field';
@@ -37,7 +37,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     name: Flashcards Backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     YAML
     X::Cro::Tools::CroFile::Missing, field => 'id',
    'Cannot cope with missing id field';
@@ -54,7 +54,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
     name: Flashcards Backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     wat: courgette
     YAML
     X::Cro::Tools::CroFile::Unexpected, field => 'wat',
@@ -64,7 +64,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 2
     id: flashcard-backend
     name: Flashcards Backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     YAML
     X::Cro::Tools::CroFile::Version, got => '2',
    'Unrecognized version is an error';
@@ -74,7 +74,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     lives-ok { $parsed = Cro::Tools::CroFile.parse: q:to/YAML/ }, 'Endpoints parse';
         cro: 1
         id: flashcard-backend
-        entrypoint: service.p6
+        entrypoint: service.raku
         endpoints:
         - id: http
           name: HTTP (Insecure)
@@ -106,7 +106,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     endpoints:
     - protocol: http
       host-env: FLASHCARD_BACKEND_HTTP_HOST
@@ -118,7 +118,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     endpoints:
     - id: http
       host-env: FLASHCARD_BACKEND_HTTP_HOST
@@ -130,7 +130,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     endpoints:
     - id: http
       protocol: http
@@ -142,7 +142,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     endpoints:
     - id: http
       protocol: http
@@ -154,7 +154,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     endpoints:
     - id: http
       protocol: http
@@ -170,7 +170,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     lives-ok { $parsed = Cro::Tools::CroFile.parse: q:to/YAML/ }, 'Links parse';
         cro: 1
         id: flashcard-backend
-        entrypoint: service.p6
+        entrypoint: service.raku
         links:
           - service: flashcard-backend
             endpoint: https
@@ -199,7 +199,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     links:
       - endpoint: https
         host-env: FLASHCARD_BACKEND_HTTPS_HOST
@@ -211,7 +211,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     links:
       - service: flashcard-backend
         host-env: FLASHCARD_BACKEND_HTTPS_HOST
@@ -223,7 +223,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     links:
       - service: flashcard-backend
         endpoint: https
@@ -235,7 +235,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     links:
       - service: flashcard-backend
         endpoint: https
@@ -247,7 +247,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     links:
       - service: flashcard-backend
         endpoint: https
@@ -263,7 +263,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     lives-ok { $parsed = Cro::Tools::CroFile.parse: q:to/YAML/ }, 'Environment vars parse';
         cro: 1
         id: flashcard-backend
-        entrypoint: service.p6
+        entrypoint: service.raku
         env:
           - name: FLASH_DATABASE
             value: test-database.internal:6555
@@ -284,7 +284,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     env:
       - value: test-database.internal:6555
     YAML
@@ -294,7 +294,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     env:
       - name: FLASH_DATABASE
     YAML
@@ -304,7 +304,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
 throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     cro: 1
     id: flashcard-backend
-    entrypoint: service.p6
+    entrypoint: service.raku
     env:
       - name: FLASH_DATABASE
         value: test-database.internal:6555
@@ -317,7 +317,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     my $try-serialize = Cro::Tools::CroFile.new(
         id => 'flashcard-backend',
         name => 'Flashcards Backend',
-        entrypoint => 'service.p6',
+        entrypoint => 'service.raku',
         endpoints => [
             Cro::Tools::CroFile::Endpoint.new(
                 id => 'http',
@@ -351,7 +351,7 @@ throws-like { Cro::Tools::CroFile.parse: q:to/YAML/ },
     lives-ok { $parsed = Cro::Tools::CroFile.parse($yaml) }, 'Could parse output';
     is $parsed.id, 'flashcard-backend', 'Correct id (roundtrip)';
     is $parsed.name, 'Flashcards Backend', 'Correct name (roundtrip)';
-    is $parsed.entrypoint, 'service.p6', 'Correct entrypoint (roundtrip)';
+    is $parsed.entrypoint, 'service.raku', 'Correct entrypoint (roundtrip)';
     is $parsed.endpoints.elems, 1, 'Roundtripped 1 endpoint';
     given $parsed.endpoints[0] {
         is .id, 'http', 'Correct endpoint id (roundtrip)';

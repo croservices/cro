@@ -75,7 +75,7 @@ cro run
 ```
 
 You can change the service by editing files in the `hello/` subdirectory. The
-HTTP routes, for example, are in `hello/lib/Routes.pm6`.
+HTTP routes, for example, are in `hello/lib/Routes.rakumod`.
 
 ## What next?
 

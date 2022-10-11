@@ -30,7 +30,7 @@ role Cro::Tools::Template::Common {
     }
 
     method generate-common($where, $id, $name, %options, $generated-links, @links) {
-        self.write-entrypoint($where.add('service.p6'), $id, %options, $generated-links);
+        self.write-entrypoint($where.add('service.raku'), $id, %options, $generated-links);
         self.write-meta($where.add('META6.json'), $name, %options);
         self.write-readme($where.add('README.md'), $name, %options);
         self.write-cro-file($where.add('.cro.yml'), $id, $name, %options, @links);
@@ -107,7 +107,7 @@ role Cro::Tools::Template::Common {
     method cro-file-object($id, $name, %options, @links) {
         my $id-uc = self.env-name($id);
         my @endpoints = self.cro-file-endpoints($id-uc, %options);
-        my $entrypoint = 'service.p6';
+        my $entrypoint = 'service.raku';
         Cro::Tools::CroFile.new(:$id, :$name, :$entrypoint, :@endpoints, :@links)
     }
 
@@ -134,7 +134,7 @@ role Cro::Tools::Template::Common {
     }
 
     method docker-file-build-commands() {
-        'zef install --deps-only . && perl6 -c -Ilib service.p6'
+        'zef install --deps-only . && perl6 -c -Ilib service.raku'
     }
 
     method write-docker-file($file, $id, %options) {
@@ -168,7 +168,7 @@ role Cro::Tools::Template::Common {
                             ports => 10000
                         ),
                         Docker::File::CmdShell.new(
-                            command => 'perl6 -Ilib service.p6'
+                            command => 'perl6 -Ilib service.raku'
                         )
                     ]
                 )

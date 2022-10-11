@@ -13,11 +13,11 @@ sub files($root, $ext) {
     @result;
 }
 
-my @code = files($*CWD.IO.child('lib'), '.pm6');
+my @code = files($*CWD.IO.child('lib'), '.rakumod');
 my $docs = set files($*CWD.IO.child('docs/reference'), 'md');
 
 for @code -> $fn {
-    ok $docs{$fn.Str.lc.subst('.pm6', '.md').subst('/', '-', :g)}, "$fn is documented";
+    ok $docs{$fn.Str.lc.subst('.rakumod', '.md').subst('/', '-', :g)}, "$fn is documented";
 }
 
 done-testing;

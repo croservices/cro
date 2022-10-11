@@ -50,7 +50,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
                     %options, $generated-links, @links) {
         my %dir = self.make-directories($where);
         self.write-fake-tls($where) if %options<secure>;
-        self.write-app-module(%dir<lib>.add('Routes.pm6'), $name, %options, $generated-links);
+        self.write-app-module(%dir<lib>.add('Routes.rakumod'), $name, %options, $generated-links);
         self.generate-common($where, $id, $name, %options, $generated-links, @links);
     }
 
@@ -207,7 +207,7 @@ class Cro::Tools::Template::HTTPService does Cro::Tools::Template does Cro::Tool
     }
 
     method meta6-provides(%options) {
-        'Routes' => 'lib/Routes.pm6',
+        'Routes' => 'lib/Routes.rakumod',
     }
 
     method docker-base-image(%options) {

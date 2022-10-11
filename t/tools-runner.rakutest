@@ -68,7 +68,7 @@ with-test-dir -> $test-dir {
     nok $log.on-stderr, 'Was not on STDERR';
     ok $log.line ~~ /200/, 'Got log line mentioning status code';
 
-    my $service-file = "$test-dir/service1/service.p6";
+    my $service-file = "$test-dir/service1/service.raku";
     spurt $service-file, slurp($service-file).subst("OK", "UPDATED");
     my $restarted = $start-restart-messages.receive;
     isa-ok $restarted, Cro::Tools::Runner::Restarted,

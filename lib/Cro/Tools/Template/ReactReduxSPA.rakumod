@@ -281,7 +281,7 @@ class Cro::Tools::Template::ReactReduxSPA is Cro::Tools::Template::HTTPService {
             && zef install --deps-only . \
             && npm install . \
             && npm run build \
-            && perl6 -c -Ilib service.p6
+            && perl6 -c -Ilib service.raku
         DOCKER
     }
 }

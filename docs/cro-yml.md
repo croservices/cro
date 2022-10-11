@@ -37,7 +37,7 @@ For example:
     cro: 1
     id: flashcard-backend
     name: Flashcards Backend
-    entrypoint: service.p6
+    entrypoint: service.raku
 
 ## Endpoints
 

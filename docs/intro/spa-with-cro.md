@@ -84,8 +84,8 @@ jnthn@lviv:~/dev/cro/tipsy$ git commit -m "Stub tipsy backend"
  create mode 100644 .cro.yml
  create mode 100644 .gitignore
  create mode 100644 META6.json
- create mode 100644 lib/Routes.pm6
- create mode 100644 service.p6
+ create mode 100644 lib/Routes.rakumod
+ create mode 100644 service.raku
 ```
 
 ## Serving a static page
@@ -110,7 +110,7 @@ In there, we'll put an `index.html` with the following context:
 </html>
 ```
 
-Then, we'll edit `lib/Routes.pm6` to get the `/` route to serve this file:
+Then, we'll edit `lib/Routes.rakumod` to get the `/` route to serve this file:
 
 ```
 get -> {
@@ -252,7 +252,7 @@ add:
 <script src="js/bundle.js"></script>
 ```
 
-Finally, we need to serve the JavaScript. Edit `lib/Routes.pm6` and add a new
+Finally, we need to serve the JavaScript. Edit `lib/Routes.rakumod` and add a new
 route like this (which will serve anything under `static/js`, preparing us
 for multiple bundles in the future should we need that):
 
@@ -310,7 +310,7 @@ it's missing:
 $ zef install --deps-only .
 ```
 
-We'll put our business logic in a separate module, `lib/Tipsy.pm6`, and write
+We'll put our business logic in a separate module, `lib/Tipsy.rakumod`, and write
 some tests for it in `t/tipsy.t`. First, let's stub out the API for our
 business/domain logic:
 
@@ -343,8 +343,8 @@ the top 50 tips every time the rankings change. Don't try to remember all of
 that, we'll come back to them one at a time.
 
 Next up is to make this available to our routes. We could make the instance in
-`Routes.pm6`, but that will make it hard to test our routes in isolation of
-the business logic. Instead, we'll make the sub in `Routes.pm6` take an instance
+`Routes.rakumod`, but that will make it hard to test our routes in isolation of
+the business logic. Instead, we'll make the sub in `Routes.rakumod` take an instance
 of the business logic object as a parameter:
 
 ```
@@ -361,12 +361,12 @@ sub routes(Tipsy $tipsy) is export {
 }
 ```
 
-And then set it up in the `service.p6` entry point, by:
+And then set it up in the `service.raku` entry point, by:
 
 1. Using the module
 2. Making an instance of it
 
-The `service.p6` file will end up looking like this:
+The `service.raku` file will end up looking like this:
 
 ```
 use Cro::HTTP::Log::File;
@@ -489,7 +489,7 @@ $ git add .
 $ git commit -m "Implement first part of business logic"
 [master 6e352c6] Implement first part of business logic
  6 files changed, 70 insertions(+), 4 deletions(-)
- create mode 100644 lib/Tipsy.pm6
+ create mode 100644 lib/Tipsy.rakumod
  create mode 100644 t/tipsy.t
 ```
 
@@ -872,7 +872,7 @@ We'll need to do two things:
 * Write a POST handler in the Cro backend
 * Find a way to have our Redux action result in a POST
 
-First for the Cro part. In `lib/Routes.pm6` we add the following route
+First for the Cro part. In `lib/Routes.rakumod` we add the following route
 implementation:
 
 ```
@@ -1078,7 +1078,7 @@ var App = props => (
 `App` is updated simply to pass the tips to the `LatestTips` component. And
 with that, the client-side additions are done.
 
-Now for the backend, which is just a single addition in `Routes.pm6`. We clear
+Now for the backend, which is just a single addition in `Routes.rakumod`. We clear
 out the websocket stub that was generated for us, and replace it with code to
 take the `latest-tips` Supply from the `Tipsy` business logic object, turn the
 events into appropriate JSON, and emit them:
@@ -1313,7 +1313,7 @@ method top-tips(--> Supply) {
 ```
 
 With that done, it's time to expose this functionality to the outside world by
-updating `lib/Routes.pm6`. Its job is to map the business logic onto HTTP. The
+updating `lib/Routes.rakumod`. Its job is to map the business logic onto HTTP. The
 only thing we need to watch out for is to turn the "no such ID" exceptions
 into the appropriate HTTP response, which is a 404 Not Found. Otherwise, we'd
 send back 500 Internal Server Error, which is wrong because it's not the

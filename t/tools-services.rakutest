@@ -67,15 +67,15 @@ with-test-dir -> IO() $dir {
 
         nok $s1-meta-change.poll, 'No initial metadata change reported';
         spurt "$dir/nested/service2/.cro.yml",
-            slurp("$dir/nested/service2/.cro.yml").subst('service.p6', 'start.p6');
+            slurp("$dir/nested/service2/.cro.yml").subst('service.raku', 'start.raku');
         ok $s1-meta-change.receive, 'Metadata change received';
-        is $first-found.cro-file.entrypoint, 'start.p6',
+        is $first-found.cro-file.entrypoint, 'start.raku',
             'Cro file is reloaded';
 
         nok $s1-change.poll, 'No initial source change reported';
         mkdir "$dir/nested/service2/lib";
-        spurt "$dir/nested/service2/lib/Foo.pm6", "say 42";
-        is $s1-change.receive, $dir.child("nested/service2/lib/Foo.pm6").absolute,
+        spurt "$dir/nested/service2/lib/Foo.rakumod", "say 42";
+        is $s1-change.receive, $dir.child("nested/service2/lib/Foo.rakumod").absolute,
             'Got notified of changed service source file';
 
         nok $s2-meta-change.poll,
