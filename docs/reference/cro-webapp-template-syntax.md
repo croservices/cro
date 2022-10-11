@@ -263,6 +263,45 @@ The following constructs are allowed:
 Those wishing for more are encouraged to consider writing their logic outside of
 the template.
 
+An `else`-clause can be expressed using `<!>...</!>`:
+
+```
+<?$user.logged-in>
+  Logged in as <$user.name>
+</?>
+<!>
+  <a href="/lgoin">Log in</a>
+</!>
+```
+
+While `<!?cond>...</?>` can be used for an `elsif` clause:
+
+```
+<?{.x > 5}>
+  over five
+</?>
+<!?{.x > 0}>
+  over zero
+</?>
+<!>
+  zero or less
+</!>
+```
+
+These all work with the structured tag forms:
+
+```
+<?{.x > 5} div>
+  over five
+</?>
+<!?{.x > 0} p>
+  over zero
+</?>
+<! span>
+  zero or less
+</!>
+```
+
 If the opening and closing condition tags are the only thing on the line, then
 no output will be generated for those lines, making the output more pleasant.
 
