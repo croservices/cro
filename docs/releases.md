@@ -1,5 +1,86 @@
 # Cro Release History
 
+## 0.8.8
+
+This release brings numerous bug fixes and improvements. There are no intended or
+known breaking changes.
+
+The improvements center around `Cro::Webapp` templates, which gain a structured
+tag syntax that leads to shorter and less error-prone template code. An `elsif`/`else`
+syntax and a template comment syntax is also available. Live reload of templates
+now also properly accounts for dependencies. Documentation of the template engine
+is also divided into a few articles for easier navigation.
+
+The fixes span numerous areas of Cro, and include corrected IRI to URI conversion,
+more liberal media type parsing, fixes to HTTP/2.0 semantics, and corrected router
+handling of slurpy route path arguments with `where` clauses. Template `<:use ...>`
+now properly respects `route`-scoped template locations and can locate templates
+from resources.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Fix parsing of media types of the form `application/x-amz-json-1.1`
+* Add a `Str` method to the `Cro::Iri` class
+* Fix bugs in IRI to URI conversion
+
+The following changes were made to the `Cro::TLS` distribution:
+
+* Depend on a newer, more stable version of IO::Socket::Async::SSL
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Add support for parsing and extracting cookie extensions
+* Support `route` block plugins in `before`/`after` blocks (meaning that `Cro::WebApp`'s
+  `template` sub can now be used in an `after` block to produce an error page
+  response, for example)
+* Include the request method and URI in `Cro::HTTP::Client` error messages
+* Add a way to get a route handler resource resolver via `route-resource-resolver`
+  subroutine, for the benefit of router plugins that wish to work with resources
+* Implement HTTP/2.0 remote window handling
+* Provide a way to pass arbitrary TLS configuration options down to the
+  underlying TLS module in `Cro::HTTP::Client`
+* Fix cleanup of timed out connections and make timeout handling more robust
+* Fix a bug where using `where` clause on a slurpy route parameter could cause
+  an exception
+* Fix a bug where the HTTP/2 `END_OF_STREAM` flag was sent twice
+* Fix a bug where an incorrect MIME type was set when using the `resource` subroutine
+* Add support for the `application/wasm` MIME type
+* Fix a bug where percent encoding for a request body did not have enough digits,
+  resulting in a protocol violation
+* Depend on a newer HTTP::HPACK version which supports more recent Rakudo versions
+* Clean up the cookie handling code
+
+The following changes were made to the `Cro::WebApp` distribution:
+
+* Implement conditional structural tags, so that `<?.foo><div>bar</div></?>` can
+  instead be written `<?.foo div>bar</?>`
+* Implement iteration structural tags, so `<@items><li><$_></li></@>` can instead
+  be written `<@items li><$_></@>`
+* Provide an `elsif` and `else` syntax in templates (it takes the form
+  `<?foo>...</?> <!?bar>...</?> <!>baz</!>`, and works with structured tag
+  syntax also
+* Provide a syntax for template-level comments (no output send to the client)
+  with the delimiters `<#>...</#>`
+* Make template live reload account for a template's dependencies
+* Ensure that `template-location`s of all kinds are properly respected when
+  resolving template `<:use ...>` directives
+* Handle the template prelude entirely in the template repository base role,
+  to avoid custom template repositories needing to handle it
+* Fix subclassing semantics for forms
+
+The following changes were made to the `Cro` distribution:
+
+* Restructure the template documentation so that the template language gets its
+  own page, along with dedicated pages for modules and parts
+* Document new template features (structured tags, `elsif/else` forms, and comments)
+* Document `Cro::HTTP::Log::File`
+* Have `cro stub` produce output using modern Raku file extensions
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington from
+[Edument](http://cro.services/training-support), together with the following community
+members: Brian Duggan, dakkar, Juan Julián Merelo Guervós, Patrick Böker, Sylvain
+Colinet, Xliff.
+
 ## 0.8.7
 
 This release brings a number of bug fixes and new features, the most significant being
