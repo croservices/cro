@@ -1,5 +1,39 @@
 # Cro Release History
 
+## 0.8.9
+
+This is a small bugfix release. Various tests involve use of TLS, which uses
+test certificates bundled with the modules. Unfortunately, their lifetime is
+bounded to a year, and it  was forgotten to update them in the previous
+release, leading to module tests failing. Due to the Raku norm of running
+module tests at installation time, this caused inconvenience, which this
+earlier-than-planned release resolves. To avoid a repeat of this, all tests
+that depend on TLS are now moved under the `xt` directory rather than `t`, 
+meaning they are not run at module installation time. Along with this are
+a couple of further small bugfixes.
+
+The following changes were made to the `Cro::Core` distribution:
+
+* Fix parsing of media types with '.' in them
+
+The following changes were made to the `Cro::TLS` distribution:
+
+* Regenerate test certificates and move certificate-dependent tests under `xt/`
+
+The following changes were made to the `Cro::HTTP` distribution:
+
+* Regenerate test certificates and move certificate-dependent tests under `xt/`
+
+The following changes were made to the `Cro::WebSocket` distribution:
+
+* Regenerate test certificates and move certificate-dependent tests under `xt/`
+* Make WebSocket client header handling correctly accept headers specified using
+  Raku pairs
+
+This release was contributed to by Alexander Kiryuhin and Jonathan Worthington from
+[Edument](http://cro.services/training-support), together with the following community
+members: Patrick Böker.
+
 ## 0.8.8
 
 This release brings numerous bug fixes and improvements. There are no intended or
