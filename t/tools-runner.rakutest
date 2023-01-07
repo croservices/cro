@@ -6,7 +6,7 @@ use Shell::Command;
 use Test;
 
 sub with-test-dir(&test-case) {
-    my $temp-dir = "$*TMPDIR/cro-test-{(0..9).roll(40).join}";
+    my $temp-dir = $*TMPDIR.add("cro-test-{(0..9).roll(40).join}");
     mkdir $temp-dir;
     cp 't/tools-services-test-dir', $temp-dir, :r;
     LEAVE rm_rf $temp-dir;
