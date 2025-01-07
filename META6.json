@@ -2,6 +2,7 @@
   "name": "cro",
   "description": "Libraries and tools for building reactive services in Raku. This installs the cro command line and web tool, along with HTTP (including HTTPS and HTTP/2.0) and WebSocket support.",
   "version": "0.8.9",
+  "api": "0",
   "perl": "6.*",
   "authors": [
     "Jonathan Worthington <jnthn@jnthn.net>"
