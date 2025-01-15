@@ -1,6 +1,6 @@
 Revision history for cro
 
-{{NEXT}}
+0.8.10
     - Fix tests and CI.
     - Change dependency management to allow individual Cro modules to be
       updated individually.
